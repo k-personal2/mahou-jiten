@@ -140,7 +140,8 @@ export type ChainGroup = { el: Element | null; mark: string; label: string; line
 export const buildGroups = (game: string, fxList: string[], opts: { curId?: string; el?: string | null } = {}): ChainGroup[] => {
   const gm = MAGICS.filter((x) => x.game === game && fxList.includes(x.fx) && (!('el' in opts) || x.el === opts.el));
   const keys: string[] = [];
-  gm.forEach((x) => { const k = [x.fx, x.el, x.kind ?? ''].join('#'); if (!keys.includes(k)) keys.push(k); });
+  // join は null を空文字にするため、属性は String() で 'null' にしてからつなぐ
+  gm.forEach((x) => { const k = [x.fx, String(x.el), x.kind ?? ''].join('#'); if (!keys.includes(k)) keys.push(k); });
   const elOrder = EL.map((e) => e.id);
   const kindRank = (fx: string, kd: string) => { const o = Object.keys(fxById[fx]?.kinds ?? {}), i = o.indexOf(kd); return !kd ? -1 : i < 0 ? o.length : i; };
   keys.sort((a, b) => {
