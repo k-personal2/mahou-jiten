@@ -1,0 +1,93 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Chain from '../../../components/Chain.astro';
+import { GAMES, EL, MAGICS, SYSTEMS, buildGroups, elnOf, markStyle, systemUrl, chainOfMagic, type Game } from '../../../lib/dict';
+
+export function getStaticPaths() {
+  return GAMES.filter((g) => SYSTEMS[g.id]).map((g) => ({ params: { slug: g.slug }, props: { g } }));
+}
+const { g } = Astro.props as { g: Game };
+const S = SYSTEMS[g.id];
+const count = MAGICS.filter((m) => m.game === g.id).length;
+const SECS: [string, string[]][] = [
+  ['攻撃魔法', ['atk']], ['回復魔法', ['heal']], ['補助魔法', ['atkup', 'defup', 'spdup']], ['弱体魔法', ['atkdown', 'defdown', 'spddown']],
+  ['状態異常・即死', ['ailment', 'death']], ['治療・蘇生', ['cure', 'revive']], ['防御・移動・その他', ['barrier', 'field', 'misc']],
+];
+const sections = SECS.map(([title, fl]) => {
+  const groups = buildGroups(g.id, fl);
+  const n = groups.reduce((a, gp) => a + gp.lines.reduce((b, l) => b + l.items.length, 0), 0);
+  return { title, groups, n };
+}).filter((s) => s.groups.length);
+const elements = EL.filter((e) => MAGICS.some((m) => m.game === g.id && m.el === e.id)).map((e) => ({ e, local: elnOf(g.id, e.id) }));
+const otherGames = GAMES.filter((x) => x.id !== g.id && SYSTEMS[x.id] && MAGICS.some((m) => m.game === x.id)).map((x) => {
+  const c = MAGICS.find((m) => m.game === x.id && m.fx === 'atk' && m.el === 'fire') ?? MAGICS.find((m) => m.game === x.id && m.fx === 'atk') ?? MAGICS.find((m) => m.game === x.id);
+  return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
+});
+---
+<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span>{g.name}</span><span>›</span><span aria-current="page">魔法体系</span></nav>
+    <div class="sys-meta"><span class="lbl">呼び方：{g.sys} ・ 収録 {count}種</span><span class="url">{systemUrl(g.id)}</span></div>
+    <h1 class="sys-title">{g.name}の魔法体系</h1>
+    {g.basis && <p class="note" style="margin-top:8px">{g.basis}</p>}
+    {S.verdict && <div class="card verdict"><span class="lbl">収録の判断</span><p>{S.verdict}</p></div>}
+
+    <div class="two" style="margin-top:20px">
+      <div class="card box"><span class="lbl">概要</span><p class="prose prose-lg">{S.overview}</p></div>
+      <div class="card box">
+        <span class="lbl">命名のルール</span>
+        <ol class="rules">{S.rules.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
+        {S.growth && S.growth.length > 0 && (
+          <>
+            <span class="lbl" style="display:block;margin-top:20px">強化・派生のルール</span>
+            <ol class="rules">{S.growth.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
+          </>
+        )}
+      </div>
+    </div>
+
+    {S.categories && S.categories.length > 0 && (
+      <section class="sec">
+        <div class="sec-head"><h2 class="h2">{g.sys}の分類</h2></div>
+        <div class="cats">{S.categories.map((c) => <div class="card"><b>{c.name}</b><p>{c.desc}</p></div>)}</div>
+      </section>
+    )}
+
+    {elements.length > 0 && <section class="sec">
+      <div class="sec-head"><h2 class="h2">属性体系</h2><span class="note">作品内での属性の呼び名。押すと横断比較へ</span></div>
+      <div class="el-names">
+        {elements.map(({ e, local }) => (
+          <a href={`/element/${e.id}`}><span class="mark" style={markStyle(e, 28)}>{e.name}</span><span class="min">{local ?? e.name}</span>{local && <small>＝{e.name}</small>}</a>
+        ))}
+      </div>
+    </section>}
+
+    {sections.map((s) => (
+      <section class="sec">
+        <div class="sec-head"><h2 class="h2">{s.title}</h2><span class="note">{s.n}種</span></div>
+        <div class="card sys-table">
+          {s.groups.map((gp) => (
+            <div class="sys-row">
+              <div class="grp-head"><span class="mark" style={markStyle(gp.el, 24)}>{gp.mark}</span>{gp.label}</div>
+              <Chain lines={gp.lines} />
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="sec">
+      <div class="sec-head"><h2 class="h2">他の作品の魔法体系</h2></div>
+      <div class="og-grid">
+        {otherGames.map(({ x, sample }) => <a class="card og" href={systemUrl(x.id)}><b>{x.name}</b><span class="min">{sample}</span></a>)}
+      </div>
+    </section>
+    {S.src && S.src.length > 0 && (
+      <section class="sec">
+        <div class="sec-head"><h2 class="h2">出典</h2></div>
+        <ul class="src-list">{S.src.map((x) => <li><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
+      </section>
+    )}
+    <p class="disclaimer">※ 魔法名・分類・系統は攻略資料などで確認して掲載していますが、作品・版によって表記や仕様が異なる場合があります。</p>
+  </main>
+</Base>

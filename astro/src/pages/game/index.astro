@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro';
+import Chain from '../../components/Chain.astro';
+import { CATALOG, MAGICS, FX, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
+const ALL_FX = FX.map((f) => f.id);
+---
+<Base title="作品から探す｜RPG魔法の言い換え辞典" description="収録作品と、各作品での魔法の呼び方の一覧。" active="games" path="/game">
+  <main class="wrap page">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">作品から探す</span></nav>
+    <h1 class="sys-title" style="margin-top:18px">作品から探す</h1>
+    <p class="cmp-lead" style="font-size:16px;margin-top:10px">収録作品と、各作品での魔法の呼び方。行を開くと収録魔法を一覧できます。</p>
+
+    {CATALOG.map((cat) => (
+      <section class="g-cat">
+        <div class="sec-head"><h2 class="h2">{cat.name}</h2><span class="note">{cat.items.length}作品</span></div>
+        <div class="card glist">
+          <div class="g-row g-head"><span>作品</span><span>魔法の呼び方</span><span style="text-align:right">収録</span><span>URL</span><span></span></div>
+          {cat.items.map((it) => {
+            const g = it.game ? gameById[it.game] : null;
+            if (!g) return (
+              <div class="g-item is-off"><div class="g-row">
+                <span><span class="g-name">{it.name}</span><span class="g-sp">{it.sys} · 準備中</span></span>
+                <span class="g-sys">{it.sys}</span><span class="g-num">準備中</span><span class="url">/game/{it.slug}</span><span></span>
+              </div></div>
+            );
+            const n = MAGICS.filter((m) => m.game === g.id).length;
+            const sys = g.sys;
+            return (
+              <details class="g-item">
+                <summary class="g-row">
+                  <span><span class="g-name">{it.name}</span><span class="g-sp">{sys} · {n}件</span></span>
+                  <span class="g-sys">{sys}</span><span class="g-num">{n}件</span><span class="url">{systemUrl(g.id)}</span>
+                </summary>
+                <div class="g-body">
+                  <a class="more" style="font-weight:700" href={systemUrl(g.id)}>{it.name}の魔法体系を読む →</a>
+                  {buildGroups(g.id, ALL_FX).map((gp) => (
+                    <div class="g-group">
+                      <span class="g-group-lbl"><span class="mark" style={markStyle(gp.el, 20)}>{gp.mark}</span>{gp.label}</span>
+                      <Chain lines={gp.lines} />
+                    </div>
+                  ))}
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+  </main>
+</Base>

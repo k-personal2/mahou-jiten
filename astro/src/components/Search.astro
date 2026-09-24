@@ -1,0 +1,14 @@
+---
+interface Props { size?: 'sm' | 'lg' }
+const { size = 'sm' } = Astro.props;
+const lg = size === 'lg';
+---
+<form class:list={['search', { 'search-lg': lg }]} data-search role="search" action="#">
+  <div class="search-box">
+    <svg width={lg ? 20 : 16} height={lg ? 20 : 16} viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
+    <input type="search" name="q" autocomplete="off" aria-label="魔法を検索"
+      placeholder={lg ? '「ヒャド」「ブフ」「火属性」「回復」など' : '魔法名・属性・用途で検索'} />
+    {lg && <button class="btn btn-solid" type="submit">検索</button>}
+  </div>
+  <div class="sug" data-sug hidden></div>
+</form>

@@ -1,0 +1,9 @@
+---
+import CompareView from '../../components/CompareView.astro';
+import { EL } from '../../lib/dict';
+export function getStaticPaths() {
+  return EL.map((e) => ({ params: { el: e.id } }));
+}
+const { el } = Astro.params;
+---
+<CompareView el={el!} fx="atk" />

@@ -1,0 +1,10 @@
+---
+import CompareView from '../../components/CompareView.astro';
+import { FX } from '../../lib/dict';
+export function getStaticPaths() {
+  // 攻撃は属性ごとに /element/[el] で扱う
+  return FX.filter((f) => f.id !== 'atk').map((f) => ({ params: { slug: f.slug }, props: { fx: f.id } }));
+}
+const { fx } = Astro.props;
+---
+<CompareView el={null} fx={fx} />

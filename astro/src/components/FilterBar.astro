@@ -1,0 +1,21 @@
+---
+import { EL, FX, markStyle, compareUrl } from '../lib/dict';
+interface Props { el: string | null; fx: string }
+const { el, fx } = Astro.props;
+---
+<nav class="filters" aria-label="属性・用途で絞り込み">
+  <div>
+    <span class="lbl">属性</span>
+    {EL.map((e) => (
+      <a class="chip" href={`/element/${e.id}`} aria-current={fx === 'atk' && el === e.id ? 'page' : undefined}>
+        <span class="mark" style={markStyle(e, 20)}>{e.name}</span>{e.name}
+      </a>
+    ))}
+  </div>
+  <div>
+    <span class="lbl">用途</span>
+    {FX.map((f) => (
+      <a class="chip" href={compareUrl(el, f.id)} aria-current={fx === f.id ? 'page' : undefined}>{f.name}</a>
+    ))}
+  </div>
+</nav>

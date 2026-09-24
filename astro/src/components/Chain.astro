@@ -1,0 +1,20 @@
+---
+import type { ChainLine } from '../lib/dict';
+interface Props { lines: ChainLine[] }
+const { lines } = Astro.props;
+---
+<div class="chain-lines">
+  {lines.map((ln) => (
+    <div class="chain-line">
+      {ln.showLabel && <span class="lbl chain-lbl">{ln.label}</span>}
+      {ln.items.map((it, i) => (
+        <>
+          {i > 0 && <span class="chain-arrow" aria-hidden="true">→</span>}
+          <a class:list={['chain-item min', { 'is-cur': it.cur }]} href={it.href} aria-current={it.cur ? 'page' : undefined}>
+            {it.a}<span class:list={{ hl: it.hl }}>{it.b}</span>{it.c}
+          </a>
+        </>
+      ))}
+    </div>
+  ))}
+</div>

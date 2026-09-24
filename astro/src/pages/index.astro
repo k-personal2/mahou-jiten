@@ -1,0 +1,120 @@
+---
+import Base from '../layouts/Base.astro';
+import Search from '../components/Search.astro';
+import { EL, FX, GAMES, MAGICS, gameById, elById, fxById, chainOf, markStyle, compareUrl, magicUrl, systemUrl, todayMagic, kindOf } from '../lib/dict';
+import { motifSvg } from '../lib/motif';
+
+const examples = ['ヒャド', 'ブリザド', 'マハリト', 'PKファイアー', '回復'];
+const bands = [
+  { label: '氷の攻撃', el: 'ice', fx: 'atk' },
+  { label: '回復', el: null, fx: 'heal' },
+  { label: '炎の攻撃', el: 'fire', fx: 'atk' },
+].map((b) => ({ ...b, list: GAMES.map((g) => chainOf(g.id, b.el, b.fx)[0]).filter(Boolean) }));
+
+const atkCount = (el: string) => MAGICS.filter((m) => m.el === el && m.fx === 'atk').length;
+const fxCount = (fx: string) => MAGICS.filter((m) => m.fx === fx).length;
+
+const tm = todayMagic();
+const tL = [...tm.name].length;
+const tK = tL <= 3 ? 1 : tL <= 4 ? 0.86 : tL <= 6 ? 0.72 : 0.58;
+const d = new Date();
+const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+const tE = tm.el ? elById[tm.el] : null;
+---
+<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch>
+  <section class="hero">
+    <div class="hero-in">
+      <div class="hero-kicker">✦ Lexicon Arcanum ✦</div>
+      <h1>RPG魔法の言い換え辞典</h1>
+      <p class="hero-sub">あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？</p>
+      <Search size="lg" />
+      <div class="examples">
+        <span class="note">検索例</span>
+        {examples.map((x) => <button class="chip-ex" type="button" data-fill={x}>{x}</button>)}
+      </div>
+
+      <div class="band">
+        <div class="band-tabs" role="tablist">
+          {bands.map((b, i) => <button type="button" role="tab" data-tab aria-selected={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+        </div>
+        {bands.map((b, i) => (
+          <div data-panel hidden={i !== 0}>
+            <p class="band-cap">たとえば「{b.label}魔法」は、作品によってこう呼ばれる</p>
+            <div class="ribbon">
+              {b.list.map((m, j) => (
+                <>
+                  {j > 0 && <span class="ribbon-sep" aria-hidden="true">≒</span>}
+                  <a href={magicUrl(m)}><span class="min">{m.name}</span><small>{gameById[m.game].short}</small></a>
+                </>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <main class="wrap page home">
+    <div class="home-grid">
+      <section>
+        <div class="sec-head"><h2 class="h2">属性から探す</h2><span class="note">攻撃魔法を作品横断で比較</span></div>
+        <div class="tiles tiles-el">
+          {EL.map((e) => {
+            const c = atkCount(e.id);
+            return (
+              <a class:list={['card tile', { 'is-off': !c }]} href={`/element/${e.id}`}>
+                <span class="mark" style={markStyle(e, 32)}>{e.name}</span>
+                <span><span class="tile-name">{e.name}</span><span class="tile-sub">{c ? `${c}件` : '準備中'}</span></span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+      <section>
+        <div class="sec-head"><h2 class="h2">使用目的から探す</h2></div>
+        <div class="tiles tiles-fx">
+          {FX.map((f) => (
+            <a class="card tile tile-fx" href={compareUrl(null, f.id)}>
+              <span class="mark" style={markStyle(null, 28)}>{f.kanji}</span>
+              <span class="tile-name">{f.name}</span>
+              <span class="note">{fxCount(f.id)}件</span>
+              <span class="tile-arrow" aria-hidden="true">›</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+
+    <div class="home-grid">
+      <section class="card today">
+        <div class="today-top"><span class="lbl">今日の魔法</span><span class="url">{dateStr}</span></div>
+        <div class="today-scene">
+          <Fragment set:html={motifSvg(kindOf(tm))} />
+          <div class="today-name" style={`--k:${tK}`}>{tm.name}</div>
+          <div class="today-game">{gameById[tm.game].name}</div>
+        </div>
+        <div class="badges">
+          {tE && <span class="badge"><span class="mark" style={markStyle(tE, 20)}>{tE.name}</span>{tE.name}</span>}
+          <span class="badge"><span class="mark" style={markStyle(null, 20)}>{fxById[tm.fx].kanji}</span>{fxById[tm.fx].name}</span>
+        </div>
+        <p class="today-note">「これ何だっけ？」となるRPG魔法を毎日ひとつ。</p>
+        <div class="actions">
+          <a class="btn btn-solid" href={magicUrl(tm)}>詳しく見る</a>
+          <a class="btn btn-line" href="#" data-random>ランダムに探す</a>
+        </div>
+      </section>
+      <section>
+        <div class="sec-head"><h2 class="h2">作品から探す</h2><a class="more" href="/game">すべての作品 →</a></div>
+        <div class="rows">
+          {GAMES.map((g) => (
+            <a href={systemUrl(g.id)}>
+              <span class="r-name">{g.name}</span>
+              <span class="tag">{g.sys}</span>
+              <span class="r-num">{MAGICS.filter((m) => m.game === g.id).length}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+</Base>

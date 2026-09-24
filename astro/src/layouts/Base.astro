@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+import Search from '../components/Search.astro';
+interface Props { title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'magic'; path?: string; hideSearch?: boolean }
+const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false } = Astro.props;
+const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
+const nav = [
+  { key: 'home', label: 'トップ', short: 'トップ', glyph: '辞', href: '/' },
+  { key: 'compare', label: '横断比較', short: '比較', glyph: '較', href: '/element/fire' },
+  { key: 'games', label: '作品一覧', short: '作品', glyph: '作', href: '/game' },
+];
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=IM+Fell+English+SC&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="hdr">
+      <div class="wrap hdr-in">
+        <a class="logo" href="/"><span class="seal">魔</span><span>RPG魔法の言い換え辞典</span></a>
+        <div class="hdr-sp"></div>
+        {!hideSearch && <Search />}
+        <nav class="gnav" aria-label="メイン">
+          {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined}>{n.label}</a>)}
+          <a href="#" data-random>ランダム</a>
+        </nav>
+      </div>
+    </header>
+
+    <slot />
+
+    <footer class="ftr">
+      <div class="wrap"><strong>RPG魔法の言い換え辞典</strong><span>魔法名は各作品の日本語版表記に準拠</span></div>
+    </footer>
+    <nav class="tabbar" aria-label="メイン">
+      {nav.map((n) => <a href={n.href} aria-current={active === n.key || (n.key === 'compare' && active === 'magic') ? 'page' : undefined}><b>{n.glyph}</b>{n.short}</a>)}
+      <a href="#" data-random><b>運</b>ランダム</a>
+    </nav>
+
+    <script>import '../scripts/site.ts';</script>
+  </body>
+</html>

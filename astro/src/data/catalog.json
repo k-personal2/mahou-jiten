@@ -1,0 +1,177 @@
+[
+  {
+    "name": "王道",
+    "items": [
+      {
+        "name": "ドラゴンクエスト",
+        "sys": "呪文",
+        "game": "dq"
+      },
+      {
+        "name": "FINAL FANTASY V",
+        "sys": "魔法",
+        "game": "ff"
+      },
+      {
+        "name": "Wizardry",
+        "sys": "呪文",
+        "game": "wiz"
+      },
+      {
+        "name": "真・女神転生",
+        "sys": "魔法",
+        "game": "smt"
+      },
+      {
+        "name": "ペルソナ",
+        "sys": "スキル",
+        "game": "persona"
+      }
+    ]
+  },
+  {
+    "name": "スクウェア系",
+    "items": [
+      {
+        "name": "魔界塔士Sa・Ga",
+        "sys": "魔法",
+        "game": "saga1"
+      },
+      {
+        "name": "Sa・Ga2 秘宝伝説",
+        "sys": "魔法",
+        "game": "saga2"
+      },
+      {
+        "name": "時空の覇者 Sa・Ga3［完結編］",
+        "sys": "魔法",
+        "game": "saga3"
+      },
+      {
+        "name": "ロマンシング サ・ガ",
+        "sys": "術",
+        "game": "rsaga"
+      },
+      {
+        "name": "サガ フロンティア",
+        "sys": "術",
+        "game": "sf"
+      },
+      {
+        "name": "聖剣伝説",
+        "sys": "魔法",
+        "slug": "seiken-densetsu"
+      },
+      {
+        "name": "クロノ・トリガー",
+        "sys": "技（魔法）",
+        "game": "chrono"
+      },
+      {
+        "name": "MOTHER2 ギーグの逆襲",
+        "sys": "PSI",
+        "game": "mother"
+      },
+      {
+        "name": "ニーア レプリカント",
+        "sys": "魔法",
+        "game": "nier"
+      }
+    ]
+  },
+  {
+    "name": "和風・古典",
+    "items": [
+      {
+        "name": "天外魔境II 卍MARU",
+        "sys": "術",
+        "game": "tengai"
+      },
+      {
+        "name": "新桃太郎伝説",
+        "sys": "術",
+        "game": "momo"
+      },
+      {
+        "name": "ONI V 隠忍を継ぐ者",
+        "sys": "術",
+        "game": "oni"
+      },
+      {
+        "name": "サンサーラ・ナーガ2",
+        "sys": "マントラ",
+        "game": "naga"
+      },
+      {
+        "name": "ヘラクレスの栄光III 神々の沈黙",
+        "sys": "魔法",
+        "game": "heracles"
+      },
+      {
+        "name": "大貝獣物語",
+        "sys": "魔法",
+        "game": "daikaiju"
+      },
+      {
+        "name": "がんばれゴエモン外伝 きえた黄金キセル",
+        "sys": "忍術",
+        "game": "goemon"
+      }
+    ]
+  },
+  {
+    "name": "その他",
+    "items": [
+      {
+        "name": "ブレス オブ ファイア 竜の戦士",
+        "sys": "魔法",
+        "game": "bof"
+      },
+      {
+        "name": "天地を喰らうII 諸葛孔明伝",
+        "sys": "策略",
+        "game": "tenchi"
+      },
+      {
+        "name": "メタルマックス",
+        "sys": "なし",
+        "game": "metalmax"
+      },
+      {
+        "name": "SDガンダム外伝 ナイトガンダム物語",
+        "sys": "魔法",
+        "game": "knightgundam"
+      },
+      {
+        "name": "スーパーマリオRPG",
+        "sys": "スペシャル",
+        "game": "smrpg"
+      },
+      {
+        "name": "テイルズ",
+        "sys": "術",
+        "slug": "tales"
+      },
+      {
+        "name": "ポケットモンスター",
+        "sys": "わざ",
+        "slug": "pokemon"
+      },
+      {
+        "name": "ゼルダの伝説 時のオカリナ",
+        "sys": "魔法",
+        "game": "zelda"
+      },
+      {
+        "name": "KINGDOM HEARTS",
+        "sys": "魔法",
+        "game": "kh"
+      },
+      {
+        "name": "Metaphor: ReFantazio",
+        "sys": "魔法",
+        "game": "metaphor"
+      }
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+[
+  {"id":"fire","name":"炎","hue":35,"phrase":"炎を使った","aliases":["炎","火","ほのお","fire"]},
+  {"id":"ice","name":"氷","hue":230,"phrase":"氷・冷気を使った","aliases":["氷","冷気","こおり","ice"]},
+  {"id":"thunder","name":"雷","hue":85,"phrase":"雷・電撃を使った","aliases":["雷","電撃","かみなり","thunder"]},
+  {"id":"wind","name":"風","hue":155,"phrase":"風・真空を使った","aliases":["風","かぜ","wind"]},
+  {"id":"water","name":"水","hue":250,"phrase":"水を使った","aliases":["水","みず","water"]},
+  {"id":"earth","name":"地","hue":60,"phrase":"大地の力を使った","aliases":["地","土","earth"]},
+  {"id":"light","name":"光","hue":95,"phrase":"光を使った","aliases":["光","聖","light"]},
+  {"id":"dark","name":"闇","hue":300,"phrase":"闇の力を使った","aliases":["闇","dark"]},
+  {"id":"none","name":"無","hue":null,"phrase":"属性を持たない","aliases":["無属性"]}
+]

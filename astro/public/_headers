@@ -1,0 +1,3 @@
+# Astro がハッシュ付きファイル名で出力するアセットは長期キャッシュ
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
