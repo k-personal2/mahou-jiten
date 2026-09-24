@@ -40,16 +40,16 @@ npm run build   # dist/ に静的HTMLを出力
 - 検索インデックスは `/search-index.json` として出力し、検索を使ったときだけ読み込む
 - データは攻略資料などで照合して登録しているが、作品・版によって表記や仕様が異なる場合がある
 
-## デプロイ（Cloudflare Workers・静的アセット配信）
+## デプロイ（Cloudflare Pages）
 
-Cloudflare の管理画面で GitHub 連携（Workers Builds）すると、`main` への push ごとに自動デプロイされる。設定は `wrangler.jsonc`。
+GitHub 連携で `main` への push ごとに自動デプロイ。
 
 | 設定 | 値 |
 | --- | --- |
-| Root directory（パス） | `astro` |
+| Root directory | `astro` |
 | Build command | `npm run build` |
-| Deploy command | `npx wrangler deploy` |
+| Build output | `dist` |
 
 - Node のバージョンは `.node-version` で指定
-- `build.format: 'file'` で出力（`/foo/index.html` だと `/foo/` にリダイレクトされ、`trailingSlash: 'never'` と食い違うため）
-- 毎日の再デプロイは `.github/workflows/daily-rebuild.yml`。GitHub の Secrets に `CLOUDFLARE_API_TOKEN`（Workers の編集権限）と `CLOUDFLARE_ACCOUNT_ID` を登録すると有効になる
+- `build.format: 'file'` で出力（`/foo/index.html` だと Pages が `/foo/` にリダイレクトし、`trailingSlash: 'never'` と食い違うため）
+- 毎日の再ビルドは `.github/workflows/daily-rebuild.yml`。Pages の Deploy Hook URL を GitHub の Secret `CLOUDFLARE_DEPLOY_HOOK_URL` に登録すると有効になる

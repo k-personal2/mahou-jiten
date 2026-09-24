@@ -1,4 +1,4 @@
-# 「今日の魔法」はビルド日で決まるため、毎日ビルドして Cloudflare Workers に再デプロイする
+# 「今日の魔法」はビルド日で決まるため、毎日 Cloudflare Pages を再ビルドする
 name: Daily rebuild
 
 on:
@@ -7,30 +7,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  rebuild:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: astro
     steps:
-      - name: Check secrets
-        id: check
+      - name: Trigger Cloudflare Pages deploy hook
         env:
-          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          DEPLOY_HOOK_URL: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK_URL }}
         run: |
-          if [ -z "$TOKEN" ]; then echo "CLOUDFLARE_API_TOKEN が未設定のためスキップ"; echo "skip=1" >> "$GITHUB_OUTPUT"; fi
-      - uses: actions/checkout@v4
-        if: steps.check.outputs.skip != '1'
-      - uses: actions/setup-node@v4
-        if: steps.check.outputs.skip != '1'
-        with:
-          node-version-file: astro/.node-version
-          cache: npm
-          cache-dependency-path: astro/package-lock.json
-      - if: steps.check.outputs.skip != '1'
-        run: npm ci && npm run build
-      - if: steps.check.outputs.skip != '1'
-        run: npx wrangler@4 deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "CLOUDFLARE_DEPLOY_HOOK_URL が未設定のためスキップ"
+            exit 0
+          fi
+          curl -fsS -X POST "$DEPLOY_HOOK_URL"
