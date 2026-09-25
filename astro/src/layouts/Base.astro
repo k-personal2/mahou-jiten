@@ -4,6 +4,8 @@ import Search from '../components/Search.astro';
 interface Props { title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'magic'; path?: string; hideSearch?: boolean }
 const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false } = Astro.props;
 const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
+// OGP 画像はサイト共通の1枚（scripts/make-og.mjs で生成）。SNS は絶対URLが必要
+const ogImage = new URL('/og.png', Astro.site ?? Astro.url).href;
 const nav = [
   { key: 'home', label: 'トップ', short: 'トップ', glyph: '辞', href: '/' },
   { key: 'compare', label: '横断比較', short: '比較', glyph: '較', href: '/element/fire' },
@@ -23,8 +25,16 @@ const nav = [
     <meta name="theme-color" content="#ece2ca" />
     <meta name="google-site-verification" content="xtgTp9GaqCZJbzQf_eNLFUsGESCEf6iWNv42d084ivY" />
     {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content={path === '/' ? 'website' : 'article'} />
+    <meta property="og:site_name" content="RPG魔法の言い換え辞典" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=IM+Fell+English+SC&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
