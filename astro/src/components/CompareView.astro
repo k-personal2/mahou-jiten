@@ -29,10 +29,15 @@ rows.forEach((r) => {
 });
 const nNames = new Set(rows.map((r) => r.list[0].name)).size;
 const cols = [...Array(Math.max(4, ...rows.map((r) => r.list.length))).keys()];
-const desc = E ? `${E.phrase.replace('を使った', '')}による攻撃魔法を、ゲーム作品ごとに比較します。` : `${F.phrase}魔法を、ゲーム作品ごとに比較します。`;
+// 例：炎属性の攻撃魔法を26作品で比較。メラ（DQ）、ファイア（FF5）、アギ（メガテン）など41通りの呼び名。
+const sample = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i).slice(0, 3).map((r) => `${r.list[0].name}（${r.g.short}）`).join('、');
+const desc = rows.length
+  ? `${title}を${nGames}作品で比較。${sample}など${nNames}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
+  : `${title}を作品ごとに比較します。`;
 const gaugeColor = tone(E).ink;
 ---
-<Base title={`${title}の言い換え一覧｜RPG魔法の言い換え辞典`} description={desc} active="compare" path={compareUrl(el, fx)}>
+<Base title={`${title}の言い換え一覧｜RPG魔法の言い換え辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
+  crumbs={[{ name: 'トップ', path: '/' }, { name: title, path: compareUrl(el, fx) }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span>横断比較</span><span>›</span><span aria-current="page">{title}</span></nav>
 

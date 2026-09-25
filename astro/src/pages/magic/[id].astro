@@ -35,7 +35,8 @@ const S = SYSTEMS[m.game];
 <Base
   title={`${m.name}（${G.name}）の他作品での呼び名｜RPG魔法の言い換え辞典`}
   description={`${G.name}の${m.name}は、他のRPGでは何と呼ばれる？ ${others.filter((o, i) => others.findIndex((x) => x.g.id === o.g.id) === i).slice(0, 3).map((o) => `${o.g.short}では${o.eq.name}`).join('、')}など。`}
-  active="magic" path={magicUrl(m)}>
+  active="magic" path={magicUrl(m)}
+  crumbs={[{ name: 'トップ', path: '/' }, { name: cmpTitle, path: cmpHref }, { name: m.name, path: magicUrl(m) }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href={cmpHref}>{cmpTitle}</a><span>›</span><span aria-current="page">{m.name}</span></nav>
 

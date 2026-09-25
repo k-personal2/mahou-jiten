@@ -1,11 +1,23 @@
 ---
 import '../styles/global.css';
 import Search from '../components/Search.astro';
-interface Props { title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'magic'; path?: string; hideSearch?: boolean }
-const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false } = Astro.props;
+/** crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ */
+interface Props {
+  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'magic'; path?: string; hideSearch?: boolean;
+  crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
+}
+const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false } = Astro.props;
 const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
 // OGP 画像はサイト共通の1枚（scripts/make-og.mjs で生成）。SNS は絶対URLが必要
 const ogImage = new URL('/og.png', Astro.site ?? Astro.url).href;
+const abs = (p: string) => new URL(p, Astro.site ?? Astro.url).href;
+const ld = [
+  ...(crumbs?.length
+    ? [{ '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+        itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: abs(c.path) })) }]
+    : []),
+  ...jsonld,
+];
 const nav = [
   { key: 'home', label: 'トップ', short: 'トップ', glyph: '辞', href: '/' },
   { key: 'compare', label: '横断比較', short: '比較', glyph: '較', href: '/element/fire' },
@@ -19,6 +31,7 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -35,6 +48,7 @@ const nav = [
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content="ja_JP" />
     <meta name="twitter:card" content="summary_large_image" />
+    {ld.map((x) => <script type="application/ld+json" set:html={JSON.stringify(x)} />)}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=IM+Fell+English+SC&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -63,7 +77,7 @@ const nav = [
     <slot />
 
     <footer class="ftr">
-      <div class="wrap"><strong>RPG魔法の言い換え辞典</strong><span>魔法名は各作品の日本語版表記に準拠</span></div>
+      <div class="wrap"><strong>RPG魔法の言い換え辞典</strong><span>魔法名は各作品の日本語版表記に準拠</span><a href="/about">このサイトについて・データの集め方</a></div>
     </footer>
     <nav class="tabbar" aria-label="メイン">
       {nav.map((n) => <a href={n.href} aria-current={active === n.key || (n.key === 'compare' && active === 'magic') ? 'page' : undefined}><b>{n.glyph}</b>{n.short}</a>)}

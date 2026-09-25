@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import { GAMES, MAGICS, FX } from '../lib/dict';
+
+const nGames = GAMES.filter((g) => MAGICS.some((m) => m.game === g.id)).length;
+const nSrc = new Set(MAGICS.flatMap((m) => (m.src ?? []).map((s) => s.url))).size;
+const rules = [
+  '作品内で「魔法」「呪文」「術」「PSI」「策略」などとして分類されているものを収録します。',
+  'プレイヤーが使えるものに限ります。敵だけが使う魔法は、原則として収録しません。',
+  '通常攻撃・武器技・必殺技・アイテム・装備効果など、魔法でないものは収録しません。',
+  '召喚魔法は、作品内で魔法として扱われていれば収録します（用途は「その他」）。',
+  '魔法体系がほぼない作品（メタルマックスなど）は、無理に魔法を作らず、その判断を魔法体系ページに書いています。',
+];
+---
+<Base title="このサイトについて・データの集め方｜RPG魔法の言い換え辞典" path="/about"
+  description="RPG魔法の言い換え辞典の目的、収録のルール、魔法データの集め方と出典の扱い、表記の基準について。"
+  crumbs={[{ name: 'トップ', path: '/' }, { name: 'このサイトについて', path: '/about' }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">このサイトについて</span></nav>
+    <h1 class="sys-title" style="margin-top:18px">このサイトについて</h1>
+
+    <section class="sec">
+      <h2 class="h2">何のためのサイトか</h2>
+      <p class="prose prose-lg" style="margin-top:12px">
+        同じような魔法が、RPG作品によってどういう名前で呼ばれているのかを、作品を横断して眺めるための辞典です。
+        たとえば炎の攻撃魔法は、ドラゴンクエストでは「メラ」、FINAL FANTASYでは「ファイア」、真・女神転生では「アギ」、MOTHER2では「PKファイアー」と呼ばれます。
+        攻略情報ではなく、「その作品では魔法をどう分類し、どう名付けているか」を楽しむことを目的にしています。
+      </p>
+      <p class="prose" style="margin-top:12px">現在、{nGames}作品・{MAGICS.length}種の魔法を、{FX.length}種類の用途に分けて収録しています。</p>
+    </section>
+
+    <section class="sec">
+      <h2 class="h2">収録のルール</h2>
+      <ul class="about-list">{rules.map((r) => <li>{r}</li>)}</ul>
+    </section>
+
+    <section class="sec">
+      <h2 class="h2">データの集め方と出典</h2>
+      <div class="prose" style="margin-top:12px">
+        <p>魔法名・属性・効果・消費・使用者は、攻略Wiki・攻略サイト・データベース・公式の説明書などを参照し、できるだけ複数の資料で照合して登録しています。照合に使った資料は、各魔法のページの「出典」に載せています（参照している資料は約{nSrc}件）。</p>
+        <p>資料の調査と整理には、生成AI（Claude）を使っています。AIが集めた内容は出典URLとあわせて記録し、資料どうしで食い違う値や、1つの資料でしか確認できなかった値は、その旨を各魔法の補足に書いています。確認できなかった値は、推測で埋めずに空欄にしています。</p>
+        <p>系統や段階（メラ → メラミ → メラゾーマ など）は、資料で上位・下位の関係が確認できたものだけに付けています。名前が似ているだけで同じ系統とは扱いません。</p>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2 class="h2">表記の基準</h2>
+      <div class="prose" style="margin-top:12px">
+        <p>魔法名は各作品の日本語版の表記に合わせています。作品や版によって表記や仕様が違う場合は、基準にした作品・版を各作品の魔法体系ページに書いています。</p>
+        <p>属性は、サイト共通の分類（炎・氷・雷・風・水・地・光・闇・無）と、作品内での呼び名（火炎・氷結・疾風など）を分けて扱っています。</p>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2 class="h2">ご注意</h2>
+      <div class="prose" style="margin-top:12px">
+        <p>個人が運営する非公式の趣味サイトです。掲載している作品名・魔法名などの権利は、各権利者に帰属します。内容の正確さには注意していますが、誤りが含まれる場合があります。</p>
+      </div>
+    </section>
+  </main>
+</Base>

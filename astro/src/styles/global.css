@@ -334,6 +334,7 @@ a.card:hover { border-color: var(--ink); }
 .ftr { border-top: 1px solid var(--line); background: var(--card); }
 .ftr .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; padding-block: 24px; font-size: 13px; color: var(--mut); }
 .ftr strong { color: var(--ink); }
+.ftr a { color: var(--ink2); }
 .tabbar { display: none; }
 @media (max-width: 760px) {
   .tabbar { position: sticky; bottom: 0; z-index: 20; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--card); border-top: 1px solid var(--line); }
@@ -341,3 +342,5 @@ a.card:hover { border-color: var(--ink); }
   .tabbar a b { font: 800 18px/1 var(--f-min); }
   .tabbar a[aria-current] { color: var(--acc); }
 }
+.about-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; padding-left: 1.4em; font-size: 16px; line-height: 1.8; }
+.prose p + p { margin-top: 12px; }

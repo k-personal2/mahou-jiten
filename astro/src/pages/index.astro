@@ -21,7 +21,9 @@ const d = new Date();
 const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 const tE = tm.el ? elById[tm.el] : null;
 ---
-<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch>
+<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch
+  description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${GAMES.filter((g) => MAGICS.some((m) => m.game === g.id)).length}作品・${MAGICS.length}種の魔法と、作品ごとの魔法体系を収録。`}
+  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法の言い換え辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
   <section class="hero">
     <div class="hero-in">
       <div class="hero-kicker">✦ Lexicon Arcanum ✦</div>
@@ -35,10 +37,10 @@ const tE = tm.el ? elById[tm.el] : null;
 
       <div class="band">
         <div class="band-tabs" role="tablist">
-          {bands.map((b, i) => <button type="button" role="tab" data-tab aria-selected={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+          {bands.map((b, i) => <button type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-panel-${i}`} data-tab aria-selected={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
         </div>
         {bands.map((b, i) => (
-          <div data-panel hidden={i !== 0}>
+          <div data-panel role="tabpanel" id={`band-panel-${i}`} aria-labelledby={`band-tab-${i}`} hidden={i !== 0}>
             <p class="band-cap">たとえば「{b.label}魔法」は、作品によってこう呼ばれる</p>
             <div class="ribbon">
               {b.list.map((m, j) => (

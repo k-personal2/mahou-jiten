@@ -24,7 +24,8 @@ const otherGames = GAMES.filter((x) => x.id !== g.id && SYSTEMS[x.id] && MAGICS.
   return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
 });
 ---
-<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)}>
+<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)}
+  crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }, { name: `${g.name}の魔法体系`, path: systemUrl(g.id) }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span>{g.name}</span><span>›</span><span aria-current="page">魔法体系</span></nav>
     <div class="sys-meta"><span class="lbl">呼び方：{g.sys} ・ 収録 {count}種</span><span class="url">{systemUrl(g.id)}</span></div>
