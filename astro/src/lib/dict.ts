@@ -18,6 +18,8 @@ export type Game = { id: string; name: string; short: string; sys: string; slug:
 export type Magic = {
   id: string; name: string; kana?: string; game: string; el: string | null; fx: string; kind?: string; series?: string;
   tier: number; scope?: string; line?: 'base' | 'all'; desc?: string; note?: string; src?: Source[];
+  /** 消費（作品内の単位つき。例 "MP 3"、"PP 2"）/ 主な使用者（作品内の呼び方のまま） */
+  cost?: string; users?: string[];
 };
 export type MagicSystem = {
   overview: string; rules: string[]; growth?: string[]; categories?: { name: string; desc: string }[];

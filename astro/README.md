@@ -23,7 +23,7 @@ npm run build   # dist/ に静的HTMLを出力
 
 - `magics.json` — 1行1魔法
   - 必須：`id` / `name` / `game` / `el`（攻撃魔法の属性。攻撃以外は null）/ `fx`（用途）/ `tier`（系統内の段階）
-  - 任意：`kana`（読み）/ `scope`（単体・グループ・全体・自分）/ `kind`（用途内の細分類。眠り・毒など）/ `series`（同じ作品・属性・用途に別系統があるときの識別子。DQのメラ系とギラ系など）/ `line`（`all`＝単体系統と並行する全体系統）/ `desc`（効果の要約）/ `note`（版による差など）/ `src`（出典 `{title,url}` の配列）
+  - 任意：`kana`（読み）/ `scope`（単体・グループ・全体・自分）/ `kind`（用途内の細分類。眠り・毒など）/ `series`（同じ作品・属性・用途に別系統があるときの識別子。DQのメラ系とギラ系など）/ `line`（`all`＝単体系統と並行する全体系統）/ `desc`（効果の要約）/ `note`（版による差など）/ `src`（出典 `{title,url}` の配列） / `cost`（消費。作品内の単位つき文字列。例 `MP 3`）/ `users`（主な使用者。作品内の呼び方のままの配列）
   - 系統＝ `game + el + fx + kind + series + line` が同じもの
 - `games.json` — 作品。並び順が比較ページの表示順。`basis` にどの作品・版の表記を基準にしたかを書く
 - `systems.json` — 作品ごとの魔法体系。`overview`（概要）/ `rules`（命名ルール）/ `growth`（強化・派生ルール）/ `categories`（作品内の分類）/ `elementNames`（作品内の属性名）/ `classes`（用途→作品内の分類名）/ `verdict`（魔法体系がほぼない作品の判断）/ `src`

@@ -35,6 +35,8 @@ magics.forEach((m) => {
   if (m.kind && fxById[m.fx]?.kinds && !fxById[m.fx].kinds[m.kind]) errors.push(`${w}: ${m.fx} に未定義の kind ${m.kind}`);
   if (m.scope != null && !SCOPES.has(m.scope)) errors.push(`${w}: scope は ${[...SCOPES].join('/')} のいずれか（${m.scope}）`);
   if (!Number.isInteger(m.tier) || m.tier < 1) errors.push(`${w}: tier は1以上の整数`);
+  if (m.cost != null && (typeof m.cost !== 'string' || !m.cost.trim())) errors.push(`${w}: cost は空でない文字列`);
+  if (m.users != null && (!Array.isArray(m.users) || m.users.some((u) => typeof u !== 'string' || !u.trim()))) errors.push(`${w}: users は文字列の配列`);
   if (!srcOk(m.src, w)) noSrc++;
 });
 
