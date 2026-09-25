@@ -18,8 +18,8 @@ const nGames = new Set(rows.map((r) => r.g.id)).size;
 const total = rows.reduce((a, r) => a + r.list.length, 0);
 const title = titleOf(el, fx);
 const toCard = ({ g, list }: Row) => {
-  const b = list[0], L = [...b.name].length;
-  return { g, b, sys: subOf(b), k: L <= 4 ? 1 : L <= 6 ? 0.84 : 0.7, rest: list.slice(1) };
+  const b = list[0];
+  return { g, b, sys: subOf(b), rest: list.slice(1) };
 };
 const groups: { label: string | null; cards: ReturnType<typeof toCard>[] }[] = [];
 rows.forEach((r) => {
@@ -58,7 +58,7 @@ const gaugeColor = tone(E).ink;
               {gp.cards.map((c) => (
                 <a class="card cmp-card" href={magicUrl(c.b)}>
                   <span class="cmp-card-top"><span class="cmp-game">{c.g.name}</span><span class="tag dot">{c.sys}</span></span>
-                  <span class="cmp-name" style={`--k:${c.k}`}>{c.b.name}</span>
+                  <span class="cmp-name">{c.b.name}</span>
                   <span class="cmp-rest">{c.rest.length ? '› ' + c.rest.map((r) => r.name).join(' › ') : 'この系統はこの1種'}</span>
                 </a>
               ))}

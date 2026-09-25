@@ -167,12 +167,13 @@ a.card:hover { border-color: var(--ink); }
 .chip[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--card); }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 24px; }
 @media (max-width: 760px) { .cards { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
-.cmp-card { display: flex; flex-direction: column; min-width: 0; padding: 16px 20px 20px; }
+.cmp-card { display: flex; flex-direction: column; min-width: 0; padding: 16px 20px 20px; container-type: inline-size; }
 .cmp-card-top { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px dashed var(--line); }
 .cmp-game { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--ink2); }
-.cmp-name { margin-top: 18px; font: 800 calc(46px * var(--k, 1)) / 1.1 var(--f-min); word-break: keep-all; overflow-wrap: anywhere; }
+/* 文字サイズはカード幅から決める（同じページのカードはすべて同じ大きさ。約8.5文字で1行、それ以上は折り返す） */
+.cmp-name { margin-top: 18px; font: 800 min(46px, 100cqi / 8.5) / 1.15 var(--f-min); overflow-wrap: anywhere; }
 .cmp-rest { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--mut); }
-@media (max-width: 760px) { .cmp-card { padding: 14px 16px 16px; } .cmp-name { margin-top: 12px; font-size: calc(36px * var(--k, 1)); } }
+@media (max-width: 760px) { .cmp-card { padding: 14px 16px 16px; } .cmp-name { margin-top: 12px; font-size: min(36px, 100cqi / 8.5); } }
 .empty { margin-top: 32px; padding: 48px 24px; text-align: center; border: 1px dashed var(--off); border-radius: 4px; color: var(--mut); }
 .empty strong { display: block; font-size: 17px; color: var(--ink); }
 .matrix { overflow: hidden; }
