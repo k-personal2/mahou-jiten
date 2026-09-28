@@ -58,9 +58,29 @@
         "game": "sf"
       },
       {
-        "name": "聖剣伝説",
+        "name": "ロマンシング サ・ガ2",
+        "sys": "術",
+        "game": "rsaga2"
+      },
+      {
+        "name": "ロマンシング サ・ガ3",
+        "sys": "術",
+        "game": "rsaga3"
+      },
+      {
+        "name": "サガ フロンティア2",
+        "sys": "術",
+        "game": "sf2"
+      },
+      {
+        "name": "聖剣伝説2",
         "sys": "魔法",
-        "slug": "seiken-densetsu"
+        "game": "seiken2"
+      },
+      {
+        "name": "聖剣伝説3",
+        "sys": "魔法",
+        "game": "seiken3"
       },
       {
         "name": "クロノ・トリガー",
