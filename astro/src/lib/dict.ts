@@ -9,7 +9,8 @@ export type Element = { id: string; name: string; hue: number | null; phrase: st
 export type Source = { title: string; url: string };
 export type Effect = { id: string; name: string; kanji: string; slug: string; phrase: string; kinds?: Record<string, string> };
 /** series: シリーズ名 / basis: どの作品・版の表記を基準にしているか */
-export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string };
+/** group: シリーズの各作品のとき、そのシリーズの代表作品の id（DQIII なら 'dq'） */
+export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string; group?: string };
 /**
  * kind: 用途内の細分類（眠り・毒など。作品横断の比較単位。effects.json の kinds に定義）
  * series: 同じ作品・属性・用途の中に別系統があるときの識別子（DQ のメラ系とギラ系など）
@@ -39,15 +40,45 @@ export const fxById = Object.fromEntries(FX.map((f) => [f.id, f])) as Record<str
 export const gameById = Object.fromEntries(GAMES.map((g) => [g.id, g])) as Record<string, Game>;
 export const magicById = Object.fromEntries(MAGICS.map((m) => [m.id, m])) as Record<string, Magic>;
 
+// ---------- シリーズ（代表作品＋各作品）
+/** 比較ページなどに並べる代表作品（シリーズの各作品を除く） */
+export const REP_GAMES = GAMES.filter((g) => !g.group);
+/** 作品が属するシリーズの代表の id（代表自身ならそのまま） */
+export const groupOf = (gameId: string) => gameById[gameId]?.group ?? gameId;
+/** シリーズの作品（代表 → 各作品の順） */
+export const seriesGames = (gameId: string) => { const r = groupOf(gameId); return GAMES.filter((g) => g.id === r || g.group === r); };
+
+// シリーズの各作品の魔法は、代表作品（なければ先に出た各作品）の同名の魔法のページにまとめる。
+// 代表作品どうし・同じ作品の中の同名（ロマサガの各系統のエレメンタルなど）はまとめない
+const gameOrder = new Map(GAMES.map((g, i) => [g.id, i]));
+const repByName = new Map<string, Magic>();
+MAGICS.forEach((m) => { if (!gameById[m.game]?.group) { const k = m.game + '|' + m.name; if (!repByName.has(k)) repByName.set(k, m); } });
+const varByName = new Map<string, Magic>();
+[...MAGICS].filter((m) => gameById[m.game]?.group).sort((a, b) => gameOrder.get(a.game)! - gameOrder.get(b.game)!)
+  .forEach((m) => { const k = groupOf(m.game) + '|' + m.name; if (!varByName.has(k)) varByName.set(k, m); });
+const canon = new Map<Magic, Magic>();
+MAGICS.forEach((m) => {
+  const g = gameById[m.game]?.group;
+  canon.set(m, g ? repByName.get(g + '|' + m.name) ?? varByName.get(g + '|' + m.name)! : m);
+});
+const members = new Map<Magic, Magic[]>();
+[...MAGICS].sort((a, b) => gameOrder.get(a.game)! - gameOrder.get(b.game)!).forEach((m) => { const c = canon.get(m)!; members.set(c, [...(members.get(c) ?? []), m]); });
+/** その魔法のページになる正規の魔法 */
+export const canonicalOf = (m: Magic) => canon.get(m) ?? m;
+/** 同じページにまとめられる魔法（登場作品の一覧。正規のものが先頭） */
+export const appearancesOf = (m: Magic) => members.get(canonicalOf(m)) ?? [m];
+/** ページを作る魔法 */
+export const PAGE_MAGICS = MAGICS.filter((m) => canonicalOf(m) === m);
+
 /** 「魔法」の呼び方ごとの作品（詳細ページ用。収録のある作品のみ） */
 export const SYSTEM_NAMES: [string, string[]][] = (() => {
   const m = new Map<string, string[]>();
-  GAMES.filter((g) => MAGICS.some((x) => x.game === g.id)).forEach((g) => m.set(g.sys, [...(m.get(g.sys) ?? []), g.short]));
+  REP_GAMES.filter((g) => MAGICS.some((x) => x.game === g.id)).forEach((g) => m.set(g.sys, [...(m.get(g.sys) ?? []), g.short]));
   return [...m];
 })();
 
 // ---------- URLs
-export const magicUrl = (m: Magic) => `/magic/${m.id}`;
+export const magicUrl = (m: Magic) => `/magic/${canonicalOf(m).id}`;
 export const systemUrl = (gameId: string) => `/game/${gameById[gameId].slug}/magic-system`;
 export const compareUrl = (el: string | null, fx: string) =>
   fx === 'atk' ? `/element/${el ?? 'fire'}` : `/effect/${fxById[fx].slug}`;
@@ -173,11 +204,34 @@ export const buildGroups = (game: string, fxList: string[], opts: { curId?: stri
 };
 
 /** 今日の魔法（ビルド日で決定。毎日再ビルドする想定） */
-export const todayMagic = (d = new Date()) => MAGICS[(Math.floor(d.getTime() / 86400000) * 7) % MAGICS.length];
+export const todayMagic = (d = new Date()) => PAGE_MAGICS[(Math.floor(d.getTime() / 86400000) * 7) % PAGE_MAGICS.length];
+
+/**
+ * 横断比較でシリーズ代表の系統に添える「作品による違い」。
+ * 代表のその属性×用途にない名前を含む、シリーズ各作品の系統を返す。
+ * 各作品の系統は、名前が共通する代表の系統（なければ代表の最初の系統）の1か所にだけ添える
+ */
+export const variantsOf = (repId: string, el: string | null, fx: string, kind: string | null, repChain: Magic[]) => {
+  const repChains = chainsOf(repId, el, fx).filter((c) => c.kind === kind).map((c) => c.list);
+  const repNames = new Set(repChains.flat().map((m) => m.name));
+  const seen = new Set<string>();
+  return GAMES.filter((g) => g.group === repId).flatMap((g) =>
+    chainsOf(g.id, el, fx).filter((c) => c.kind === kind && c.list.some((m) => !repNames.has(m.name)))
+      .map((c) => ({ g, list: c.list })))
+    .filter((v) => {
+      const names = new Set(v.list.map((m) => m.name));
+      const home = repChains.find((rc) => rc.some((m) => names.has(m.name))) ?? repChains[0];
+      if (home !== repChains.find((rc) => rc[0] === repChain[0])) return false;
+      const k = v.list.map((m) => m.name).join('›');
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+};
 
 /** クライアント検索用の軽量インデックス */
 export const searchIndex = {
-  magics: MAGICS.map((m) => ({ id: m.id, n: m.name, ...(m.kana ? { k: m.kana } : {}), g: gameById[m.game].name })),
+  magics: PAGE_MAGICS.map((m) => ({ id: m.id, n: m.name, ...(m.kana ? { k: m.kana } : {}), g: gameById[m.game].name })),
   els: EL.filter((e) => e.id !== 'none').map((e) => ({ name: e.name, al: e.aliases, href: `/element/${e.id}` })),
   fxs: FX.map((f) => ({ name: f.name, href: compareUrl(null, f.id) })),
   games: GAMES.map((g) => ({ name: g.name, short: g.short, href: systemUrl(g.id) })),

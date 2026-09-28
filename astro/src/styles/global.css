@@ -344,3 +344,12 @@ a.card:hover { border-color: var(--ink); }
 }
 .about-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; padding-left: 1.4em; font-size: 16px; line-height: 1.8; }
 .prose p + p { margin-top: 12px; }
+/* シリーズ：登場作品の表・作品による違い・各作品リンク */
+.apps { overflow-x: auto; }
+.apps-row { display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(90px, 0.7fr) minmax(0, 2fr); gap: 12px; padding: 10px 20px; border-top: 1px solid var(--soft); font-size: 16px; line-height: 1.6; }
+.apps-head { border-top: 0; font-size: 12px; color: var(--mut); }
+.apps-row a { color: var(--ink); font-weight: 700; }
+.cmp-vars { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 13px; line-height: 1.6; color: var(--mut); }
+.cmp-vars b { margin-right: 6px; color: var(--ink2); font-weight: 700; }
+.g-series { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin: 8px 0 4px; font-size: 14px; }
+.g-series a { color: var(--ink2); }

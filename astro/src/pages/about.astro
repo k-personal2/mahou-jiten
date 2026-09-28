@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { GAMES, MAGICS, FX } from '../lib/dict';
+import { GAMES, MAGICS, PAGE_MAGICS, FX } from '../lib/dict';
 
 const nGames = GAMES.filter((g) => MAGICS.some((m) => m.game === g.id)).length;
 const nSrc = new Set(MAGICS.flatMap((m) => (m.src ?? []).map((s) => s.url))).size;
@@ -26,7 +26,7 @@ const rules = [
         たとえば炎の攻撃魔法は、ドラゴンクエストでは「メラ」、FINAL FANTASYでは「ファイア」、真・女神転生では「アギ」、MOTHER2では「PKファイアー」と呼ばれます。
         攻略情報ではなく、「その作品では魔法をどう分類し、どう名付けているか」を楽しむことを目的にしています。
       </p>
-      <p class="prose" style="margin-top:12px">現在、{nGames}作品・{MAGICS.length}種の魔法を、{FX.length}種類の用途に分けて収録しています。</p>
+      <p class="prose" style="margin-top:12px">現在、{nGames}作品・{PAGE_MAGICS.length}種の魔法を、{FX.length}種類の用途に分けて収録しています。</p>
     </section>
 
     <section class="sec">

@@ -2,12 +2,12 @@
 import Base from '../../layouts/Base.astro';
 import Chain from '../../components/Chain.astro';
 import {
-  MAGICS, GAMES, SYSTEMS, SYSTEM_NAMES, gameById, elById, fxById, chainOfMagic, chainsOf, kindName, titleOf, subOf, elnOf, effectText,
+  PAGE_MAGICS, REP_GAMES, SYSTEMS, SYSTEM_NAMES, groupOf, appearancesOf, gameById as gById, gameById, elById, fxById, chainOfMagic, chainsOf, kindName, titleOf, subOf, elnOf, effectText,
   buildGroups, markStyle, tone, magicUrl, systemUrl, compareUrl, type Magic,
 } from '../../lib/dict';
 
 export function getStaticPaths() {
-  return MAGICS.map((m) => ({ params: { id: m.id }, props: { m } }));
+  return PAGE_MAGICS.map((m) => ({ params: { id: m.id }, props: { m } }));
 }
 const { m } = Astro.props as { m: Magic };
 const G = gameById[m.game], E = m.el ? elById[m.el] : null, F = fxById[m.fx];
@@ -20,7 +20,7 @@ const cmpHref = compareUrl(m.el, m.fx);
 const desc = effectText(m);
 
 // 他作品の同じ属性×用途の系統（細分類があるものは同じ細分類だけ）
-const others = GAMES.filter((g) => g.id !== m.game)
+const others = REP_GAMES.filter((g) => g.id !== groupOf(m.game))
   .flatMap((g) => chainsOf(g.id, m.el, m.fx).filter((c) => !F.kinds || c.kind === (m.kind ?? null)).map((c) => ({ g, list: c.list })))
   .map(({ g, list }) => {
     const ei = Math.min(idx, list.length - 1), eq = list[ei];
@@ -31,6 +31,8 @@ const names = [...SYSTEM_NAMES].sort(([a], [b]) => Number(b === G.sys) - Number(
 const gauge = tone(E).ink;
 const segs = [...Array(Math.max(4, ch.length)).keys()];
 const S = SYSTEMS[m.game];
+// 同じシリーズで同じ名前の魔法（登場作品の表）
+const apps = appearancesOf(m).map((x) => ({ x, g: gById[x.game] }));
 ---
 <Base
   title={`${m.name}（${G.name}）の他作品での呼び名｜RPG魔法の言い換え辞典`}
@@ -80,6 +82,22 @@ const S = SYSTEMS[m.game];
         ))}
       </div>
     </section>
+
+    {apps.length > 1 && (
+      <section class="sec">
+        <div class="sec-head"><h2 class="h2">登場作品</h2><span class="note">{G.series ?? G.name}で「{m.name}」が出てくる作品</span></div>
+        <div class="card apps">
+          <div class="apps-row apps-head"><span>作品</span><span>消費</span><span>主な使用者</span></div>
+          {apps.map(({ x, g }) => (
+            <div class="apps-row">
+              <a href={systemUrl(g.id)}>{g.short}</a>
+              <span>{x.cost ?? '—'}</span>
+              <span>{x.users?.join('、') ?? '—'}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
 
     <section class="sec">
       <div class="sec-head"><h2 class="h2">他作品では？</h2><a class="more" href={cmpHref}>{cmpTitle}をすべて比較 →</a></div>

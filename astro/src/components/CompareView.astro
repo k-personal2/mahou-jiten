@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import FilterBar from './FilterBar.astro';
-import { GAMES, elById, fxById, chainsOf, kindName, titleOf, subOf, tone, markStyle, magicUrl, systemUrl, compareUrl, type Magic, type Game } from '../lib/dict';
+import { REP_GAMES as GAMES, variantsOf, elById, fxById, chainsOf, kindName, titleOf, subOf, tone, markStyle, magicUrl, systemUrl, compareUrl, type Magic, type Game } from '../lib/dict';
 interface Props { el: string | null; fx: string }
 const { el, fx } = Astro.props;
 const E = el ? elById[el] : null, F = fxById[fx];
@@ -17,9 +17,9 @@ const rows = [...all].sort((a, b) => rank(a.kind) - rank(b.kind));
 const nGames = new Set(rows.map((r) => r.g.id)).size;
 const total = rows.reduce((a, r) => a + r.list.length, 0);
 const title = titleOf(el, fx);
-const toCard = ({ g, list }: Row) => {
-  const b = list[0];
-  return { g, b, sys: subOf(b), rest: list.slice(1) };
+const toCard = ({ g, list, kind }: Row) => {
+  const b = list[0], vars = variantsOf(g.id, el, fx, kind, list);
+  return { g, b, sys: subOf(b), rest: list.slice(1), vars: vars.slice(0, 3), more: Math.max(0, vars.length - 3) };
 };
 const groups: { label: string | null; cards: ReturnType<typeof toCard>[] }[] = [];
 rows.forEach((r) => {
@@ -65,6 +65,12 @@ const gaugeColor = tone(E).ink;
                   <span class="cmp-card-top"><span class="cmp-game">{c.g.name}</span><span class="tag dot">{c.sys}</span></span>
                   <span class="cmp-name">{c.b.name}</span>
                   <span class="cmp-rest">{c.rest.length ? '› ' + c.rest.map((r) => r.name).join(' › ') : 'この系統はこの1種'}</span>
+                  {c.vars.length > 0 && (
+                    <span class="cmp-vars">
+                      {c.vars.map((v) => <span><b>{v.g.short}</b>{v.list.map((x) => x.name).join(' › ')}</span>)}
+                      {c.more > 0 && <span>ほか{c.more}作品</span>}
+                    </span>
+                  )}
                 </a>
               ))}
             </div>

@@ -16,6 +16,13 @@ const dup = (list, key, label) => {
 dup(games, 'id', 'games'); dup(games, 'slug', 'games'); dup(magics, 'id', 'magics');
 
 games.forEach((g) => { if (!systems[g.id]) errors.push(`systems に ${g.id} がない`); });
+// シリーズの各作品は、代表作品（group を持たない作品）を指す
+games.forEach((g) => {
+  if (!g.group) return;
+  const r = games.find((x) => x.id === g.group);
+  if (!r) errors.push(`games.${g.id}: group ${g.group} が存在しない`);
+  else if (r.group) errors.push(`games.${g.id}: group の先 ${g.group} も各作品になっている（代表を指す）`);
+});
 Object.keys(systems).forEach((k) => { if (!gameIds.has(k)) errors.push(`systems.${k} に対応する作品がない`); });
 
 const srcOk = (src, where) => {
@@ -59,7 +66,7 @@ Object.entries(systems).forEach(([k, s]) => {
 });
 
 catalog.forEach((c) => c.items.forEach((it) => { if (it.game && !gameIds.has(it.game)) errors.push(`catalog: 未定義の作品 ${it.game}`); }));
-games.forEach((g) => { if (!catalog.some((c) => c.items.some((it) => it.game === g.id))) warns.push(`catalog に ${g.id} がない（作品一覧に出ない）`); });
+games.forEach((g) => { if (!g.group && !catalog.some((c) => c.items.some((it) => it.game === g.id))) warns.push(`catalog に ${g.id} がない（作品一覧に出ない）`); });
 
 if (noSrc) warns.push(`出典のない魔法 ${noSrc} 件`);
 warns.forEach((w) => console.warn('⚠ ' + w));

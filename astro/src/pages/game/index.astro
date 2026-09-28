@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Chain from '../../components/Chain.astro';
-import { CATALOG, GAMES, MAGICS, FX, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
+import { CATALOG, GAMES, seriesGames, MAGICS, FX, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
 const ALL_FX = FX.map((f) => f.id);
 ---
 <Base title="作品から探す｜RPG魔法の言い換え辞典" active="games" path="/game"
@@ -35,6 +35,9 @@ const ALL_FX = FX.map((f) => f.id);
                 </summary>
                 <div class="g-body">
                   <a class="more" style="font-weight:700" href={systemUrl(g.id)}>{it.name}の魔法体系を読む →</a>
+                  {seriesGames(g.id).length > 1 && (
+                    <p class="g-series"><span class="lbl">シリーズの各作品</span>{seriesGames(g.id).filter((x) => x.group).map((x) => <a href={systemUrl(x.id)}>{x.short}</a>)}</p>
+                  )}
                   {buildGroups(g.id, ALL_FX).map((gp) => (
                     <div class="g-group">
                       <span class="g-group-lbl"><span class="mark" style={markStyle(gp.el, 20)}>{gp.mark}</span>{gp.label}</span>

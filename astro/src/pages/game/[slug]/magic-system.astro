@@ -1,7 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import Chain from '../../../components/Chain.astro';
-import { GAMES, EL, MAGICS, SYSTEMS, buildGroups, elnOf, markStyle, systemUrl, chainOfMagic, type Game } from '../../../lib/dict';
+import { GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, markStyle, systemUrl, chainOfMagic, type Game } from '../../../lib/dict';
 
 export function getStaticPaths() {
   return GAMES.filter((g) => SYSTEMS[g.id]).map((g) => ({ params: { slug: g.slug }, props: { g } }));
@@ -19,7 +19,8 @@ const sections = SECS.map(([title, fl]) => {
   return { title, groups, n };
 }).filter((s) => s.groups.length);
 const elements = EL.filter((e) => MAGICS.some((m) => m.game === g.id && m.el === e.id)).map((e) => ({ e, local: elnOf(g.id, e.id) }));
-const otherGames = GAMES.filter((x) => x.id !== g.id && SYSTEMS[x.id] && MAGICS.some((m) => m.game === x.id)).map((x) => {
+const siblings = seriesGames(g.id).filter((x) => SYSTEMS[x.id]);
+const otherGames = REP_GAMES.filter((x) => x.id !== groupOf(g.id) && SYSTEMS[x.id] && MAGICS.some((m) => m.game === x.id)).map((x) => {
   const c = MAGICS.find((m) => m.game === x.id && m.fx === 'atk' && m.el === 'fire') ?? MAGICS.find((m) => m.game === x.id && m.fx === 'atk') ?? MAGICS.find((m) => m.game === x.id);
   return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
 });
@@ -76,6 +77,15 @@ const otherGames = GAMES.filter((x) => x.id !== g.id && SYSTEMS[x.id] && MAGICS.
         </div>
       </section>
     ))}
+
+    {siblings.length > 1 && (
+      <section class="sec">
+        <div class="sec-head"><h2 class="h2">{g.series ?? 'シリーズ'}の各作品</h2><span class="note">作品ごとに命名や分類が少しずつ違います</span></div>
+        <div class="el-names">
+          {siblings.map((x) => <a href={systemUrl(x.id)} aria-current={x.id === g.id ? 'page' : undefined}><span class="min">{x.short}</span>{!x.group && <small>代表</small>}</a>)}
+        </div>
+      </section>
+    )}
 
     <section class="sec">
       <div class="sec-head"><h2 class="h2">他の作品の魔法体系</h2></div>
