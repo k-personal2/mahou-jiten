@@ -3,7 +3,7 @@
     "name": "王道",
     "items": [
       {
-        "name": "ドラゴンクエスト",
+        "name": "ドラゴンクエスト（シリーズ）",
         "sys": "呪文",
         "game": "dq"
       },
@@ -18,12 +18,12 @@
         "game": "wiz"
       },
       {
-        "name": "真・女神転生",
+        "name": "真・女神転生III-NOCTURNE",
         "sys": "魔法",
         "game": "smt"
       },
       {
-        "name": "ペルソナ",
+        "name": "ペルソナ5 ザ・ロイヤル",
         "sys": "スキル",
         "game": "persona"
       }

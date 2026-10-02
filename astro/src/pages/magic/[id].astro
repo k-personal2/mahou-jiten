@@ -31,11 +31,15 @@ const names = [...SYSTEM_NAMES].sort(([a], [b]) => Number(b === G.sys) - Number(
 const gauge = tone(E).ink;
 const segs = [...Array(Math.max(4, ch.length)).keys()];
 const S = SYSTEMS[m.game];
+// 同じ作品に同名の魔法が複数あるとき（ロマサガの各系統のエレメンタルなど）は、補足の冒頭（「火術」など）で区別する
+const twin = PAGE_MAGICS.some((x) => x !== m && x.game === m.game && x.name === m.name);
+const tag = twin ? (m.note?.split('。')[0] ?? '').slice(0, 8) || m.id : '';
+const label = tag ? `${m.name}・${tag}` : m.name;
 // 同じシリーズで同じ名前の魔法（登場作品の表）
 const apps = appearancesOf(m).map((x) => ({ x, g: gById[x.game] }));
 ---
 <Base
-  title={`${m.name}（${G.name}）の他作品での呼び名｜RPG魔法の言い換え辞典`}
+  title={`${label}（${G.name}）の他作品での呼び名｜RPG魔法の言い換え辞典`}
   description={`${G.name}の${m.name}は、他のRPGでは何と呼ばれる？ ${others.filter((o, i) => others.findIndex((x) => x.g.id === o.g.id) === i).slice(0, 3).map((o) => `${o.g.short}では${o.eq.name}`).join('、')}など。`}
   active="magic" path={magicUrl(m)}
   crumbs={[{ name: 'トップ', path: '/' }, { name: cmpTitle, path: cmpHref }, { name: m.name, path: magicUrl(m) }]}>

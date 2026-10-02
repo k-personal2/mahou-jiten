@@ -29,7 +29,7 @@ rows.forEach((r) => {
 });
 const nNames = new Set(rows.map((r) => r.list[0].name)).size;
 const cols = [...Array(Math.max(4, ...rows.map((r) => r.list.length))).keys()];
-// 例：炎属性の攻撃魔法を26作品で比較。メラ（DQ）、ファイア（FF5）、アギ（メガテン）など41通りの呼び名。
+// 例：炎属性の攻撃魔法を26作品で比較。メラ（DQ）、ファイア（FFV）、アギ（真・女神転生III）など41通りの呼び名。
 const sample = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i).slice(0, 3).map((r) => `${r.list[0].name}（${r.g.short}）`).join('、');
 const desc = rows.length
   ? `${title}を${nGames}作品で比較。${sample}など${nNames}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
