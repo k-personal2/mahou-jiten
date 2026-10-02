@@ -1,8 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Chain from '../../components/Chain.astro';
-import { CATALOG, GAMES, seriesGames, MAGICS, FX, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
-const ALL_FX = FX.map((f) => f.id);
+import { CATALOG, GAMES, seriesGames, MAGICS, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
 ---
 <Base title="作品から探す｜RPG魔法の言い換え辞典" active="games" path="/game"
   description={`ドラゴンクエスト、FINAL FANTASY、真・女神転生、MOTHER、サガシリーズなど、収録${GAMES.length}作品の一覧。作品ごとに「魔法」を何と呼ぶか（呪文・術・PSIなど）と、収録している魔法の系統を見られます。`}
@@ -38,7 +37,8 @@ const ALL_FX = FX.map((f) => f.id);
                   {seriesGames(g.id).length > 1 && (
                     <p class="g-series"><span class="lbl">シリーズの各作品</span>{seriesGames(g.id).filter((x) => x.group).map((x) => <a href={systemUrl(x.id)}>{x.short}</a>)}</p>
                   )}
-                  {buildGroups(g.id, ALL_FX).map((gp) => (
+                  {/* 一覧では攻撃・回復の見本だけ（全系統は魔法体系ページ）。ページを軽くするため */}
+                  {buildGroups(g.id, ['atk', 'heal']).slice(0, 6).map((gp) => (
                     <div class="g-group">
                       <span class="g-group-lbl"><span class="mark" style={markStyle(gp.el, 20)}>{gp.mark}</span>{gp.label}</span>
                       <Chain lines={gp.lines} />
