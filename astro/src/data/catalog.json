@@ -169,7 +169,7 @@
       },
       {
         "name": "テイルズ",
-        "sys": "術",
+        "sys": "術技",
         "slug": "tales"
       },
       {
@@ -191,6 +191,26 @@
         "name": "Metaphor: ReFantazio",
         "sys": "魔法",
         "game": "metaphor"
+      },
+      {
+        "name": "英雄伝説 軌跡シリーズ",
+        "sys": "アーツ",
+        "slug": "kiseki"
+      },
+      {
+        "name": "幻想水滸伝",
+        "sys": "紋章",
+        "slug": "genso-suikoden"
+      },
+      {
+        "name": "黄金の太陽",
+        "sys": "エナジー",
+        "slug": "golden-sun"
+      },
+      {
+        "name": "ルドラの秘宝",
+        "sys": "言霊",
+        "slug": "rudra-no-hihou"
       }
     ]
   }

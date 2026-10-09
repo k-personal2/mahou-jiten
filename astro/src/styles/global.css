@@ -353,3 +353,11 @@ a.card:hover { border-color: var(--ink); }
 .cmp-vars b { margin-right: 6px; color: var(--ink2); font-weight: 700; }
 .g-series { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin: 8px 0 4px; font-size: 14px; }
 .g-series a { color: var(--ink2); }
+/* 作品一覧：魔法を何と呼ぶ？ */
+.terms { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 16px; padding: 0; list-style: none; }
+.term { display: flex; flex-direction: column; gap: 8px; padding: 14px 18px; }
+.term-name { font: 800 28px/1.2 var(--f-min); color: var(--ink); }
+.term-games { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 16px; line-height: 1.6; }
+.term-games a { color: var(--ink2); }
+.term-games .is-off { color: var(--faint); }
+.term-games .is-off::after { content: '（準備中）'; font-size: 12px; }
