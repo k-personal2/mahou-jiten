@@ -70,5 +70,6 @@
   {"id":"kh","name":"KINGDOM HEARTS","short":"KH","sys":"魔法","slug":"kingdom-hearts","series":"キングダム ハーツシリーズ","basis":"PS2版1作目（2002）の日本語表記を基準。FINAL MIXでの性能差はnoteに記載"},
   {"id":"nier","name":"ニーア レプリカント","short":"NieR","sys":"魔法","slug":"nier","series":"ニーアシリーズ","basis":"『ニーア レプリカント ver.1.22474487139...』（2021）で、白の書と契約したニーアが使う魔法8種の表記"},
   {"id":"seiken2","name":"聖剣伝説2","short":"聖剣2","sys":"魔法","slug":"seiken-densetsu-2","series":"聖剣伝説シリーズ","basis":"スーパーファミコン版（1993、スクウェア）の表記。消費MPはリメイク版（2018）とも共通の資料で確認"},
-  {"id":"seiken3","name":"聖剣伝説3","short":"聖剣3","sys":"魔法","slug":"seiken-densetsu-3","series":"聖剣伝説シリーズ","basis":"スーパーファミコン版（1995、スクウェア）の表記。リメイク版『聖剣伝説3 TRIALS of MANA』（2020）は習得魔法・性能が異なるため含めない"}
+  {"id":"seiken3","name":"聖剣伝説3","short":"聖剣3","sys":"魔法","slug":"seiken-densetsu-3","series":"聖剣伝説シリーズ","basis":"スーパーファミコン版（1995、スクウェア）の表記。リメイク版『聖剣伝説3 TRIALS of MANA』（2020）は習得魔法・性能が異なるため含めない"},
+  {"id":"makamaka","name":"摩訶摩訶","short":"摩訶摩訶","sys":"変身技","slug":"maka-maka","basis":"スーパーファミコン版『摩訶摩訶（まかまか）』（1992年、シグマ）の表記。技名・消費TP・習得レベルは主にGAME CENTER GXの変身技一覧による"}
 ]

@@ -211,6 +211,11 @@
         "name": "ルドラの秘宝",
         "sys": "言霊",
         "slug": "rudra-no-hihou"
+      },
+      {
+        "name": "摩訶摩訶",
+        "sys": "変身技",
+        "game": "makamaka"
       }
     ]
   }
