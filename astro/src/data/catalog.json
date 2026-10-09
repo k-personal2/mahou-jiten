@@ -246,6 +246,26 @@
         "name": "オクトパストラベラー",
         "sys": "バトルアビリティ（魔法）",
         "game": "octopath"
+      },
+      {
+        "name": "ゼノギアス",
+        "sys": "エーテル",
+        "game": "xenogears"
+      },
+      {
+        "name": "ヴァルキリープロファイル",
+        "sys": "魔法",
+        "game": "valkyrie"
+      },
+      {
+        "name": "LUNAR ザ・シルバースター",
+        "sys": "魔法",
+        "game": "lunar"
+      },
+      {
+        "name": "エストポリス伝記II",
+        "sys": "魔法",
+        "game": "estpolis"
       }
     ]
   }
