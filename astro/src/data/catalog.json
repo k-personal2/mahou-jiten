@@ -266,6 +266,11 @@
         "name": "エストポリス伝記II",
         "sys": "魔法",
         "game": "estpolis"
+      },
+      {
+        "name": "グランディア",
+        "sys": "魔法",
+        "game": "grandia"
       }
     ]
   }

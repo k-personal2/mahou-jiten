@@ -87,5 +87,6 @@
   {"id":"xenogears","name":"ゼノギアス","short":"ゼノギアス","sys":"エーテル","slug":"xenogears","series":"ゼノシリーズ","basis":"PlayStation版（1998年、スクウェア）。生身で使う特殊能力（エーテル）の名前・消費EP・範囲は、キャラクター別 習得技と習得特技！、ゲームなんでもデータベース、Stateless Zone を照合し、フェイ・エリィ・シタンは EXCEED THE LIMIT!! でも確認"},
   {"id":"valkyrie","name":"ヴァルキリープロファイル","short":"ヴァルキリープロファイル","sys":"魔法","slug":"valkyrie-profile","series":"ヴァルキリープロファイルシリーズ","basis":"PlayStation版（1999）。PSP版『-レナス-』以降もゲーム内容は同じとされ、魔法名は PSP 版向けの資料とも一致"},
   {"id":"lunar","name":"LUNAR ザ・シルバースター","short":"LUNAR","sys":"魔法","slug":"lunar","series":"LUNARシリーズ","basis":"メガCD版（1992、ゲームアーツ）。魔法名・習得・消費MPは RRPG（メガCD版の攻略ページ）を採用し、北米セガCD版の英語チャート（oocities）と Almar's Guides で並び・消費MP・対象・効果を照合。リメイク版（SS・PS『シルバースターストーリー』）との違いは note に記載"},
-  {"id":"estpolis","name":"エストポリス伝記II","short":"エストポリス伝記II","sys":"魔法","slug":"estpolis-denki","series":"エストポリス伝記シリーズ","basis":"スーパーファミコン版（1995年、タイトー）"}
+  {"id":"estpolis","name":"エストポリス伝記II","short":"エストポリス伝記II","sys":"魔法","slug":"estpolis-denki","series":"エストポリス伝記シリーズ","basis":"スーパーファミコン版（1995年、タイトー）"},
+  {"id":"grandia","name":"グランディア","short":"グランディア","sys":"魔法","slug":"grandia","series":"グランディアシリーズ","basis":"PlayStation版（1999）を基準にした。日本語の主な資料（chulip.org）はPS版の記事。セガサターン版（1997）との魔法の違いは資料では確認できなかった。英語版資料（Almar's Guides、北米PS版）とも魔法の種類と必要スキルはほぼ一致"}
 ]
