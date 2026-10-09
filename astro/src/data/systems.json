@@ -5688,5 +5688,101 @@
         "url": "https://www.serebii.net/attackdex-rby/"
       }
     ]
+  },
+  "bravely": {
+    "overview": "『ブレイブリーデフォルト フライングフェアリー』の魔法は、白魔道士の「白魔法」、黒魔道士の「黒魔法」、時魔道士の「時空魔法」、召喚士の「召喚魔法」に分かれます。白・黒・時空はLv1〜6の各レベルに3つずつあり、店で魔法書を買ったうえで、ジョブのアビリティで使えるレベルが開きます。名前はFFと共通で、ファイア→ファイラ→ファイガ、ケアル→ケアルラ→ケアルガのように語尾「〜ラ」「〜ガ」で段階を、スロウガやヘイスガのように「〜ガ」で全体版を表します。FFとの違いは、回復がケアルダを挟む4段階になったこと、風のエアロ系が白魔法、土のクエイク系が時空魔法に入り、攻撃魔法が火・水・雷・土・風の5属性×3段階にそろったこと、ブリザド系が水属性として扱われること、回避を上げるベール／ベールガがあることです。召喚魔法はイフリートなどFFの召喚獣ではなく、ギルタブリルやジウスドラの罪など神話に由来する名前で、どれも敵全体への攻撃です。シリーズ第1作のため、前作との違いはありません。",
+    "rules": [
+      "FFと同じく語尾を「〜ラ」「〜ガ」に変えて段階を表す（ファイア→ファイラ→ファイガ、エアロ→エアロラ→エアロガ）",
+      "回復はケアル→ケアルラ→ケアルダ→ケアルガの4段階",
+      "「〜ガ」で全体版を表すものもある（スロウ→スロウガ、ヘイスト→ヘイスガ、ベール→ベールガ、エスナ→エスナガ）",
+      "召喚魔法は召喚獣の名前ではなく、神話・伝承に由来する固有名（ギルタブリル、ジウスドラの罪、プロメテウスの火、スサノオ）"
+    ],
+    "growth": [
+      "魔法書を店で買い、ジョブのアビリティ（白魔法Lv1〜6など）で使えるレベルが開く。赤魔道士は白魔法・黒魔法をLv4まで使える",
+      "攻撃魔法とケアル系は全体化でき、サポートアビリティ「何でも全体化」でほかの魔法も全体化できる",
+      "召喚魔法は各地の隠者に認められて増える（ギルタブリルは最初から使える）",
+      "サポートアビリティで消費MPや威力を変えられる（黒魔法強化、召喚魔法強化、魔法消費MP節約など）"
+    ],
+    "categories": [
+      {
+        "name": "白魔法",
+        "desc": "回復・蘇生・状態異常回復・防御補助と、風のエアロ系、光のホーリー（白魔道士・赤魔道士）"
+      },
+      {
+        "name": "黒魔法",
+        "desc": "火・水・雷の攻撃、状態異常、吸収、即死、闇のダーク（黒魔道士・赤魔道士）"
+      },
+      {
+        "name": "時空魔法",
+        "desc": "素早さ・回避の操作、土のクエイク系、重力、停止、脱出、隕石攻撃（時魔道士）"
+      },
+      {
+        "name": "召喚魔法",
+        "desc": "召喚獣を呼んで敵全体を攻撃する6種（召喚士）"
+      }
+    ],
+    "elementNames": {
+      "fire": "火",
+      "ice": "水",
+      "thunder": "雷",
+      "earth": "土",
+      "wind": "風",
+      "light": "光",
+      "dark": "闇"
+    },
+    "classes": {
+      "atk": "黒魔法",
+      "ailment": "黒魔法",
+      "death": "黒魔法",
+      "spdup": "時空魔法",
+      "spddown": "時空魔法",
+      "default": "白魔法"
+    },
+    "src": [
+      {
+        "title": "魔法一覧と入手場所（アルテマ BDFF）",
+        "url": "https://altema.jp/bdff/mahoitiran"
+      },
+      {
+        "title": "【ブレイブリーデフォルト】魔法の一覧と入手方法・使い方（ゲームエイト）",
+        "url": "https://game8.jp/bdff/688253"
+      },
+      {
+        "title": "Bravely Default Magic Spell List（Gamer Guides）",
+        "url": "https://gamerguides.com/bravely-default/guide/jobs-and-abilities/magic-spell-list"
+      },
+      {
+        "title": "Bravely Default Black Magic（Gamer Guides）",
+        "url": "https://www.gamerguides.com/bravely-default/guide/jobs-and-abilities/magic-spell-list/black-magic"
+      },
+      {
+        "title": "Bravely Default Time Magic（Gamer Guides）",
+        "url": "https://www.gamerguides.com/bravely-default/guide/jobs-and-abilities/magic-spell-list/time-magic"
+      },
+      {
+        "title": "Bravely Default Summoning（Gamer Guides）",
+        "url": "https://www.gamerguides.com/bravely-default/guide/jobs-and-abilities/magic-spell-list/summoning"
+      },
+      {
+        "title": "白魔道士のおすすめアビリティと解放条件（ゲームエイト BDFF）",
+        "url": "https://game8.jp/bdff/687799"
+      },
+      {
+        "title": "赤魔道士のアビリティ（アルテマ BDFF）",
+        "url": "https://altema.jp/bdff/job12"
+      },
+      {
+        "title": "時魔導士のアビリティ（アルテマ BDFF）",
+        "url": "https://altema.jp/bdff/job9"
+      },
+      {
+        "title": "召喚士のアビリティ（アルテマ BDFF）",
+        "url": "https://altema.jp/bdff/job24"
+      },
+      {
+        "title": "『ブレイブリーデフォルト』体験版Vol.3バトル篇の戦闘テクニックを攻略！（電撃オンライン）",
+        "url": "https://dengekionline.com/elem/000/000/500/500737/"
+      }
+    ]
   }
 }
