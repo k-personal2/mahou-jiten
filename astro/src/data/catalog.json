@@ -168,9 +168,9 @@
         "game": "smrpg"
       },
       {
-        "name": "テイルズ",
-        "sys": "術技",
-        "slug": "tales"
+        "name": "テイルズ オブ ファンタジア",
+        "sys": "術",
+        "game": "tales"
       },
       {
         "name": "ポケットモンスター",
@@ -193,29 +193,39 @@
         "game": "metaphor"
       },
       {
-        "name": "英雄伝説 軌跡シリーズ",
+        "name": "英雄伝説 空の軌跡FC",
         "sys": "アーツ",
-        "slug": "kiseki"
+        "game": "kiseki"
       },
       {
         "name": "幻想水滸伝",
         "sys": "紋章",
-        "slug": "genso-suikoden"
+        "game": "suikoden"
       },
       {
-        "name": "黄金の太陽",
+        "name": "黄金の太陽 開かれし封印",
         "sys": "エナジー",
-        "slug": "golden-sun"
+        "game": "goldensun"
       },
       {
         "name": "ルドラの秘宝",
         "sys": "言霊",
-        "slug": "rudra-no-hihou"
+        "game": "rudra"
       },
       {
         "name": "摩訶摩訶",
         "sys": "変身技",
         "game": "makamaka"
+      },
+      {
+        "name": "ファンタシースターII 還らざる時の終わりに",
+        "sys": "テクニック",
+        "game": "phantasystar"
+      },
+      {
+        "name": "シャイニング・フォース 神々の遺産",
+        "sys": "魔法",
+        "game": "shiningforce"
       }
     ]
   }
