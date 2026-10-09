@@ -1,15 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Chain from '../../components/Chain.astro';
-import { CATALOG, GAMES, REP_GAMES, SYSTEMS, seriesGames, MAGICS, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
+import { CATALOG, GAMES, NAMING, seriesGames, MAGICS, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
 
-// 「魔法を何と呼ぶ？」：呼び方ごとに作品をまとめる（シリーズは代表作品だけ。準備中の作品は catalog から）
-type NameItem = { name: string; href?: string };
-const terms = new Map<string, NameItem[]>();
-const add = (sys: string, it: NameItem) => { if (sys && sys !== '—') terms.set(sys, [...(terms.get(sys) ?? []), it]); };
-REP_GAMES.filter((g) => SYSTEMS[g.id]).forEach((g) => add(g.sys, { name: g.short, href: systemUrl(g.id) }));
-CATALOG.flatMap((c) => c.items).filter((it) => !it.game).forEach((it) => add(it.sys, { name: it.name }));
-const termList = [...terms];
 ---
 <Base title="作品から探す｜RPG魔法の言い換え辞典" active="games" path="/game"
   description={`ドラゴンクエスト、FINAL FANTASY、真・女神転生、MOTHER、サガシリーズなど、収録${GAMES.length}作品の一覧。作品ごとに「魔法」を何と呼ぶか（呪文・術・PSIなど）と、収録している魔法の系統を見られます。`}
@@ -20,14 +13,14 @@ const termList = [...terms];
     <p class="cmp-lead" style="font-size:16px;margin-top:10px">収録作品と、各作品での魔法の呼び方。行を開くと収録魔法を一覧できます。</p>
 
     <section class="sec" aria-labelledby="terms-h">
-      <div class="sec-head"><h2 class="h2" id="terms-h">魔法を何と呼ぶ？</h2><span class="note">{termList.length}通りの呼び方</span></div>
+      <div class="sec-head"><h2 class="h2" id="terms-h">魔法を何と呼ぶ？</h2><a class="more" href="/names">{NAMING.length}通りの呼び方を詳しく →</a></div>
       <p class="prose" style="margin-top:8px">同じ「魔法」でも、作品によって呼び方はさまざま。呼び方から、その作品の魔法体系を読めます。</p>
       <ul class="terms">
-        {termList.map(([sys, items]) => (
+        {NAMING.map(({ term: sys, items }) => (
           <li class="card term">
             <b class="term-name">{sys}</b>
             <span class="term-games">
-              {items.map((it) => it.href ? <a href={it.href}>{it.name}</a> : <span class="is-off" title="準備中">{it.name}</span>)}
+              {items.map((it) => it.href ? <a href={it.href}>{it.short}</a> : <span class="is-off" title="準備中">{it.short}</span>)}
             </span>
           </li>
         ))}

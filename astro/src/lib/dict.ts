@@ -4,6 +4,7 @@ import gamesData from '../data/games.json';
 import magicsData from '../data/magics.json';
 import systemsData from '../data/systems.json';
 import catalogData from '../data/catalog.json';
+import termsData from '../data/terms.json';
 
 export type Element = { id: string; name: string; hue: number | null; phrase: string; aliases: string[] };
 export type Source = { title: string; url: string };
@@ -34,6 +35,8 @@ export const GAMES = gamesData as Game[];
 export const MAGICS = magicsData as Magic[];
 export const SYSTEMS = systemsData as Record<string, MagicSystem>;
 export const CATALOG = catalogData as { name: string; items: CatalogItem[] }[];
+/** 魔法の呼び方（呪文・術・PSI…）の説明 */
+export const TERMS = termsData as Record<string, string>;
 
 export const elById = Object.fromEntries(EL.map((e) => [e.id, e])) as Record<string, Element>;
 export const fxById = Object.fromEntries(FX.map((f) => [f.id, f])) as Record<string, Effect>;
@@ -236,3 +239,16 @@ export const searchIndex = {
   fxs: FX.map((f) => ({ name: f.name, href: compareUrl(null, f.id) })),
   games: GAMES.map((g) => ({ name: g.name, short: g.short, href: systemUrl(g.id) })),
 };
+
+/**
+ * 「魔法を何と呼ぶ？」：呼び方ごとの作品（シリーズは代表作品だけ。準備中の作品は catalog から）。
+ * 並びは games.json → catalog の順に、その呼び方が最初に出てきた順
+ */
+export type NamingItem = { name: string; short: string; href?: string };
+export const NAMING: { term: string; desc?: string; items: NamingItem[] }[] = (() => {
+  const m = new Map<string, NamingItem[]>();
+  const add = (sys: string, it: NamingItem) => { if (sys && sys !== '—') m.set(sys, [...(m.get(sys) ?? []), it]); };
+  REP_GAMES.filter((g) => SYSTEMS[g.id]).forEach((g) => add(g.sys, { name: g.name, short: g.short, href: systemUrl(g.id) }));
+  CATALOG.flatMap((c) => c.items).filter((it) => !it.game).forEach((it) => add(it.sys, { name: it.name, short: it.name }));
+  return [...m].map(([term, items]) => ({ term, desc: TERMS[term], items }));
+})();

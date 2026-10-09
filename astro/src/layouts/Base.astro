@@ -3,7 +3,7 @@ import '../styles/global.css';
 import Search from '../components/Search.astro';
 /** crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ */
 interface Props {
-  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'magic'; path?: string; hideSearch?: boolean;
+  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'magic'; path?: string; hideSearch?: boolean;
   crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
 }
 const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false } = Astro.props;
@@ -22,6 +22,7 @@ const nav = [
   { key: 'home', label: 'トップ', short: 'トップ', glyph: '辞', href: '/' },
   { key: 'compare', label: '横断比較', short: '比較', glyph: '較', href: '/element/fire' },
   { key: 'games', label: '作品一覧', short: '作品', glyph: '作', href: '/game' },
+  { key: 'names', label: '魔法の呼び方', short: '呼び方', glyph: '名', href: '/names' },
 ];
 ---
 <!doctype html>
