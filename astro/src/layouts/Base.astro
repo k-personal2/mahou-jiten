@@ -1,9 +1,10 @@
 ---
 import '../styles/global.css';
 import Search from '../components/Search.astro';
+import { statsText } from '../lib/dict';
 /** crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ */
 interface Props {
-  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'magic'; path?: string; hideSearch?: boolean;
+  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'about'; path?: string; hideSearch?: boolean;
   crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
 }
 const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false } = Astro.props;
@@ -19,10 +20,11 @@ const ld = [
   ...jsonld,
 ];
 const nav = [
-  { key: 'home', label: 'トップ', short: 'トップ', glyph: '辞', href: '/' },
-  { key: 'compare', label: '横断比較', short: '比較', glyph: '較', href: '/element/fire' },
-  { key: 'games', label: '作品一覧', short: '作品', glyph: '作', href: '/game' },
-  { key: 'names', label: '魔法の呼び方', short: '呼び方', glyph: '名', href: '/names' },
+  { key: 'home', label: 'トップ', href: '/' },
+  { key: 'compare', label: '用途・属性で比べる', href: '/element/fire' },
+  { key: 'games', label: '作品から探す', href: '/game' },
+  { key: 'names', label: '魔法の呼び方', href: '/names' },
+  { key: 'about', label: 'このサイトについて', href: '/about' },
 ];
 ---
 <!doctype html>
@@ -36,7 +38,7 @@ const nav = [
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#ece2ca" />
+    <meta name="theme-color" content="#f1e9d6" />
     <meta name="google-site-verification" content="xtgTp9GaqCZJbzQf_eNLFUsGESCEf6iWNv42d084ivY" />
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content={path === '/' ? 'website' : 'article'} />
@@ -52,7 +54,7 @@ const nav = [
     {ld.map((x) => <script type="application/ld+json" set:html={JSON.stringify(x)} />)}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=IM+Fell+English+SC&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho+B1:wght@700;800&display=swap" rel="stylesheet" />
     <!-- Google tag (gtag.js)。is:inline で Astro の加工を避け、そのまま出力する -->
     <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-SKPG3ST0T5"></script>
     <script is:inline>
@@ -64,13 +66,12 @@ const nav = [
   </head>
   <body>
     <header class="hdr">
-      <div class="wrap hdr-in">
-        <a class="logo" href="/"><span class="seal">魔</span><span>RPG魔法の言い換え辞典</span></a>
-        <div class="hdr-sp"></div>
+      <div class="wrap hdr__in">
+        <a class="logo" href="/"><span class="logo__seal" aria-hidden="true">魔</span><span class="logo__name">RPG魔法の言い換え辞典</span></a>
+        <div class="hdr__sp"></div>
         {!hideSearch && <Search />}
         <nav class="gnav" aria-label="メイン">
           {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined}>{n.label}</a>)}
-          <a href="#" data-random>ランダム</a>
         </nav>
       </div>
     </header>
@@ -78,12 +79,14 @@ const nav = [
     <slot />
 
     <footer class="ftr">
-      <div class="wrap"><strong>RPG魔法の言い換え辞典</strong><span>魔法名は各作品の日本語版表記に準拠</span><a href="/about">このサイトについて・データの集め方</a></div>
+      <div class="wrap ftr__in">
+        <span class="ftr__name">RPG魔法の言い換え辞典</span>
+        <span>{statsText}</span>
+        <span>魔法名は各作品の日本語版表記に準拠</span>
+        <a href="/about">このサイトについて・データの集め方</a>
+        <span>個人運営の非公式サイトです</span>
+      </div>
     </footer>
-    <nav class="tabbar" aria-label="メイン">
-      {nav.map((n) => <a href={n.href} aria-current={active === n.key || (n.key === 'compare' && active === 'magic') ? 'page' : undefined}><b>{n.glyph}</b>{n.short}</a>)}
-      <a href="#" data-random><b>運</b>ランダム</a>
-    </nav>
 
     <script>import '../scripts/site.ts';</script>
   </body>

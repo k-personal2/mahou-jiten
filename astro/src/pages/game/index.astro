@@ -1,71 +1,131 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Chain from '../../components/Chain.astro';
-import { CATALOG, GAMES, NAMING, seriesGames, MAGICS, gameById, buildGroups, markStyle, systemUrl } from '../../lib/dict';
+import Chapter from '../../components/Chapter.astro';
+import { CATALOG, MAGICS, STATS, gameById, seriesGames, chainOfMagic, systemUrl } from '../../lib/dict';
 
+// 絞り込みで引けるようにする略称・通称（作品名・短縮名・呼び方に加えて）
+const ALIAS: Record<string, string> = {
+  dq: 'ドラクエ', ff: 'ファイナルファンタジー FF', smt: 'メガテン 女神転生', persona: 'メガテン P5R', rsaga: 'サガ', rsaga2: 'サガ', rsaga3: 'サガ',
+  sf: 'サガ', sf2: 'サガ', saga1: 'サガ', saga2: 'サガ', saga3: 'サガ', tales: 'テイルズ', mother: 'マザー', kh: 'キングダムハーツ',
+};
+const cats = CATALOG.map((cat) => ({
+  name: cat.name,
+  items: cat.items.map((it) => {
+    const g = it.game ? gameById[it.game] : null;
+    const own = g ? MAGICS.filter((m) => m.game === g.id) : [];
+    const sample = own.find((m) => m.fx === 'atk' && m.el === 'fire') ?? own.find((m) => m.fx === 'atk') ?? own[0];
+    const sib = g ? seriesGames(g.id).filter((x) => x.group) : [];
+    return {
+      name: it.name, sys: it.sys, href: g ? systemUrl(g.id) : undefined, cnt: own.length,
+      ex: sample ? chainOfMagic(sample).map((m) => m.name).join(' → ') : '',
+      series: sib.length ? `シリーズ：${sib.map((x) => x.short).join('・')}` : '',
+      key: [it.name, g?.short, it.sys, ALIAS[it.game ?? ''], ...sib.map((x) => x.name + ' ' + x.short)].filter(Boolean).join(' '),
+    };
+  }),
+}));
 ---
-<Base title="作品から探す｜RPG魔法の言い換え辞典" active="games" path="/game"
-  description={`ドラゴンクエスト、FINAL FANTASY、真・女神転生、MOTHER、サガシリーズなど、収録${GAMES.length}作品の一覧。作品ごとに「魔法」を何と呼ぶか（呪文・術・PSIなど）と、収録している魔法の系統を見られます。`}
+<Base title={`収録${STATS.games}作品の一覧と魔法の呼び方｜RPG魔法の言い換え辞典`} active="games" path="/game"
+  description={`ドラゴンクエスト、FINAL FANTASY、真・女神転生、MOTHER、サガシリーズなど、収録${STATS.games}作品の一覧。作品ごとに「魔法」を何と呼ぶか（呪文・術・PSIなど）と、収録件数、代表的な系統を見られます。`}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">作品から探す</span></nav>
-    <h1 class="sys-title" style="margin-top:18px">作品から探す</h1>
-    <p class="cmp-lead" style="font-size:16px;margin-top:10px">収録作品と、各作品での魔法の呼び方。行を開くと収録魔法を一覧できます。</p>
+    <h1 class="t-h1">作品から探す</h1>
+    <p class="desc">収録{STATS.games}作品。作品の中で魔法を何と呼ぶかと、収録件数、代表的な系統を載せています。作品名を押すと、その作品の魔法体系へ進みます。シリーズ（ドラゴンクエスト・FINAL FANTASYなど）は1作品として数えています。</p>
 
-    <section class="sec" aria-labelledby="terms-h">
-      <div class="sec-head"><h2 class="h2" id="terms-h">魔法を何と呼ぶ？</h2><a class="more" href="/names">{NAMING.length}通りの呼び方を詳しく →</a></div>
-      <p class="prose" style="margin-top:8px">同じ「魔法」でも、作品によって呼び方はさまざま。呼び方から、その作品の魔法体系を読めます。</p>
-      <ul class="terms">
-        {NAMING.map(({ term: sys, items }) => (
-          <li class="card term">
-            <b class="term-name">{sys}</b>
-            <span class="term-games">
-              {items.map((it) => it.href ? <a href={it.href}>{it.short}</a> : <span class="is-off" title="準備中">{it.short}</span>)}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div class="wbar" data-wbar>
+      <div class="search__box">
+        <input type="search" aria-label="作品名で絞り込み" placeholder="作品名で絞り込み（例：サガ、テイルズ）" data-wq />
+        <button class="wbar__clear" type="button" aria-label="絞り込みを解除" data-wclear hidden>解除</button>
+      </div>
+      <div class="wbar__views" role="group" aria-label="並べ方">
+        <span class="t-label">並べ方</span>
+        <button class="tab" type="button" aria-pressed="true" data-view="cat">カテゴリ</button>
+        <button class="tab" type="button" aria-pressed="false" data-view="sys">呼び方</button>
+        <button class="tab" type="button" aria-pressed="false" data-view="cnt">収録数</button>
+      </div>
+      <span class="t-note" role="status" data-wcount></span>
+    </div>
 
-    {CATALOG.map((cat) => (
-      <section class="g-cat">
-        <div class="sec-head"><h2 class="h2">{cat.name}</h2><span class="note">{cat.items.length}作品</span></div>
-        <div class="card glist">
-          <div class="g-row g-head"><span>作品</span><span>魔法の呼び方</span><span style="text-align:right">収録</span><span>URL</span><span></span></div>
-          {cat.items.map((it) => {
-            const g = it.game ? gameById[it.game] : null;
-            if (!g) return (
-              <div class="g-item is-off"><div class="g-row">
-                <span><span class="g-name">{it.name}</span><span class="g-sp">{it.sys} · 準備中</span></span>
-                <span class="g-sys">{it.sys}</span><span class="g-num">準備中</span><span class="url">/game/{it.slug}</span><span></span>
-              </div></div>
-            );
-            const n = MAGICS.filter((m) => m.game === g.id).length;
-            const sys = g.sys;
-            return (
-              <details class="g-item">
-                <summary class="g-row">
-                  <span><span class="g-name">{it.name}</span><span class="g-sp">{sys} · {n}件</span></span>
-                  <span class="g-sys">{sys}</span><span class="g-num">{n}件</span><span class="url">{systemUrl(g.id)}</span>
-                </summary>
-                <div class="g-body">
-                  <a class="more" style="font-weight:700" href={systemUrl(g.id)}>{it.name}の魔法体系を読む →</a>
-                  {seriesGames(g.id).length > 1 && (
-                    <p class="g-series"><span class="lbl">シリーズの各作品</span>{seriesGames(g.id).filter((x) => x.group).map((x) => <a href={systemUrl(x.id)}>{x.short}</a>)}</p>
-                  )}
-                  {/* 一覧では攻撃・回復の見本だけ（全系統は魔法体系ページ）。ページを軽くするため */}
-                  {buildGroups(g.id, ['atk', 'heal']).slice(0, 6).map((gp) => (
-                    <div class="g-group">
-                      <span class="g-group-lbl"><span class="mark" style={markStyle(gp.el, 20)}>{gp.mark}</span>{gp.label}</span>
-                      <Chain lines={gp.lines} />
-                    </div>
-                  ))}
+    <div class="wgrid">
+      <nav class="windex" aria-label="グループへ移動" data-windex>
+        {cats.map((c, i) => <a href={`#wg${i}`}><span>{c.name}</span><span>{c.items.length}</span></a>)}
+      </nav>
+      <div class="wgroups" data-wgroups>
+        {cats.map((c, i) => (
+          <section class="wgroup" id={`wg${i}`}>
+            <Chapter title={c.name} note={`${c.items.length}作品`} plain />
+            {c.items.map((w) => (
+              <div class="wrow" data-cat={i} data-sys={w.sys} data-cnt={w.cnt} data-key={w.key}>
+                <div>
+                  {w.href ? <a class="wrow__name" href={w.href}>{w.name}</a> : <span class="wrow__name">{w.name}</span>}
+                  {w.series && <span class="wrow__series">{w.series}</span>}
                 </div>
-              </details>
-            );
-          })}
-        </div>
-      </section>
-    ))}
+                <span class="wrow__sys">{w.sys}</span>
+                <span class:list={['wrow__cnt', { 'is-zero': !w.cnt }]}>{w.cnt}件</span>
+                <span class="wrow__ex">{w.ex}</span>
+              </div>
+            ))}
+          </section>
+        ))}
+        <p class="empty" data-wempty hidden></p>
+      </div>
+    </div>
   </main>
 </Base>
+
+<script>
+  // 絞り込みと並べ方の切り替え。行の DOM はそのまま使い、グループだけ組み直す
+  const root = document.querySelector<HTMLElement>('[data-wgroups]')!;
+  const index = document.querySelector<HTMLElement>('[data-windex]')!;
+  const input = document.querySelector<HTMLInputElement>('[data-wq]')!;
+  const clear = document.querySelector<HTMLButtonElement>('[data-wclear]')!;
+  const count = document.querySelector<HTMLElement>('[data-wcount]')!;
+  const empty = document.querySelector<HTMLElement>('[data-wempty]')!;
+  const views = [...document.querySelectorAll<HTMLButtonElement>('[data-view]')];
+  const rows = [...root.querySelectorAll<HTMLElement>('.wrow')];
+  const catNames = [...root.querySelectorAll('.wgroup h2')].map((h) => h.textContent!);
+  const kata = (s: string) => s.toLowerCase().replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60)).replace(/\s+/g, '');
+  let view = 'cat';
+
+  const render = () => {
+    const q = kata(input.value);
+    const hit = rows.filter((r) => !q || kata(r.dataset.key!).includes(q));
+    let groups: [string, HTMLElement[]][];
+    if (view === 'sys') {
+      const m = new Map<string, HTMLElement[]>();
+      hit.forEach((r) => m.set(r.dataset.sys!, [...(m.get(r.dataset.sys!) ?? []), r]));
+      groups = [...m].sort((a, b) => b[1].length - a[1].length);
+    } else if (view === 'cnt') {
+      groups = [['収録数の多い順', [...hit].sort((a, b) => +b.dataset.cnt! - +a.dataset.cnt!)]];
+    } else {
+      groups = catNames.map((n, i) => [n, hit.filter((r) => r.dataset.cat === String(i))] as [string, HTMLElement[]]).filter((g) => g[1].length);
+    }
+    root.querySelectorAll('.wgroup').forEach((s) => s.remove());
+    index.replaceChildren();
+    groups.forEach(([name, list], i) => {
+      const sec = document.createElement('section');
+      sec.className = 'wgroup';
+      sec.id = 'wg' + i;
+      const head = document.createElement('div');
+      head.className = 'chapter chapter--plain';
+      head.append(Object.assign(document.createElement('h2'), { textContent: name }), Object.assign(document.createElement('span'), { className: 't-note', textContent: `${list.length}作品` }));
+      sec.append(head, ...list);
+      root.insertBefore(sec, empty);
+      const a = Object.assign(document.createElement('a'), { href: '#' + sec.id });
+      a.append(Object.assign(document.createElement('span'), { textContent: name }), Object.assign(document.createElement('span'), { textContent: String(list.length) }));
+      index.append(a);
+    });
+    index.hidden = groups.length < 2;
+    clear.hidden = !input.value;
+    count.textContent = q ? `${hit.length}作品が該当` : '';
+    empty.hidden = hit.length > 0;
+    empty.textContent = `「${input.value}」に当てはまる作品はありません。略称（ロマサガ、DQなど）でも探せます。`;
+  };
+  input.addEventListener('input', render);
+  clear.addEventListener('click', () => { input.value = ''; render(); input.focus(); });
+  views.forEach((b) => b.addEventListener('click', () => {
+    view = b.dataset.view!;
+    views.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  }));
+</script>

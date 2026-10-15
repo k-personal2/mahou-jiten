@@ -36,8 +36,8 @@ document.querySelectorAll<HTMLFormElement>('[data-search]').forEach((box) => {
     if (!input.value.trim()) { list.hidden = true; return; }
     list.hidden = false;
     list.innerHTML = items.length
-      ? items.map((i) => `<a class="sug-item" href="${i.href}"><span class="sug-kind">${i.kind}</span><span class="sug-label">${esc(i.label)}</span><span class="sug-sub">${esc(i.sub)}</span></a>`).join('')
-      : '<div class="sug-empty">該当する魔法が見つかりません</div>';
+      ? items.map((i) => `<a class="sug__item" href="${i.href}"><span class="sug__kind">${i.kind}</span><span class="sug__label">${esc(i.label)}</span><span class="sug__sub">${esc(i.sub)}</span></a>`).join('')
+      : '<p class="sug__empty">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
   };
   const renderAsync = () => { if (IDX) render(); else loadIdx().then(render); };
   input.addEventListener('input', renderAsync);
@@ -64,16 +64,24 @@ document.querySelectorAll<HTMLElement>('[data-random]').forEach((b) =>
   }),
 );
 
-// トップの「たとえば〜」帯：タブ切替（6秒ごとに自動、クリックで停止）
+// トップの呼び名の帯：タブ切替
 const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-tab]')];
-if (tabs.length) {
-  const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
-  let cur = 0, auto = true;
-  const show = (i: number) => {
-    cur = i;
-    tabs.forEach((t, j) => t.setAttribute('aria-selected', String(j === i)));
+const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
+tabs.forEach((t, i) =>
+  t.addEventListener('click', () => {
+    tabs.forEach((x, j) => x.setAttribute('aria-selected', String(j === i)));
     panels.forEach((p, j) => (p.hidden = j !== i));
-  };
-  tabs.forEach((t, i) => t.addEventListener('click', () => { auto = false; show(i); }));
-  setInterval(() => auto && show((cur + 1) % tabs.length), 6000);
-}
+  }),
+);
+
+// 「すべて表示」：data-more="名前" のボタンで data-more-item="名前" の行を出し入れする
+document.querySelectorAll<HTMLButtonElement>('[data-more]').forEach((b) => {
+  const items = document.querySelectorAll<HTMLElement>(`[data-more-item="${b.dataset.more}"]`);
+  const closed = b.textContent!;
+  b.addEventListener('click', () => {
+    const open = b.getAttribute('aria-expanded') !== 'true';
+    items.forEach((x) => (x.hidden = !open));
+    b.setAttribute('aria-expanded', String(open));
+    b.textContent = open ? b.dataset.less! : closed;
+  });
+});

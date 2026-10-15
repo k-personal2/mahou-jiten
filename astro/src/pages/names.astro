@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
 import { NAMING } from '../lib/dict';
 
 const nGames = NAMING.reduce((a, t) => a + t.items.filter((i) => i.href).length, 0);
@@ -9,23 +10,19 @@ const nGames = NAMING.reduce((a, t) => a + t.items.filter((i) => i.href).length,
   crumbs={[{ name: 'トップ', path: '/' }, { name: '魔法を何と呼ぶ？', path: '/names' }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">魔法を何と呼ぶ？</span></nav>
-    <h1 class="sys-title" style="margin-top:18px">魔法を何と呼ぶ？</h1>
-    <p class="cmp-lead" style="font-size:16px;margin-top:10px">
-      ドラゴンクエストは「呪文」、MOTHERは「PSI」、サガは「術」。RPGの「魔法」は、作品によって呼び方も仕組みも違います。
-      収録{nGames}作品の呼び方を、{NAMING.length}通りに分けて並べました。作品名から、その作品の魔法体系へ進めます。
-    </p>
-    <nav class="names-toc" aria-label="呼び方の目次">
+    <h1 class="t-h1">魔法を何と呼ぶ？</h1>
+    <p class="lead">ドラゴンクエストは「呪文」、MOTHERは「PSI」、サガは「術」。RPGの「魔法」は、作品によって呼び方も仕組みも違います。</p>
+    <p class="desc">収録{nGames}作品の呼び方を、{NAMING.length}通りに分けて並べました。作品名から、その作品の魔法体系へ進めます。</p>
+    <nav class="toc" aria-label="呼び方の目次">
       {NAMING.map((t, i) => <a href={`#t${i}`}>{t.term}</a>)}
     </nav>
 
     {NAMING.map((t, i) => (
-      <section class="sec name-sec" id={`t${i}`} aria-labelledby={`t${i}-h`}>
-        <h2 class="name-h" id={`t${i}-h`}>{t.term}<small>{t.items.length}作品</small></h2>
-        {t.desc ? <p class="prose" style="margin-top:8px">{t.desc}</p> : <p class="note" style="margin-top:8px">この呼び方の作品は準備中です。</p>}
-        <ul class="name-games">
-          {t.items.map((it) => (
-            <li>{it.href ? <a href={it.href}>{it.name}<span>の魔法体系 →</span></a> : <span class="is-off">{it.name}（準備中）</span>}</li>
-          ))}
+      <section class="sec term" id={`t${i}`}>
+        <Chapter title={t.term} note={`${t.items.length}作品`} plain />
+        {t.desc ? <p class="prose">{t.desc}</p> : <p class="t-note">この呼び方の作品は準備中です。</p>}
+        <ul class="term-games">
+          {t.items.map((it) => <li>{it.href ? <a href={it.href}>{it.name}</a> : <span class="t-note">{it.name}（準備中）</span>}</li>)}
         </ul>
       </section>
     ))}

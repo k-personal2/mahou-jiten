@@ -1,120 +1,200 @@
 ---
 import Base from '../layouts/Base.astro';
 import Search from '../components/Search.astro';
-import { EL, FX, REP_GAMES as GAMES, PAGE_MAGICS as MAGICS, gameById, elById, fxById, chainOf, markStyle, compareUrl, magicUrl, systemUrl, todayMagic, kindOf } from '../lib/dict';
-import { motifSvg } from '../lib/motif';
+import Chapter from '../components/Chapter.astro';
+import {
+  EL, FX, PAGE_MAGICS, NAMING, STATS, statsText, gameById, elById, fxById, chainsOf, chainOfMagic, splitNames,
+  compareRows, rowsTotal, compareUrl, magicUrl, elInk, todayMagic,
+} from '../lib/dict';
 
-const examples = ['ヒャド', 'ブリザド', 'マハリト', 'PKファイアー', '回復'];
-const bands = [
-  { label: '氷の攻撃', el: 'ice', fx: 'atk' },
-  { label: '回復', el: null, fx: 'heal' },
-  { label: '炎の攻撃', el: 'fire', fx: 'atk' },
-].map((b) => ({ ...b, list: GAMES.map((g) => chainOf(g.id, b.el, b.fx)[0]).filter(Boolean) }));
+const examples = ['ヒャド', 'ブリザド', 'サガ', 'ひょう', 'テイルズ'];
 
-const atkCount = (el: string) => MAGICS.filter((m) => m.el === el && m.fx === 'atk').length;
-const fxCount = (fx: string) => MAGICS.filter((m) => m.fx === fx).length;
-
+// 今日の魔法（ビルド日で決まる）
 const tm = todayMagic();
-const tL = [...tm.name].length;
-const tK = tL <= 3 ? 1 : tL <= 4 ? 0.86 : tL <= 6 ? 0.72 : 0.58;
+const tG = gameById[tm.game], tE = tm.el ? elById[tm.el] : null;
+const tMeta = [tG.sys, tE ? (tE.id === 'none' ? '無属性' : `${tE.name}属性`) : null, fxById[tm.fx].name].filter(Boolean).join(' ／ ');
 const d = new Date();
 const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
-const tE = tm.el ? elById[tm.el] : null;
+
+// 呼び名の帯：作品ごとに系統の最初の名前を12件
+const bands = [
+  { label: '炎', el: 'fire', fx: 'atk', what: '炎の攻撃魔法' },
+  { label: '氷', el: 'ice', fx: 'atk', what: '氷の攻撃魔法' },
+  { label: '回復', el: null, fx: 'heal', what: '回復魔法' },
+].map((b) => {
+  const rows = compareRows(b.el, b.fx);
+  // 作品ごとに1件、なるべく違う名前を優先して12件
+  const perGame = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i);
+  const names = new Set<string>();
+  const distinct = perGame.filter((r) => !names.has(r.list[0].name) && names.add(r.list[0].name));
+  const firsts = [...distinct, ...perGame.filter((r) => !distinct.includes(r))].slice(0, 12).map((r) => ({ m: r.list[0], g: r.g }));
+  const nGames = new Set(rows.map((r) => r.g.id)).size;
+  return { ...b, firsts, href: compareUrl(b.el, b.fx), more: `${b.what}を${nGames}作品で比べる（${rowsTotal(rows)}件）` };
+});
+
+// 探し方：数字は行き先の比較ページの件数と同じ
+const fxRows = FX.map((f) => ({
+  f, href: compareUrl(null, f.id),
+  c: f.id === 'atk' ? EL.reduce((a, e) => a + rowsTotal(compareRows(e.id, 'atk')), 0) : rowsTotal(compareRows(null, f.id)),
+}));
+const elRows = EL.map((e) => ({ e, c: rowsTotal(compareRows(e.id, 'atk')), label: e.id === 'none' ? '無属性の攻撃魔法' : `${e.name}属性の攻撃魔法` }));
+const sysTop = NAMING.map((t, i) => ({ ...t, i, games: t.items.filter((x) => x.href) }))
+  .sort((a, b) => b.games.length - a.games.length).slice(0, 6);
+
+// 名前の付け方：作品ごとの命名ルール（名前はデータから）
+const PAT: [string, string, string][] = [
+  ['dq', 'fire', '段階ごとに語形そのものが変わる'],
+  ['ff', 'fire', '語尾を入れ替える'],
+  ['mother', 'fire', 'ギリシャ文字で段階を表す'],
+  ['smt', 'fire', '語尾が伸びていく'],
+  ['goemon', 'fire', '頭に「ど」を付けると強化版'],
+  ['tenchi', 'fire', '「〜の計」の前が変わる'],
+  ['tengai', 'fire', '漢字二字の名前がまるごと変わる'],
+];
+const patterns = PAT.map(([gid, el, rule]) => {
+  const list = chainsOf(gid, el, 'atk')[0]?.list ?? [];
+  const parts = splitNames(list.map((m) => m.name));
+  return { g: gameById[gid], rule, items: list.map((m, i) => ({ ...parts[i], href: magicUrl(m) })) };
+}).filter((p) => p.items.length > 1);
+
+// 名前だけではわからない魔法
+const CUR = ['昭和', 'いわし', 'グリコーン', 'だだぢぢ', '？？？？', '日立'];
+const curious = CUR.map((n) => PAGE_MAGICS.find((m) => m.name === n && !gameById[m.game].group)).filter((m) => m !== undefined).map((m) => {
+  const E = m.el ? elById[m.el] : null, G = gameById[m.game];
+  return {
+    m, g: G,
+    k: [G.sys, fxById[m.fx].name, E && E.id !== 'none' ? `${E.name}属性` : null].filter(Boolean).join(' ／ '),
+    chain: chainOfMagic(m).map((x) => x.name),
+  };
+});
 ---
 <Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch
-  description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${GAMES.filter((g) => MAGICS.some((m) => m.game === g.id)).length}作品・${MAGICS.length}種の魔法と、作品ごとの魔法体系を収録。`}
+  description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${STATS.games}作品・${STATS.magics.toLocaleString()}種の魔法と、作品ごとの魔法体系を収録。`}
   jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法の言い換え辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
-  <section class="hero">
-    <div class="hero-in">
-      <div class="hero-kicker">✦ Lexicon Arcanum ✦</div>
-      <h1>RPG魔法の言い換え辞典</h1>
-      <p class="hero-sub">あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？</p>
-      <Search size="lg" />
-      <div class="examples">
-        <span class="note">検索例</span>
-        {examples.map((x) => <button class="chip-ex" type="button" data-fill={x}>{x}</button>)}
+  <main>
+    <section class="mast">
+      <div class="wrap mast__in">
+        <div>
+          <p class="t-label">{statsText}</p>
+          <h1>RPG魔法の言い換え辞典</h1>
+          <p class="mast__sub">あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？</p>
+          <Search size="lg" />
+          <div class="examples">
+            <span class="t-note">たとえば</span>
+            {examples.map((x) => <button type="button" data-fill={x}>{x}</button>)}
+          </div>
+        </div>
+        <aside class="boxed" aria-labelledby="today-h">
+          <div class="boxed__head"><span id="today-h">今日の魔法</span><span class="t-num t-note">{dateStr}</span></div>
+          <div class="today__body">
+            <a class="today__name" href={magicUrl(tm)}>{tm.name}</a>
+            <p class="today__game">{tG.name}</p>
+            <p class="today__meta">{tMeta}</p>
+            <p class="today__note">「これ、何だっけ？」となるRPGの魔法を、毎日ひとつ。</p>
+            <div class="actions">
+              <a class="btn" href={magicUrl(tm)}>この魔法を見る</a>
+              <a class="more" href="#" data-random>ランダムに1件</a>
+            </div>
+          </div>
+        </aside>
       </div>
+    </section>
 
-      <div class="band">
-        <div class="band-tabs" role="tablist">
-          {bands.map((b, i) => <button type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-panel-${i}`} data-tab aria-selected={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+    <section class="band" aria-label="呼び名の例">
+      <div class="wrap band__in">
+        <div class="band__tabs" role="tablist" aria-label="呼び名の例">
+          {bands.map((b, i) => <button class="tab" type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-${i}`} aria-selected={i === 0 ? 'true' : 'false'} data-tab>{b.label}</button>)}
         </div>
         {bands.map((b, i) => (
-          <div data-panel role="tabpanel" id={`band-panel-${i}`} aria-labelledby={`band-tab-${i}`} hidden={i !== 0}>
-            <p class="band-cap">たとえば「{b.label}魔法」は、作品によってこう呼ばれる</p>
-            <div class="ribbon">
-              {b.list.map((m, j) => (
-                <>
-                  {j > 0 && <span class="ribbon-sep" aria-hidden="true">≒</span>}
-                  <a href={magicUrl(m)}><span class="min">{m.name}</span><small>{gameById[m.game].short}</small></a>
-                </>
-              ))}
+          <div data-panel id={`band-${i}`} role="tabpanel" aria-labelledby={`band-tab-${i}`} hidden={i !== 0}>
+            <p class="band__lead">{b.what}は、</p>
+            <div class="band__items">
+              {b.firsts.map(({ m, g }) => <a href={magicUrl(m)}><b>{m.name}</b><small>{g.short}</small></a>)}
             </div>
+            <a class="more" href={b.href}>{b.more}</a>
           </div>
         ))}
       </div>
-    </div>
-  </section>
+    </section>
 
-  <main class="wrap page home">
-    <div class="home-grid">
+    <div class="wrap chapters" style="padding-block: var(--section-gap) 80px">
       <section>
-        <div class="sec-head"><h2 class="h2">属性から探す</h2><span class="note">攻撃魔法を作品横断で比較</span></div>
-        <div class="tiles tiles-el">
-          {EL.map((e) => {
-            const c = atkCount(e.id);
-            return (
-              <a class:list={['card tile', { 'is-off': !c }]} href={`/element/${e.id}`}>
-                <span class="mark" style={markStyle(e, 32)}>{e.name}</span>
-                <span><span class="tile-name">{e.name}</span><span class="tile-sub">{c ? `${c}件` : '準備中'}</span></span>
-              </a>
-            );
-          })}
+        <Chapter title="探し方を選ぶ" />
+        <div class="find">
+          <div>
+            <h3>使いみちから</h3>
+            <p class="t-note">{FX.length}の用途。数字は収録件数</p>
+            <ul class="find__fx rows">
+              {fxRows.map(({ f, c, href }) => <li><a class="row-link" href={href}><span class="row-link__main">{f.name}</span><span class="row-link__num">{c.toLocaleString()}</span></a></li>)}
+            </ul>
+          </div>
+          <div>
+            <h3>攻撃魔法を属性から</h3>
+            <p class="t-note">同じ属性の呼び名を作品横断で比較</p>
+            <ul class="rows">
+              {elRows.map(({ e, c, label }) => (
+                <li><a class="row-link" href={`/element/${e.id}`}>
+                  <span class="find__el" style={`color:${elInk(e)}`} aria-hidden="true">{e.name}</span>
+                  <span class="row-link__main">{label}</span><span class="row-link__num">{c}</span>
+                </a></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>作品から</h3>
+            <p class="t-note">作品によって「魔法」の呼び方も違う</p>
+            <ul class="rows">
+              {sysTop.map((s) => (
+                <li><a class="row-link" href={`/names#t${s.i}`}>
+                  <span class="find__sys">{s.term}</span>
+                  <span class="find__ex">{s.games.slice(0, 3).map((x) => x.short).join('・')}</span>
+                  <span class="row-link__num">{s.games.length}作品</span>
+                </a></li>
+              ))}
+            </ul>
+            <a class="more" href="/game">収録{STATS.games}作品をすべて見る</a>
+          </div>
         </div>
       </section>
-      <section>
-        <div class="sec-head"><h2 class="h2">使用目的から探す</h2></div>
-        <div class="tiles tiles-fx">
-          {FX.map((f) => (
-            <a class="card tile tile-fx" href={compareUrl(null, f.id)}>
-              <span class="mark" style={markStyle(null, 28)}>{f.kanji}</span>
-              <span class="tile-name">{f.name}</span>
-              <span class="note">{fxCount(f.id)}件</span>
-              <span class="tile-arrow" aria-hidden="true">›</span>
-            </a>
+
+      <section class="sec">
+        <Chapter title="名前の付け方を読み比べる" />
+        <p class="intro">強くなるとき、名前のどこが変わるか。下線の部分が段階ごとに変わる部分です。</p>
+        {patterns.map((p) => (
+          <div class="pat pat--rule">
+            <span class="pat__game">{p.g.name}</span>
+            <span class="chain">
+              {p.items.map((it, i) => <>{i > 0 && <span class="chain__sep" aria-hidden="true">→</span>}<a href={it.href}>{it.a}<span class:list={{ chain__diff: it.hl && it.b }}>{it.b}</span>{it.c}</a></>)}
+            </span>
+            <span class="pat__rule">{p.rule}</span>
+          </div>
+        ))}
+        <a class="more" href="/names">呪文・術・PSI…{NAMING.length}通りの「魔法の呼び方」を読む</a>
+      </section>
+
+      <section class="sec">
+        <Chapter title="名前だけでは、何の魔法かわからない" />
+        <p class="intro">すべて収録データにある実在の魔法名です。押すと答えが出ます。</p>
+        <div class="cur">
+          {curious.map((c) => (
+            <details>
+              <summary><span class="cur__name">{c.m.name}</span><span class="cur__hint">どの作品の、何の魔法？　▸ めくる</span></summary>
+              <div class="cur__ans">
+                <b>{c.g.name}</b>
+                <span>{c.k}</span>
+                {c.chain.length > 1 && <span>{c.chain.join(' → ')}</span>}
+                <a href={magicUrl(c.m)}>{c.m.name}のページへ</a>
+              </div>
+            </details>
           ))}
         </div>
       </section>
-    </div>
 
-    <div class="home-grid">
-      <section class="card today">
-        <div class="today-top"><span class="lbl">今日の魔法</span><span class="url">{dateStr}</span></div>
-        <div class="today-scene">
-          <Fragment set:html={motifSvg(kindOf(tm))} />
-          <div class="today-name" style={`--k:${tK}`}>{tm.name}</div>
-          <div class="today-game">{gameById[tm.game].name}</div>
-        </div>
-        <div class="badges">
-          {tE && <span class="badge"><span class="mark" style={markStyle(tE, 20)}>{tE.name}</span>{tE.name}</span>}
-          <span class="badge"><span class="mark" style={markStyle(null, 20)}>{fxById[tm.fx].kanji}</span>{fxById[tm.fx].name}</span>
-        </div>
-        <p class="today-note">「これ何だっけ？」となるRPG魔法を毎日ひとつ。</p>
-        <div class="actions">
-          <a class="btn btn-solid" href={magicUrl(tm)}>詳しく見る</a>
-          <a class="btn btn-line" href="#" data-random>ランダムに探す</a>
-        </div>
-      </section>
-      <section>
-        <div class="sec-head"><h2 class="h2">作品から探す</h2><a class="more" href="/game">すべての作品 →</a></div>
-        <div class="rows">
-          {GAMES.map((g) => (
-            <a href={systemUrl(g.id)}>
-              <span class="r-name">{g.name}</span>
-              <span class="tag">{g.sys}</span>
-              <span class="r-num">{MAGICS.filter((m) => m.game === g.id).length}</span>
-            </a>
-          ))}
+      <section class="essay" aria-label="この辞典について">
+        <p class="essay__words">あの頃、夢中だった。<br />魔法の名前を見ただけで、冒険の続きを思い出す。</p>
+        <div>
+          <p class="prose">同じ氷の魔法でも、ドラゴンクエストでは「ヒャド」、FINAL FANTASYでは「ブリザド」、メガテンでは「ブフ」。この辞典は、攻略のためではなく、名前の違いを眺めるために作りました。知っている名前から、まだ遊んだことのない作品の名前へ。</p>
+          <a class="more" href="/about">このサイトについて・データの集め方</a>
         </div>
       </section>
     </div>

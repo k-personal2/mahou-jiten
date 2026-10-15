@@ -1,106 +1,156 @@
 ---
 import Base from '../layouts/Base.astro';
-import FilterBar from './FilterBar.astro';
-import { REP_GAMES as GAMES, variantsOf, elById, fxById, chainsOf, kindName, titleOf, subOf, tone, markStyle, magicUrl, systemUrl, compareUrl, type Magic, type Game } from '../lib/dict';
+import Chapter from './Chapter.astro';
+import {
+  EL, FX, SYSTEMS, elById, kindName, titleOf, subOf, splitNames, compareRows, firstNames, rowsTotal,
+  magicUrl, systemUrl, compareUrl,
+} from '../lib/dict';
 interface Props { el: string | null; fx: string }
 const { el, fx } = Astro.props;
-const E = el ? elById[el] : null, F = fxById[fx];
-// 1行＝1系統。細分類（眠り・毒など）がある用途は細分類ごとにまとめる
-type Row = { g: Game; list: Magic[]; kind: string | null };
-const all: Row[] = GAMES.flatMap((g) => chainsOf(g.id, el, fx).map((c) => ({ g, list: c.list, kind: c.kind })));
-const kindOrder = Object.keys(F.kinds ?? {});
-// 細分類なし（＝その用途の基本形）→ 定義順の細分類 → 未定義
-// 細分類が主の用途（状態異常など）では細分類なしを末尾の「その他」に、そうでなければ先頭（基本形）に
-const kinded = all.filter((r) => r.kind).length > all.length / 2;
-const rank = (k: string | null) => (!k ? (kinded ? kindOrder.length + 1 : -1) : kindOrder.includes(k) ? kindOrder.indexOf(k) : kindOrder.length);
-const rows = [...all].sort((a, b) => rank(a.kind) - rank(b.kind));
-const nGames = new Set(rows.map((r) => r.g.id)).size;
-const total = rows.reduce((a, r) => a + r.list.length, 0);
+const E = el ? elById[el] : null;
 const title = titleOf(el, fx);
-const toCard = ({ g, list, kind }: Row) => {
-  const b = list[0], vars = variantsOf(g.id, el, fx, kind, list);
-  return { g, b, sys: subOf(b), rest: list.slice(1), vars: vars.slice(0, 3), more: Math.max(0, vars.length - 3) };
-};
-const groups: { label: string | null; cards: ReturnType<typeof toCard>[] }[] = [];
-rows.forEach((r) => {
-  const label = kindOrder.length ? kindName(fx, r.kind) ?? (r.kind || kinded ? 'その他' : F.phrase) : null;
-  const gp = groups.find((x) => x.label === label) ?? (groups.push({ label, cards: [] }), groups[groups.length - 1]);
-  gp.cards.push(toCard(r));
+const rows = compareRows(el, fx);
+const total = rowsTotal(rows);
+const nGames = new Set(rows.map((r) => r.g.id)).size;
+const names = firstNames(rows);
+const shared = names.filter((n) => n.games.length > 1);
+const unique = names.filter((n) => n.games.length === 1);
+const top3 = names.slice(0, 3).map((n) => n.name);
+const lead = rows.length ? `${top3.join('、')}。${title}は、${nGames}作品・${total}件、${names.length}通りの名前で呼ばれています。` : '';
+
+// 名前の変わり方：2段以上ある系統（同じ並びは1つに）
+const seen = new Set<string>();
+const patterns = rows.filter((r) => r.list.length > 1).filter((r) => {
+  const k = r.list.map((m) => m.name).join('|');
+  return !seen.has(k) && (seen.add(k), true);
+}).map((r) => {
+  const parts = splitNames(r.list.map((m) => m.name));
+  return { g: r.g, items: r.list.map((m, i) => ({ ...parts[i], href: magicUrl(m) })) };
 });
-const nNames = new Set(rows.map((r) => r.list[0].name)).size;
-const cols = [...Array(Math.max(4, ...rows.map((r) => r.list.length))).keys()];
-// 例：炎属性の攻撃魔法を26作品で比較。メラ（DQ）、ファイア（FFV）、アギ（真・女神転生III）など41通りの呼び名。
-const sample = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i).slice(0, 3).map((r) => `${r.list[0].name}（${r.g.short}）`).join('、');
+
+// 段階対応表の列数
+const n = Math.max(3, ...rows.map((r) => r.list.length));
+const cols = [...Array(n).keys()];
+
+// 作品の中での属性の呼び名（同じ呼び名の作品をまとめる）
+const elNames = (() => {
+  if (!el) return [];
+  const m = new Map<string, string[]>();
+  rows.forEach(({ g }) => {
+    const local = SYSTEMS[g.id]?.elementNames?.[el];
+    if (local && !m.get(local)?.includes(g.name)) m.set(local, [...(m.get(local) ?? []), g.name]);
+  });
+  return [...m].map(([local, games]) => ({ local, games }));
+})();
+
+// ほかの比較：属性ページは次の属性2つ＋回復、用途ページは次の用途3つ
+const sample = (e: string | null, f: string) => firstNames(compareRows(e, f)).slice(0, 4).map((x) => x.name).join(' ／ ');
+const related = (el
+  ? [...EL.filter((e) => e.id !== 'none'), ...EL.filter((e) => e.id !== 'none')].slice(EL.findIndex((e) => e.id === el) + 1).slice(0, 2).map((e) => ({ e: e.id as string | null, f: 'atk' })).concat(fx === 'heal' ? [] : [{ e: null, f: 'heal' }])
+  : [...FX, ...FX].slice(FX.findIndex((f) => f.id === fx) + 1).filter((f) => f.id !== 'atk').slice(0, 3).map((f) => ({ e: null as string | null, f: f.id }))
+).map(({ e, f }) => ({ title: `${titleOf(e, f)}の言い換え一覧`, href: compareUrl(e, f), ex: sample(e, f) })).filter((x) => x.ex);
+
 const desc = rows.length
-  ? `${title}を${nGames}作品で比較。${sample}など${nNames}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
+  ? `${title}を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
   : `${title}を作品ごとに比較します。`;
-const gaugeColor = tone(E).ink;
 ---
-<Base title={`${title}の言い換え一覧｜RPG魔法の言い換え辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
+<Base title={`${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法の言い換え辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
   crumbs={[{ name: 'トップ', path: '/' }, { name: title, path: compareUrl(el, fx) }]}>
-  <main class="wrap page">
-    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span>横断比較</span><span>›</span><span aria-current="page">{title}</span></nav>
+  <main class="wrap page chapters">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span>比べる</span><span>›</span><span aria-current="page">{title}</span></nav>
+    <h1 class="t-h1">{title}の言い換え一覧</h1>
+    {lead && <p class="lead">{lead}</p>}
 
-    <header class="cmp-head">
-      <span class="mark" style={markStyle(E, 72)}>{E ? E.name : F.kanji}</span>
+    <nav class="filters" aria-label="属性・用途で絞り込み">
       <div>
-        <p class="lbl">{title} ・ {nGames}作品 · {total}件</p>
-        <h1 class="cmp-h1">{E ? E.name + 'の' : ''}{F.name}魔法、<br />ゲームによってこんなに違う。</h1>
-        {rows.length > 0 && <p class="cmp-lead">同じ役割の魔法を作品ごとに読み比べ。{nGames}作品で{nNames}通りの呼び名があります。</p>}
+        <span class="t-label">属性</span>
+        <ul>{EL.map((e) => <li><a href={`/element/${e.id}`} aria-current={fx === 'atk' && el === e.id ? 'page' : undefined}>{e.name}</a></li>)}</ul>
       </div>
-    </header>
-
-    <FilterBar el={el} fx={fx} />
+      <div>
+        <span class="t-label">用途</span>
+        <ul class="is-scroll">{FX.map((f) => <li><a href={compareUrl(el, f.id)} aria-current={fx === f.id ? 'page' : undefined}>{f.name}</a></li>)}</ul>
+      </div>
+    </nav>
 
     {rows.length === 0 ? (
-      <div class="empty"><strong>この組み合わせの魔法はまだ収録されていません</strong><p>別の属性・用途を選んでください。</p></div>
+      <p class="empty">この組み合わせの魔法はまだ収録されていません。別の属性・用途を選んでください。</p>
     ) : (
       <>
-        {groups.map((gp) => (
-          <section class="cmp-group" aria-label={gp.label ?? '作品ごとの呼び名'}>
-            {gp.label && <h2 class="h2 cmp-kind">{gp.label}</h2>}
-            <div class="cards">
-              {gp.cards.map((c) => (
-                <a class="card cmp-card" href={magicUrl(c.b)}>
-                  <span class="cmp-card-top"><span class="cmp-game">{c.g.name}</span><span class="tag dot">{c.sys}</span></span>
-                  <span class="cmp-name">{c.b.name}</span>
-                  <span class="cmp-rest">{c.rest.length ? '› ' + c.rest.map((r) => r.name).join(' › ') : 'この系統はこの1種'}</span>
-                  {c.vars.length > 0 && (
-                    <span class="cmp-vars">
-                      {c.vars.map((v) => <span><b>{v.g.short}</b>{v.list.map((x) => x.name).join(' › ')}</span>)}
-                      {c.more > 0 && <span>ほか{c.more}作品</span>}
-                    </span>
-                  )}
-                </a>
-              ))}
+        <section class="sec">
+          <Chapter title={shared.length ? '複数の作品で使われている名前' : '作品ごとの名前'} />
+          <p class="intro">系統の最初の名前で数えています。</p>
+          {shared.map((o) => (
+            <div class:list={['idx', { 'idx--lg': o.games.length >= 4 }]}>
+              <span class="idx__name"><a href={magicUrl(o.magic)}>{o.name}</a><span class="t-num t-note">{o.games.length}作品</span></span>
+              <span class="idx__works">{o.games.map((g) => g.name).join('、')}</span>
             </div>
-          </section>
-        ))}
+          ))}
+          {unique.length > 0 && (
+            <>
+              {shared.length > 0 && <h3 class="unique">この作品だけの名前</h3>}
+              <ul class="unique-list">{unique.map((o) => <li><a href={magicUrl(o.magic)} title={o.games[0].name}>{o.name}</a></li>)}</ul>
+            </>
+          )}
+        </section>
 
-        <section class="sec pc-only">
-          <div class="sec-head">
-            <h2 class="h2">段階対応表</h2>
-            <span class="note">各作品の系統内での段階。威力の厳密な一致ではありません</span>
-          </div>
-          <div class="card matrix" style={`--g:${gaugeColor};--cols:${cols.length}`}>
-            <div class="mx-row mx-head">
-              <span>作品</span><span>分類</span>
-              {cols.map((i) => (
-                <span class="mx-th"><span class="gauge">{cols.map((j) => <i class:list={{ on: j <= i }}></i>)}</span>{i + 1}段目</span>
-              ))}
+        {patterns.length > 0 && (
+          <section class="sec">
+            <Chapter title="強くなると、名前はどう変わる？" />
+            <p class="intro">下線の部分が段階ごとに変わる部分です。</p>
+            {patterns.map((p, i) => (
+              <div class="pat" data-more-item={i >= 8 ? 'pat' : undefined} hidden={i >= 8}>
+                <span class="pat__game">{p.g.name}</span>
+                <span class="chain">
+                  {p.items.map((it, j) => <>{j > 0 && <span class="chain__sep" aria-hidden="true">→</span>}<a href={it.href}>{it.a}<span class:list={{ chain__diff: it.hl && it.b }}>{it.b}</span>{it.c}</a></>)}
+                </span>
+              </div>
+            ))}
+            {patterns.length > 8 && <button class="btn btn--line" type="button" style="margin-top:14px" data-more="pat" data-less="8件に戻す" aria-expanded="false">残り{patterns.length - 8}件を表示</button>}
+          </section>
+        )}
+
+        <section class="sec">
+          <Chapter title="段階対応表" />
+          <p class="intro" style="font-size:14px">各作品の系統の中で何段目か、を並べた表です。作品をまたいだ威力の一致ではありません。下の小さな文字は対象範囲です。</p>
+          <div class="tbl mx" role="table" aria-label={`${title}の段階対応表`} style={`--n:${n}`}>
+            <div class="tbl__row tbl__head" role="row">
+              <span role="columnheader">作品</span><span role="columnheader">作品内の分類</span>
+              {cols.map((i) => <span role="columnheader">{i + 1}段目</span>)}
             </div>
-            {rows.map(({ g, list, kind }) => (
-              <div class="mx-row">
-                <a class="mx-game" href={systemUrl(g.id)}>{g.name}{kindName(fx, kind) && <small class="mx-kind">{kindName(fx, kind)}</small>}</a>
-                <span><span class="tag">{subOf(list[0])}</span></span>
-                {cols.map((i) => list[i]
-                  ? <a class="mx-cell" href={magicUrl(list[i])}><span class="min">{list[i].name}</span><small>{list[i].scope}</small></a>
-                  : <span class="mx-none">—</span>)}
+            {rows.map(({ g, list, kind }, ri) => (
+              <div class="tbl__row" role="row" data-more-item={ri >= 16 ? 'mx' : undefined} hidden={ri >= 16}>
+                <a class="mx__game" role="cell" href={systemUrl(g.id)}>{g.name}</a>
+                <span class="mx__k" role="cell">{subOf(list[0])}{kindName(fx, kind) && `・${kindName(fx, kind)}`}</span>
+                <span class="mx__cells">
+                  {cols.map((i) => list[i]
+                    ? <a class="mx__cell" role="cell" href={magicUrl(list[i])}><b>{list[i].name}</b><small>{list[i].scope}</small></a>
+                    : <span class="mx__none" role="cell">—</span>)}
+                </span>
               </div>
             ))}
           </div>
+          {rows.length > 16 && <button class="btn btn--line" type="button" style="margin-top:14px" data-more="mx" data-less="16系統に戻す" aria-expanded="false">残り{rows.length - 16}系統を表示（全{rows.length}系統）</button>}
         </section>
+
+        {E && elNames.length > 0 && (
+          <section class="sec">
+            <Chapter title={`作品の中では、${E.name}をどう呼ぶ？`} />
+            <p class="intro">サイトでは共通の「{E.name}」にまとめていますが、作品の中の分類はそろっていません。無理に一つの尺度にせず、作品の呼び名をそのまま載せます。</p>
+            <div class="eln">
+              {elNames.map((x) => <div><span>{x.games.join(' ／ ')}</span><b>{x.local}</b></div>)}
+            </div>
+          </section>
+        )}
       </>
+    )}
+
+    {related.length > 0 && (
+      <section class="sec">
+        <Chapter title="ほかの言い換えも比べる" />
+        <div class="related">
+          {related.map((x) => <a href={x.href}><span>{x.title}</span><span>{x.ex}</span></a>)}
+        </div>
+      </section>
     )}
   </main>
 </Base>

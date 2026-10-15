@@ -1,102 +1,134 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Chapter from '../../components/Chapter.astro';
 import Chain from '../../components/Chain.astro';
 import {
-  PAGE_MAGICS, REP_GAMES, SYSTEMS, SYSTEM_NAMES, groupOf, appearancesOf, gameById as gById, gameById, elById, fxById, chainOfMagic, chainsOf, kindName, titleOf, subOf, elnOf, effectText,
-  buildGroups, markStyle, tone, magicUrl, systemUrl, compareUrl, type Magic,
+  PAGE_MAGICS, SYSTEMS, groupOf, appearancesOf, gameById, elById, fxById, chainOfMagic, kindName, titleOf, subOf, elnOf, leadParts,
+  buildGroups, compareRows, firstNames, magicUrl, systemUrl, compareUrl, type Magic,
 } from '../../lib/dict';
 
 export function getStaticPaths() {
   return PAGE_MAGICS.map((m) => ({ params: { id: m.id }, props: { m } }));
 }
 const { m } = Astro.props as { m: Magic };
-const G = gameById[m.game], E = m.el ? elById[m.el] : null, F = fxById[m.fx];
-const ch = chainOfMagic(m);
+const G = gameById[m.game], E = m.el ? elById[m.el] : null, F = fxById[m.fx], S = SYSTEMS[m.game];
+const ch = chainOfMagic(m), idx = ch.findIndex((c) => c.id === m.id);
 const kn = kindName(m.fx, m.kind);
-const idx = ch.findIndex((c) => c.id === m.id);
 const eln = elnOf(m.game, m.el);
-const cmpTitle = titleOf(m.el, m.fx);
-const cmpHref = compareUrl(m.el, m.fx);
-const desc = effectText(m);
-
-// 他作品の同じ属性×用途の系統（細分類があるものは同じ細分類だけ）
-const others = REP_GAMES.filter((g) => g.id !== groupOf(m.game))
-  .flatMap((g) => chainsOf(g.id, m.el, m.fx).filter((c) => !F.kinds || c.kind === (m.kind ?? null)).map((c) => ({ g, list: c.list })))
-  .map(({ g, list }) => {
-    const ei = Math.min(idx, list.length - 1), eq = list[ei];
-    return { g, list, eq, tier: `${ei + 1}段目${ei < idx ? '・最上位' : ''}` };
-  });
-const miniGroups = buildGroups(m.game, [m.fx], { curId: m.id, el: m.el });
-const names = [...SYSTEM_NAMES].sort(([a], [b]) => Number(b === G.sys) - Number(a === G.sys));
-const gauge = tone(E).ink;
-const segs = [...Array(Math.max(4, ch.length)).keys()];
-const S = SYSTEMS[m.game];
+const cmpTitle = titleOf(m.el, m.fx), cmpHref = compareUrl(m.el, m.fx);
+const lead = leadParts(m);
 // 同じ作品に同名の魔法が複数あるとき（ロマサガの各系統のエレメンタルなど）は、補足の冒頭（「火術」など）で区別する
 const twin = PAGE_MAGICS.some((x) => x !== m && x.game === m.game && x.name === m.name);
 const tag = twin ? (m.note?.split('。')[0] ?? '').slice(0, 8) || m.id : '';
 const label = tag ? `${m.name}・${tag}` : m.name;
+
+// 他作品の呼び名：同じ属性×用途（細分類がある用途は同じ細分類）の系統の最初の名前を、名前ごとにまとめる
+const rows = compareRows(m.el, m.fx).filter((r) => !F.kinds || r.kind === (m.kind ?? null));
+const allNames = firstNames(rows);
+const others = firstNames(rows.filter((r) => r.g.id !== groupOf(m.game)));
+const what = kn ? `${F.name}（${kn}）の魔法` : cmpTitle;
+const nGames = new Set(rows.map((r) => r.g.id)).size;
+
+const tags = [
+  E && { label: E.id === 'none' ? '無属性' : `${E.name}属性`, href: m.fx === 'atk' ? `/element/${E.id}` : undefined },
+  { label: F.name + (kn ? `（${kn}）` : ''), href: m.fx === 'atk' ? undefined : compareUrl(null, m.fx) },
+  m.scope && { label: m.scope },
+].filter(Boolean) as { label: string; href?: string }[];
+
+const spec = [
+  { k: '作品内の分類', v: subOf(m) },
+  E && { k: '属性', v: E.name, note: eln ? `作品内では「${eln}」` : '作品内の固有の呼び名はなし' },
+  { k: '用途', v: F.name + (kn ? `（${kn}）` : '') },
+  m.scope && { k: '対象', v: m.scope },
+  m.cost && { k: '消費', v: m.cost },
+  m.users?.length && { k: '主な使用者', v: m.users.join('、') },
+  { k: '系統', v: ch.length > 1 ? `${idx + 1}段目 ／ 全${ch.length}段` : 'この1つだけ' },
+  m.kana && { k: '読み', v: m.kana },
+].filter(Boolean) as { k: string; v: string; note?: string }[];
+
 // 同じシリーズで同じ名前の魔法（登場作品の表）
-const apps = appearancesOf(m).map((x) => ({ x, g: gById[x.game] }));
+const apps = appearancesOf(m).map((x) => ({ x, g: gameById[x.game] }));
+// 作品の体系：同じ用途の系統を並べ、この魔法の系統に色を付ける
+const groups = buildGroups(m.game, [m.fx], { curId: m.id });
+// 出典は URL の重複を除く
+const src = (m.src ?? []).filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
+
+const otherSample = others.slice(0, 2).map((o) => `${o.games[0].short}では${o.name}`).join('、');
+const url = new URL(magicUrl(m), Astro.site ?? Astro.url).href;
+const shareBase = `${m.name}（${G.short}）${otherSample ? `は、${otherSample}。` : ''}\n${url}`;
 ---
 <Base
-  title={`${label}（${G.name}）の他作品での呼び名｜RPG魔法の言い換え辞典`}
-  description={`${G.name}の${m.name}は、他のRPGでは何と呼ばれる？ ${others.filter((o, i) => others.findIndex((x) => x.g.id === o.g.id) === i).slice(0, 3).map((o) => `${o.g.short}では${o.eq.name}`).join('、')}など。`}
-  active="magic" path={magicUrl(m)}
+  title={`${label}（${G.name}）の他作品での呼び名と系統｜RPG魔法の言い換え辞典`}
+  description={`${G.name}の${m.name}は、他のRPGでは何と呼ばれる？ ${others.slice(0, 3).map((o) => `${o.games[0].short}では${o.name}`).join('、')}など。`}
+  active="compare" path={magicUrl(m)}
   crumbs={[{ name: 'トップ', path: '/' }, { name: cmpTitle, path: cmpHref }, { name: m.name, path: magicUrl(m) }]}>
-  <main class="wrap page">
+  <main class="wrap page chapters">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href={cmpHref}>{cmpTitle}</a><span>›</span><span aria-current="page">{m.name}</span></nav>
 
-    <header class="m-head">
-      <a class="m-game" href={systemUrl(m.game)}>{G.name}<span> の{G.sys}</span></a>
-      <h1 class="m-name">{m.name}</h1>
-      {m.kana && <p class="m-kana">{m.kana}</p>}
-      <span class="url">{magicUrl(m)}</span>
-      <div class="badges">
-        {E && <span class="badge"><span class="mark" style={markStyle(E, 22)}>{E.name}</span>{E.name}</span>}
-        <span class="badge"><span class="mark" style={markStyle(null, 22)}>{F.kanji}</span>{F.name}{kn && `（${kn}）`}</span>
-        {m.scope && <span class="badge"><span class="mark" style={markStyle(null, 22)}>的</span>{m.scope}</span>}
-        <span class="badge"><span class="mark" style={markStyle(null, 22)}>段</span>系統 {idx + 1} / {ch.length}</span>
+    <div class="m-top">
+      <div>
+        <a class="m-game" href={systemUrl(m.game)}>{G.name}の{G.sys === 'なし' ? '魔法' : G.sys}</a>
+        <h1 class:list={['m-name', { 'm-name--long': [...m.name].length > 6 }]}>{m.name}</h1>
+        <p class="lead">
+          {lead.head}{lead.chain && <>{lead.chain.root}系統の<b>{lead.chain.tier}段目</b>（全{lead.chain.n}段）。</>}
+        </p>
+        {m.desc && <p class="desc">{m.desc}</p>}
+        <div class="tags">{tags.map((t) => (t.href ? <a href={t.href}>{t.label}</a> : <span>{t.label}</span>))}</div>
       </div>
-      <div class="m-effect"><span class="lbl">効果</span><p>{desc}</p>{m.note && <p class="m-note">{m.note}</p>}</div>
-    </header>
-
-    <div class="stats">
-      <div class="card stat">
-        <span class="lbl">威力段階</span>
-        <span class="gauge gauge-lg" style={`--g:${gauge}`}>{segs.map((j) => <i class:list={{ on: j <= idx }}></i>)}</span>
-        <span class="stat-v">{idx + 1}段目</span><span class="stat-s">系統全{ch.length}段中</span>
-      </div>
-      <div class="card stat"><span class="lbl">対象</span><span class="stat-v">{m.scope ?? '—'}</span><span class="stat-s">{m.scope ? '' : '作品・版により異なる'}</span></div>
-      <div class="card stat"><span class="lbl">作品内の分類</span><span class="stat-v">{subOf(m)}</span><span class="stat-s">{G.name}</span></div>
-      <div class="card stat"><span class="lbl">作品内の属性名</span><span class="stat-v">{eln ?? (E ? E.name : '—')}</span><span class="stat-s">{eln ? `${E!.name}属性をこう呼ぶ` : E ? '固有の呼び名なし' : '属性なし'}</span></div>
-      {m.cost && <div class="card stat"><span class="lbl">消費</span><span class="stat-v">{m.cost}</span><span class="stat-s">{G.short}での表記</span></div>}
-      {m.users && m.users.length > 0 && <div class="card stat stat-wide"><span class="lbl">主な使用者</span><span class="stat-v stat-users">{m.users.join('、')}</span></div>}
+      <aside class="boxed data" aria-labelledby="data-h">
+        <div class="boxed__head" id="data-h">データ</div>
+        <dl>
+          {spec.map((s) => <div><dt>{s.k}</dt><dd>{s.v}{s.note && <small>{s.note}</small>}</dd></div>)}
+          {m.note && <div><dt>補足</dt><dd class="is-note">{m.note}</dd></div>}
+        </dl>
+      </aside>
     </div>
 
+    {ch.length > 1 && (
+      <section class="sec">
+        <Chapter title={`${ch[0].name}の系統`} />
+        <ol class="tiers">
+          {ch.map((c, i) => (
+            <li><a href={magicUrl(c)} aria-current={c.id === m.id ? 'page' : undefined}>
+              <span class="t-label">{i + 1}段目</span><b>{c.name}</b>{c.scope && <small>{c.scope}</small>}
+            </a></li>
+          ))}
+        </ol>
+        <p class="t-note" style="margin-top:10px">対象範囲（単体・グループ・全体）は作品や版によって変わることがあります。</p>
+      </section>
+    )}
+
     <section class="sec">
-      <div class="sec-head"><h2 class="h2">同系統の{G.sys}</h2></div>
-      <div class="lineage">
-        {ch.map((c, i) => (
-          <>
-            {i > 0 && <span class="lineage-sep" aria-hidden="true">→</span>}
-            <a href={magicUrl(c)} aria-current={c.id === m.id ? 'page' : undefined}>
-              <span class="tier">{i + 1}段目</span><span class="min">{c.name}</span>{c.scope && <span class="scope">{c.scope}</span>}
-            </a>
-          </>
-        ))}
+      <Chapter title="他の作品では何と呼ぶ？" />
+      {others.length === 0 ? (
+        <p class="intro">この組み合わせは、ほかの作品にはまだ収録されていません。</p>
+      ) : (
+        <>
+          <p class="intro">{what}は、{nGames}作品で{allNames.length}通りの名前があります。各作品の系統の最初の名前を、呼び名ごとにまとめました。</p>
+          {others.map((o, i) => (
+            <div class="idx" data-more-item={i >= 10 ? 'others' : undefined} hidden={i >= 10}>
+              <span class="idx__name"><a href={magicUrl(o.magic)}>{o.name}</a>{o.games.length > 1 && <span class="t-num t-note">{o.games.length}作品</span>}</span>
+              <span class="idx__works">{o.games.map((g) => g.name).join('、')}</span>
+            </div>
+          ))}
+        </>
+      )}
+      <div class="actions">
+        {others.length > 10 && <button class="btn--line btn" type="button" data-more="others" data-less="10件に戻す" aria-expanded="false">残り{others.length - 10}件の呼び名も表示</button>}
+        <a class="more" href={cmpHref}>段階ごとに比べる：{cmpTitle}の言い換え一覧</a>
       </div>
     </section>
 
     {apps.length > 1 && (
       <section class="sec">
-        <div class="sec-head"><h2 class="h2">登場作品</h2><span class="note">{G.series ?? G.name}で「{m.name}」が出てくる作品</span></div>
-        <div class="card apps">
-          <div class="apps-row apps-head"><span>作品</span><span>消費</span><span>主な使用者</span></div>
+        <Chapter title={`${m.name}が出てくる作品`} />
+        <div class="tbl apps" role="table" aria-label={`${m.name}が出てくる作品`}>
+          <div class="tbl__row tbl__head" role="row"><span role="columnheader">作品</span><span role="columnheader">消費</span><span role="columnheader">主な使用者</span></div>
           {apps.map(({ x, g }) => (
-            <div class="apps-row">
-              <a href={systemUrl(g.id)}>{g.short}</a>
-              <span>{x.cost ?? '—'}</span>
-              <span>{x.users?.join('、') ?? '—'}</span>
+            <div class="tbl__row" role="row">
+              <span role="cell"><a href={systemUrl(g.id)} style="color:var(--ink)">{g.short}</a></span>
+              <span role="cell" class="t-num">{x.cost ?? '—'}</span>
+              <span role="cell">{x.users?.join('、') ?? '—'}</span>
             </div>
           ))}
         </div>
@@ -104,59 +136,86 @@ const apps = appearancesOf(m).map((x) => ({ x, g: gById[x.game] }));
     )}
 
     <section class="sec">
-      <div class="sec-head"><h2 class="h2">他作品では？</h2><a class="more" href={cmpHref}>{cmpTitle}をすべて比較 →</a></div>
-      <div class="card others pc-only">
-        <div class="o-row o-head"><span>作品</span><span>同じ段階（{idx + 1}段目）</span><span>系統</span><span>分類</span></div>
-        {others.length === 0 && <div class="o-row"><span class="note">この組み合わせは、ほかの作品にはまだ収録されていません。</span></div>}
-        {others.map((o) => (
-          <div class="o-row">
-            <a class="mx-game" href={systemUrl(o.g.id)}>{o.g.name}</a>
-            <a class="o-eq" href={magicUrl(o.eq)}><span class="min">{o.eq.name}</span><small>{o.tier}</small></a>
-            <div class="o-chain">
-              {o.list.map((x, i) => <>{i > 0 && <span>›</span>}<a class:list={{ 'is-eq': x.id === o.eq.id }} href={magicUrl(x)}>{x.name}</a></>)}
+      <Chapter title={`${G.name}の${F.name}${F.name.length > 2 ? 'の' : ''}${G.sys === 'なし' ? '魔法' : G.sys}`} />
+      <div class="split">
+        <div>
+          {S && <p class="prose">{S.overview}</p>}
+          <a class="more" href={systemUrl(m.game)}>{G.name}の魔法体系をすべて読む</a>
+        </div>
+        <div class="lines">
+          {groups.flatMap((gp) => gp.lines.map((ln) => (
+            <div class:list={{ 'is-cur': ln.items.some((it) => it.cur) }}>
+              <span class="lines__lbl">{gp.label}</span>
+              <Chain line={ln} />
             </div>
-            <span class="o-sys">{subOf(o.eq)}</span>
-          </div>
-        ))}
-      </div>
-      <div class="card o-list sp-only">
-        {others.map((o) => (
-          <a href={magicUrl(o.eq)}>
-            <span><small>{o.g.name} · {o.tier}</small><span class="min">{o.eq.name}</span><small>{o.list.map((x) => x.name).join(' › ')}</small></span>
-            <span class="tile-arrow" aria-hidden="true">›</span>
-          </a>
-        ))}
-      </div>
-    </section>
-
-    <section class="sec">
-      <div class="sec-head"><h2 class="h2">この作品の魔法体系</h2><a class="more" href={systemUrl(m.game)}>{G.name}の魔法体系を見る →</a></div>
-      <div class="two">
-        <div class="card sys-card">
-          <p class="prose">{S.overview}</p>
-          <div class="sys-mini">
-            {miniGroups.map((gp) => (
-              <div>
-                <div class="grp-head"><span class="mark" style={markStyle(gp.el, 22)}>{gp.mark}</span>{gp.label}</div>
-                <Chain lines={gp.lines} />
-              </div>
-            ))}
-          </div>
-          <a class="btn btn-line" style="align-self:flex-start;height:40px" href={systemUrl(m.game)}>詳しく見る →</a>
-        </div>
-        <div class="card names">
-          <span class="lbl">魔法体系の呼び方</span>
-          <p>作品ごとに「魔法」の分類名も異なります。</p>
-          {names.map(([s, gs]) => <div class:list={['names-row', { 'is-cur': s === G.sys }]}><span>{gs.join('・')}</span><span class="min">{s}</span></div>)}
+          )))}
         </div>
       </div>
     </section>
 
-    {m.src && m.src.length > 0 && (
-      <section class="sec">
-        <div class="sec-head"><h2 class="h2">出典</h2><span class="note">名称・効果の確認に使った資料</span></div>
-        <ul class="src-list">{m.src.map((x) => <li><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
+    <section class="memory" aria-labelledby="memory-h" data-share={shareBase} data-name={m.name}>
+      <div class="split" style="gap:16px 48px">
+        <div>
+          <h2 id="memory-h">{m.name}で、何を思い出す？</h2>
+          <p class="intro" style="margin-top:8px;font-size:14px">書かなくてもかまいません。ひとこと添えて共有したいときだけ使ってください。投稿前に必ず内容を確認できます。</p>
+        </div>
+        <div>
+          <div data-step="edit">
+            <label class="t-note" for="memo">思い出（任意・60字まで）</label>
+            <textarea id="memo" maxlength="60" rows="2" placeholder="例：冬にこたつで、兄のプレイを横で見ていた頃"></textarea>
+            <div class="actions" style="margin-top:10px">
+              <button class="btn" type="button" data-act="confirm">共有する内容を確認</button>
+              <button class="link-btn" type="button" data-act="copy">リンクだけコピー</button>
+            </div>
+          </div>
+          <div data-step="confirm" hidden>
+            <p class="t-note">この内容で投稿します</p>
+            <p class="memory__preview" data-preview></p>
+            <div class="actions" style="margin-top:10px">
+              <a class="btn" href="#" target="_blank" rel="noopener" data-act="post">Xで投稿する</a>
+              <button class="link-btn" type="button" data-act="back">書き直す</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {src.length > 0 && (
+      <section class="src" aria-labelledby="src-h">
+        <h2 id="src-h">出典</h2>
+        <p class="t-note" style="margin:4px 0 8px">名称・効果の確認に使った資料（重複を除いて{src.length}件）</p>
+        <ul>{src.map((x, i) => <li data-more-item={i >= 4 ? 'src' : undefined} hidden={i >= 4}><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
+        {src.length > 4 && <button class="link-btn" type="button" style="margin-top:8px;font-size:14px" data-more="src" data-less="4件に戻す" aria-expanded="false">すべて表示（{src.length}件）</button>}
       </section>
     )}
   </main>
 </Base>
+
+<script>
+  // 思い出の共有：確認画面を挟んで X の投稿画面を開く（自動では投稿しない）
+  const box = document.querySelector<HTMLElement>('[data-share]');
+  if (box) {
+    const memo = box.querySelector('textarea')!;
+    const steps = box.querySelectorAll<HTMLElement>('[data-step]');
+    const show = (s: string) => steps.forEach((x) => (x.hidden = x.dataset.step !== s));
+    const toast = (msg: string) => {
+      const t = Object.assign(document.createElement('div'), { className: 'toast', textContent: msg });
+      t.setAttribute('role', 'status');
+      document.body.append(t);
+      setTimeout(() => t.remove(), 2200);
+    };
+    const text = () => {
+      const v = memo.value.trim();
+      return (v ? `「${box.dataset.name}」で思い出すこと：${v}\n` : '') + box.dataset.share;
+    };
+    box.querySelector('[data-act="confirm"]')!.addEventListener('click', () => {
+      box.querySelector('[data-preview]')!.textContent = text();
+      box.querySelector<HTMLAnchorElement>('[data-act="post"]')!.href = 'https://x.com/intent/post?text=' + encodeURIComponent(text());
+      show('confirm');
+    });
+    box.querySelector('[data-act="back"]')!.addEventListener('click', () => show('edit'));
+    box.querySelector('[data-act="copy"]')!.addEventListener('click', () =>
+      navigator.clipboard.writeText(location.href).then(() => toast('リンクをコピーしました'), () => toast('コピーできませんでした')),
+    );
+  }
+</script>
