@@ -102,7 +102,7 @@ const curious = CUR.map((n) => PAGE_MAGICS.find((m) => m.name === n && !gameById
     <section class="band" aria-label="呼び名の例">
       <div class="wrap band__in">
         <div class="band__tabs" role="tablist" aria-label="呼び名の例">
-          {bands.map((b, i) => <button class="tab" type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-${i}`} aria-selected={i === 0 ? 'true' : 'false'} data-tab>{b.label}</button>)}
+          {bands.map((b, i) => <button class="tab" type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab>{b.label}</button>)}
         </div>
         {bands.map((b, i) => (
           <div data-panel id={`band-${i}`} role="tabpanel" aria-labelledby={`band-tab-${i}`} hidden={i !== 0}>

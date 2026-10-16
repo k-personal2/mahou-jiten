@@ -2,13 +2,15 @@
 interface Props { size?: 'sm' | 'lg' }
 const { size = 'sm' } = Astro.props;
 const lg = size === 'lg';
+const listId = `sug-${size}`;
 ---
 <form class:list={['search', { 'search--lg': lg }]} data-search role="search" action="#">
   <div class="search__box">
     {!lg && <span class="search__icon" aria-hidden="true">検</span>}
     <input type="search" name="q" autocomplete="off" aria-label="魔法を検索"
+      role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={listId}
       placeholder={lg ? '「ヒャド」「ケアル」「天外魔境」など' : '魔法名・作品名で検索'} />
     {lg && <button class="btn" type="submit">検索</button>}
   </div>
-  <div class="sug" data-sug hidden></div>
+  <div class="sug" id={listId} role="listbox" aria-label="検索候補" data-sug hidden></div>
 </form>

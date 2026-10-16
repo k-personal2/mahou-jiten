@@ -31,20 +31,45 @@ function suggest(q: string): Sug[] {
 document.querySelectorAll<HTMLFormElement>('[data-search]').forEach((box) => {
   const input = box.querySelector('input')!, list = box.querySelector<HTMLElement>('[data-sug]')!;
   let items: Sug[] = [];
+  // ↑↓で選んでいる候補（-1 は未選択。Enter で1件目へ）。フォーカスは入力欄に置いたまま aria-activedescendant で示す
+  let active = -1;
+  const show = (open: boolean) => { list.hidden = !open; input.setAttribute('aria-expanded', String(open)); };
+  const setActive = (i: number) => {
+    active = i;
+    list.querySelectorAll('[role="option"]').forEach((el, j) => el.setAttribute('aria-selected', String(j === i)));
+    if (i < 0) input.removeAttribute('aria-activedescendant');
+    else { input.setAttribute('aria-activedescendant', `${list.id}-${i}`); list.querySelector(`#${list.id}-${i}`)!.scrollIntoView({ block: 'nearest' }); }
+  };
   const render = () => {
     items = suggest(input.value);
-    if (!input.value.trim()) { list.hidden = true; return; }
-    list.hidden = false;
+    active = -1;
+    input.removeAttribute('aria-activedescendant');
+    if (!input.value.trim()) { show(false); return; }
+    show(true);
     list.innerHTML = items.length
-      ? items.map((i) => `<a class="sug__item" href="${i.href}"><span class="sug__kind">${i.kind}</span><span class="sug__label">${esc(i.label)}</span><span class="sug__sub">${esc(i.sub)}</span></a>`).join('')
-      : '<p class="sug__empty">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
+      ? items.map((i, j) => `<a class="sug__item" id="${list.id}-${j}" role="option" aria-selected="false" href="${i.href}"><span class="sug__kind">${i.kind}</span><span class="sug__label">${esc(i.label)}</span><span class="sug__sub">${esc(i.sub)}</span></a>`).join('')
+      : '<p class="sug__empty" role="status">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
   };
   const renderAsync = () => { if (IDX) render(); else loadIdx().then(render); };
   input.addEventListener('input', renderAsync);
   input.addEventListener('focus', renderAsync);
-  input.addEventListener('blur', () => setTimeout(() => (list.hidden = true), 150));
-  input.addEventListener('keydown', (e) => { if (e.key === 'Escape') list.hidden = true; });
-  box.addEventListener('submit', (e) => { e.preventDefault(); loadIdx().then(() => { render(); if (items[0]) location.href = items[0].href; }); });
+  input.addEventListener('blur', () => setTimeout(() => show(false), 150));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { show(false); setActive(-1); return; }
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    if (list.hidden) { renderAsync(); return; }
+    if (!items.length) return;
+    // 未選択(-1)〜最後の候補を輪にして回す。末尾の次は未選択（入力欄）に戻る
+    const n = items.length + 1, step = e.key === 'ArrowDown' ? 1 : -1;
+    setActive(((active + 1 + step + n) % n) - 1);
+  });
+  box.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const target = items[active];
+    if (target) { location.href = target.href; return; }
+    loadIdx().then(() => { render(); if (items[0]) location.href = items[0].href; });
+  });
 });
 
 document.querySelectorAll<HTMLElement>('[data-fill]').forEach((b) =>
@@ -67,12 +92,22 @@ document.querySelectorAll<HTMLElement>('[data-random]').forEach((b) =>
 // トップの呼び名の帯：タブ切替
 const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-tab]')];
 const panels = [...document.querySelectorAll<HTMLElement>('[data-panel]')];
-tabs.forEach((t, i) =>
-  t.addEventListener('click', () => {
-    tabs.forEach((x, j) => x.setAttribute('aria-selected', String(j === i)));
-    panels.forEach((p, j) => (p.hidden = j !== i));
-  }),
-);
+// Tab キーでは選択中のタブだけに止まり、タブ間は ←→・Home・End で移る（WAI-ARIA のタブの作法）
+const selectTab = (i: number) => {
+  tabs.forEach((x, j) => { x.setAttribute('aria-selected', String(j === i)); x.tabIndex = j === i ? 0 : -1; });
+  panels.forEach((p, j) => (p.hidden = j !== i));
+};
+tabs.forEach((t, i) => {
+  t.addEventListener('click', () => selectTab(i));
+  t.addEventListener('keydown', (e) => {
+    const n = tabs.length;
+    const to = ({ ArrowRight: (i + 1) % n, ArrowLeft: (i - 1 + n) % n, Home: 0, End: n - 1 } as Record<string, number>)[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    selectTab(to);
+    tabs[to].focus();
+  });
+});
 
 // 「すべて表示」：data-more="名前" のボタンで data-more-item="名前" の行を出し入れする
 document.querySelectorAll<HTMLButtonElement>('[data-more]').forEach((b) => {

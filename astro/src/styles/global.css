@@ -171,7 +171,7 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
 .sug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; background: var(--field); border: 1px solid var(--ink); }
 .sug__item { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--rule-soft); color: var(--ink); text-decoration: none; }
 .sug__item:last-child { border-bottom: 0; }
-.sug__item:hover, .sug__item:focus-visible { background: #efe5cf; color: var(--ink); }
+.sug__item:hover, .sug__item:focus-visible, .sug__item[aria-selected="true"] { background: #efe5cf; color: var(--ink); }
 .sug__kind { flex: none; font-weight: 700; letter-spacing: .06em; font-size: 11px; color: var(--muted); }
 .sug__label { font: 800 17px var(--font-mincho); }
 .sug__sub { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
