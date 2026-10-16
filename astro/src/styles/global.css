@@ -15,8 +15,9 @@
   --data-bg: #f6f0e2;    /* データ欄・今日の魔法 */
   --hover: #ebe2cc;
 
-  --font-mincho: 'Shippori Mincho B1', serif;                    /* 700/800：魔法名・見出し */
-  --font-gothic: 'Zen Kaku Gothic New', system-ui, sans-serif;   /* 400/700：本文・操作・数字 */
+  /* Web フォントを読み込むまでは OS の和文フォントで表示する（字面の近いものを先に並べ、差し替え時のずれを小さくする） */
+  --font-mincho: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'Noto Serif JP', serif;                        /* 700/800：魔法名・見出し */
+  --font-gothic: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', system-ui, sans-serif;   /* 400/700：本文・操作・数字 */
 
   --content: 1120px;
   --px: 40px;
