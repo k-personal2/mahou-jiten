@@ -53,13 +53,26 @@ const groups = buildGroups(m.game, [m.fx], { curId: m.id });
 // 出典は URL の重複を除く
 const src = (m.src ?? []).filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
 
-const otherSample = others.slice(0, 2).map((o) => `${o.games[0].short}では${o.name}`).join('、');
+// 説明文・共有文の例は、作品が重ならないように選ぶ（「FFVでは…、FFVでは…」を避ける）
+const otherEx = others.filter((o, i, a) => a.findIndex((x) => x.games[0] === o.games[0]) === i).map((o) => `${o.games[0].short}では${o.name}`);
+const otherSample = otherEx.slice(0, 2).join('、');
 const url = new URL(magicUrl(m), Astro.site ?? Astro.url).href;
 const shareBase = `${m.name}（${G.short}）${otherSample ? `は、${otherSample}。` : ''}\n${url}`;
+// 他作品の呼び名がない魔法は、データから組んだ1文（＋効果の要約）で説明する
+const description = others.length
+  ? `${G.name}の${label}は、他のRPGでは何と呼ばれる？ ${otherEx.slice(0, 3).join('、')}など。`
+  : `${G.name}の${label}。${lead.head}${lead.chain ? `${lead.chain.root}系統の${lead.chain.tier}段目（全${lead.chain.n}段）。` : ''}${m.desc ?? ''}`.slice(0, 120);
+// 辞典の1項目として、作品の魔法体系（DefinedTermSet）に属する語（DefinedTerm）と示す
+const jsonld = [{
+  '@context': 'https://schema.org', '@type': 'DefinedTerm', name: m.name, url,
+  ...(m.kana ? { alternateName: m.kana } : {}),
+  description: m.desc ?? lead.head,
+  inDefinedTermSet: { '@type': 'DefinedTermSet', name: `${G.name}の魔法体系`, url: new URL(systemUrl(m.game), Astro.site ?? Astro.url).href },
+}];
 ---
 <Base
   title={`${label}（${G.name}）の他作品での呼び名と系統｜RPG魔法の言い換え辞典`}
-  description={`${G.name}の${m.name}は、他のRPGでは何と呼ばれる？ ${others.slice(0, 3).map((o) => `${o.games[0].short}では${o.name}`).join('、')}など。`}
+  description={description} jsonld={jsonld}
   active="compare" path={magicUrl(m)}
   crumbs={[{ name: 'トップ', path: '/' }, { name: cmpTitle, path: cmpHref }, { name: m.name, path: magicUrl(m) }]}>
   <main class="wrap page chapters">

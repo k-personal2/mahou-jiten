@@ -26,8 +26,13 @@ const otherGames = REP_GAMES.filter((x) => x.id !== groupOf(g.id) && SYSTEMS[x.i
   return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
 });
 const src = (S.src ?? []).filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
+// 作品の魔法体系を、魔法ページ（DefinedTerm）がまとまる語彙集として示す
+const jsonld = [{
+  '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: `${g.name}の魔法体系`, description: S.overview,
+  url: new URL(systemUrl(g.id), Astro.site ?? Astro.url).href, inLanguage: 'ja',
+}];
 ---
-<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)}
+<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)} jsonld={jsonld}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }, { name: `${g.name}の魔法体系`, path: systemUrl(g.id) }]}>
   <main class="wrap page chapters">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span aria-current="page">{g.name}</span></nav>
