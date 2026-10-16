@@ -129,8 +129,11 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
   .pat .chain { font-size: 19px; }
 }
 
-/* 表（PCは表、スマホは縦積み。同じDOMをCSSで組み替える） */
-.tbl { border-top: 1px solid var(--ink); }
+/* 表（PCは表、スマホは縦積み。同じDOMをCSSで組み替える）
+   <table> の行を grid で並べる。display を変えると表の意味が落ちるブラウザがあるため、HTML 側に role も明示している */
+.tbl { display: block; width: 100%; border-collapse: collapse; border-top: 1px solid var(--ink); }
+.tbl thead, .tbl tbody { display: block; }
+.tbl :where(th, td) { padding: 0; text-align: left; font-weight: inherit; } /* :where で詳細度を下げ、各表のクラス指定を優先させる */
 .tbl__row { display: grid; grid-template-columns: var(--cols); gap: 2px 16px; padding: 10px 0; border-bottom: 1px solid var(--rule-soft); align-items: baseline; font-size: 15px; }
 .tbl__head { padding: 8px 0; border-bottom: 1px solid var(--ink); font-weight: 700; letter-spacing: .06em; font-size: 13px; color: var(--muted); }
 
@@ -307,23 +310,26 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
 .mx { --cols: 200px 120px repeat(var(--n), minmax(0, 1fr)); }
 .mx .tbl__row { gap: 2px 12px; }
 .mx .tbl__row:not(.tbl__head):hover { background: var(--hover); }
-.mx__game { font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--ink); text-decoration: none; }
-.mx__game:hover { color: var(--accent); text-decoration: underline; }
+.mx__game { font-size: 14px; font-weight: 700; line-height: 1.5; }
+.mx__game a { color: var(--ink); text-decoration: none; }
+.mx__game a:hover { color: var(--accent); text-decoration: underline; }
 .mx__k { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
 .mx__cell { display: flex; flex-direction: column; min-width: 0; color: var(--ink); text-decoration: none; }
 .mx__cell b { font: 800 17px/1.35 var(--font-mincho); overflow-wrap: anywhere; }
 .mx__cell small { font-size: 11px; color: var(--muted); }
 a.mx__cell:hover b { color: var(--accent); }
 .mx__none { color: var(--rule-dash); }
-.mx__cells { display: contents; }
 @media (max-width: 759px) {
   .mx .tbl__head { display: none; }
+  /* 1行目に作品と分類、::after の改行を挟んで2行目に段階を並べる */
   .mx .tbl__row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 12px 0; }
+  .mx .tbl__row::after { content: ''; order: 1; flex-basis: 100%; }
   .mx__k { font-size: 12px; color: var(--muted); }
-  .mx__cells { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; flex-basis: 100%; }
+  .mx__st { order: 2; display: flex; align-items: baseline; }
+  .mx__st.is-none { display: none; }
   .mx__cell b { font-size: 18px; line-height: 1.6; }
-  .mx__cell small, .mx__none { display: none; }
-  .mx__cell + .mx__cell::before { content: '→'; margin-right: 8px; font: 400 13px var(--font-gothic); color: var(--faint); }
+  .mx__cell small { display: none; }
+  .mx__st + .mx__st::before { content: '→'; margin-right: 8px; font: 400 13px var(--font-gothic); color: var(--faint); }
   .mx__cell { flex-direction: row; align-items: baseline; }
 }
 .eln { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; border-top: 1px solid var(--rule); }

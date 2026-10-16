@@ -112,23 +112,27 @@ const desc = rows.length
         <section class="sec">
           <Chapter title="段階対応表" />
           <p class="intro">各作品の系統の中で何段目か、を並べた表です。作品をまたいだ威力の一致ではありません。下の小さな文字は対象範囲です。</p>
-          <div class="tbl mx" role="table" aria-label={`${title}の段階対応表`} style={`--n:${n}`}>
-            <div class="tbl__row tbl__head" role="row">
-              <span role="columnheader">作品</span><span role="columnheader">作品内の分類</span>
-              {cols.map((i) => <span role="columnheader">{i + 1}段目</span>)}
-            </div>
-            {rows.map(({ g, list, kind }, ri) => (
-              <div class="tbl__row" role="row" data-more-item={ri >= 16 ? 'mx' : undefined} hidden={ri >= 16}>
-                <a class="mx__game" role="cell" href={systemUrl(g.id)}>{g.name}</a>
-                <span class="mx__k" role="cell">{subOf(list[0])}{kindName(fx, kind) && `・${kindName(fx, kind)}`}</span>
-                <span class="mx__cells">
-                  {cols.map((i) => list[i]
-                    ? <a class="mx__cell" role="cell" href={magicUrl(list[i])}><b>{list[i].name}</b><small>{list[i].scope}</small></a>
-                    : <span class="mx__none" role="cell">—</span>)}
-                </span>
-              </div>
-            ))}
-          </div>
+          <table class="tbl mx" role="table" aria-label={`${title}の段階対応表`} style={`--n:${n}`}>
+            <thead role="rowgroup">
+              <tr class="tbl__row tbl__head" role="row">
+                <th role="columnheader" scope="col">作品</th><th role="columnheader" scope="col">作品内の分類</th>
+                {cols.map((i) => <th role="columnheader" scope="col">{i + 1}段目</th>)}
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              {rows.map(({ g, list, kind }, ri) => (
+                <tr class="tbl__row" role="row" data-more-item={ri >= 16 ? 'mx' : undefined} hidden={ri >= 16}>
+                  <th class="mx__game" role="rowheader" scope="row"><a href={systemUrl(g.id)}>{g.name}</a></th>
+                  <td class="mx__k" role="cell">{subOf(list[0])}{kindName(fx, kind) && `・${kindName(fx, kind)}`}</td>
+                  {cols.map((i) => (
+                    <td class:list={['mx__st', { 'is-none': !list[i] }]} role="cell">
+                      {list[i] ? <a class="mx__cell" href={magicUrl(list[i])}><b>{list[i].name}</b><small>{list[i].scope}</small></a> : <span class="mx__none">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
           {rows.length > 16 && <button class="btn btn--line btn--more" type="button" data-more="mx" data-less="16系統に戻す" aria-expanded="false">残り{rows.length - 16}系統を表示（全{rows.length}系統）</button>}
         </section>
 

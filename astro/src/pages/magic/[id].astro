@@ -122,16 +122,18 @@ const shareBase = `${m.name}（${G.short}）${otherSample ? `は、${otherSample
     {apps.length > 1 && (
       <section class="sec">
         <Chapter title={`${m.name}が出てくる作品`} />
-        <div class="tbl apps" role="table" aria-label={`${m.name}が出てくる作品`}>
-          <div class="tbl__row tbl__head" role="row"><span role="columnheader">作品</span><span role="columnheader">消費</span><span role="columnheader">主な使用者</span></div>
-          {apps.map(({ x, g }) => (
-            <div class="tbl__row" role="row">
-              <span role="cell"><a href={systemUrl(g.id)} style="color:var(--ink)">{g.short}</a></span>
-              <span role="cell" class="t-num">{x.cost ?? '—'}</span>
-              <span role="cell">{x.users?.join('、') ?? '—'}</span>
-            </div>
-          ))}
-        </div>
+        <table class="tbl apps" role="table" aria-label={`${m.name}が出てくる作品`}>
+          <thead role="rowgroup"><tr class="tbl__row tbl__head" role="row"><th role="columnheader" scope="col">作品</th><th role="columnheader" scope="col">消費</th><th role="columnheader" scope="col">主な使用者</th></tr></thead>
+          <tbody role="rowgroup">
+            {apps.map(({ x, g }) => (
+              <tr class="tbl__row" role="row">
+                <th role="rowheader" scope="row"><a href={systemUrl(g.id)} style="color:var(--ink)">{g.short}</a></th>
+                <td role="cell" class="t-num">{x.cost ?? '—'}</td>
+                <td role="cell">{x.users?.join('、') ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
     )}
 
