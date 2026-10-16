@@ -4,7 +4,7 @@ import Search from '../components/Search.astro';
 import Chapter from '../components/Chapter.astro';
 import {
   EL, FX, PAGE_MAGICS, NAMING, STATS, statsText, gameById, elById, fxById, chainsOf, chainOfMagic, splitNames,
-  compareRows, rowsTotal, compareUrl, magicUrl, elInk, todayMagic,
+  compareRows, rowsTotal, compareUrl, magicUrl, elInk, todayMagic, jstDateStr,
 } from '../lib/dict';
 
 const examples = ['ヒャド', 'ブリザド', 'サガ', 'ひょう', 'テイルズ'];
@@ -13,8 +13,7 @@ const examples = ['ヒャド', 'ブリザド', 'サガ', 'ひょう', 'テイル
 const tm = todayMagic();
 const tG = gameById[tm.game], tE = tm.el ? elById[tm.el] : null;
 const tMeta = [tG.sys, tE ? (tE.id === 'none' ? '無属性' : `${tE.name}属性`) : null, fxById[tm.fx].name].filter(Boolean).join(' ／ ');
-const d = new Date();
-const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+const dateStr = jstDateStr();
 
 // 呼び名の帯：作品ごとに系統の最初の名前を12件
 const bands = [

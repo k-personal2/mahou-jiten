@@ -183,8 +183,16 @@ export const buildGroups = (game: string, fxList: string[], opts: { curId?: stri
   });
 };
 
-/** 今日の魔法（ビルド日で決定。毎日再ビルドする想定） */
-export const todayMagic = (d = new Date()) => PAGE_MAGICS[(Math.floor(d.getTime() / 86400000) * 7) % PAGE_MAGICS.length];
+// ---------- 今日の魔法（ビルド日で決定。00:05 JST に毎日再ビルドする想定）
+// ビルド環境は UTC のことがあるため、日付は常に JST で数える（UTC のままだと 00:05 JST のビルドが前日扱いになる）
+const JST_MS = 9 * 3600000;
+const jstDate = (d: Date) => new Date(d.getTime() + JST_MS);
+/** JST の日付を「2026.10.16」の形で */
+export const jstDateStr = (d = new Date()) => {
+  const j = jstDate(d), p = (n: number) => String(n).padStart(2, '0');
+  return `${j.getUTCFullYear()}.${p(j.getUTCMonth() + 1)}.${p(j.getUTCDate())}`;
+};
+export const todayMagic = (d = new Date()) => PAGE_MAGICS[(Math.floor(jstDate(d).getTime() / 86400000) * 7) % PAGE_MAGICS.length];
 
 /** クライアント検索用の軽量インデックス */
 export const searchIndex = {
