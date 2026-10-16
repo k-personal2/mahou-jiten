@@ -105,13 +105,13 @@ const desc = rows.length
                 </span>
               </div>
             ))}
-            {patterns.length > 8 && <button class="btn btn--line" type="button" style="margin-top:14px" data-more="pat" data-less="8件に戻す" aria-expanded="false">残り{patterns.length - 8}件を表示</button>}
+            {patterns.length > 8 && <button class="btn btn--line btn--more" type="button" data-more="pat" data-less="8件に戻す" aria-expanded="false">残り{patterns.length - 8}件を表示</button>}
           </section>
         )}
 
         <section class="sec">
           <Chapter title="段階対応表" />
-          <p class="intro" style="font-size:14px">各作品の系統の中で何段目か、を並べた表です。作品をまたいだ威力の一致ではありません。下の小さな文字は対象範囲です。</p>
+          <p class="intro">各作品の系統の中で何段目か、を並べた表です。作品をまたいだ威力の一致ではありません。下の小さな文字は対象範囲です。</p>
           <div class="tbl mx" role="table" aria-label={`${title}の段階対応表`} style={`--n:${n}`}>
             <div class="tbl__row tbl__head" role="row">
               <span role="columnheader">作品</span><span role="columnheader">作品内の分類</span>
@@ -129,7 +129,7 @@ const desc = rows.length
               </div>
             ))}
           </div>
-          {rows.length > 16 && <button class="btn btn--line" type="button" style="margin-top:14px" data-more="mx" data-less="16系統に戻す" aria-expanded="false">残り{rows.length - 16}系統を表示（全{rows.length}系統）</button>}
+          {rows.length > 16 && <button class="btn btn--line btn--more" type="button" data-more="mx" data-less="16系統に戻す" aria-expanded="false">残り{rows.length - 16}系統を表示（全{rows.length}系統）</button>}
         </section>
 
         {E && elNames.length > 0 && (

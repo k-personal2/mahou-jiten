@@ -157,13 +157,13 @@ const shareBase = `${m.name}（${G.short}）${otherSample ? `は、${otherSample
       <div class="split" style="gap:16px 48px">
         <div>
           <h2 id="memory-h">{m.name}で、何を思い出す？</h2>
-          <p class="intro" style="margin-top:8px;font-size:14px">書かなくてもかまいません。ひとこと添えて共有したいときだけ使ってください。投稿前に必ず内容を確認できます。</p>
+          <p class="intro" style="margin-top:8px">書かなくてもかまいません。ひとこと添えて共有したいときだけ使ってください。投稿前に必ず内容を確認できます。</p>
         </div>
         <div>
           <div data-step="edit">
             <label class="t-note" for="memo">思い出（任意・60字まで）</label>
             <textarea id="memo" maxlength="60" rows="2" placeholder="例：冬にこたつで、兄のプレイを横で見ていた頃"></textarea>
-            <div class="actions" style="margin-top:10px">
+            <div class="actions">
               <button class="btn" type="button" data-act="confirm">共有する内容を確認</button>
               <button class="link-btn" type="button" data-act="copy">リンクだけコピー</button>
             </div>
@@ -171,7 +171,7 @@ const shareBase = `${m.name}（${G.short}）${otherSample ? `は、${otherSample
           <div data-step="confirm" hidden>
             <p class="t-note">この内容で投稿します</p>
             <p class="memory__preview" data-preview></p>
-            <div class="actions" style="margin-top:10px">
+            <div class="actions">
               <a class="btn" href="#" target="_blank" rel="noopener" data-act="post">Xで投稿する</a>
               <button class="link-btn" type="button" data-act="back">書き直す</button>
             </div>
