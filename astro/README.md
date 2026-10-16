@@ -3,7 +3,7 @@
 静的サイト。バックエンド・DB不要。
 
 ```bash
-npm install     # postinstall で動的ルートのファイル名（-el- → [el] など）を自動修正
+npm install
 npm run dev     # http://localhost:4321
 npm run build   # dist/ に静的HTMLを出力
 ```

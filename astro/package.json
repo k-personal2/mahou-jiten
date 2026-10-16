@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "postinstall": "node scripts/fix-routes.mjs",
     "dev": "astro dev",
     "build": "node scripts/validate-data.mjs && astro build",
     "preview": "astro preview",
