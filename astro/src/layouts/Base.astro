@@ -14,7 +14,7 @@ interface Props {
 }
 const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false, lang = 'ja', alternates } = Astro.props;
 const en = lang === 'en';
-const siteName = en ? 'RPG Spell Name Thesaurus' : 'RPG魔法の言い換え辞典';
+const siteName = en ? 'RPG Spell Name Thesaurus' : 'RPG魔法辞典';
 const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
 // OGP 画像はサイト共通の1枚（scripts/make-og.mjs で生成）。SNS は絶対URLが必要
 const ogImage = new URL('/og.png', Astro.site ?? Astro.url).href;
@@ -114,7 +114,7 @@ const nav = en ? [
       </div>
       ) : (
       <div class="wrap ftr__in">
-        <span class="ftr__name">RPG魔法の言い換え辞典</span>
+        <span class="ftr__name">RPG魔法辞典</span>
         <span>{statsText}</span>
         <span>魔法名は各作品の日本語版表記に準拠</span>
         <a href="/about">このサイトについて・データの集め方</a>

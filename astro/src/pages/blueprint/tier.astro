@@ -28,7 +28,7 @@ const jsonld = [{
   url: new URL(BLUEPRINT_TIER_URL, Astro.site ?? Astro.url).href,
 }];
 ---
-<Base title={`${title}｜RPG魔法の言い換え辞典`} description={description} path={BLUEPRINT_TIER_URL} active="blueprint" jsonld={jsonld}
+<Base title={`${title}｜RPG魔法辞典`} description={description} path={BLUEPRINT_TIER_URL} active="blueprint" jsonld={jsonld}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '魔法世界の設計図：段階の付け方', path: BLUEPRINT_TIER_URL }]}>
   <main class="wrap page chapters">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">魔法世界の設計図：段階の付け方</span></nav>

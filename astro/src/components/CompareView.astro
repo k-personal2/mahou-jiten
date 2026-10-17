@@ -54,7 +54,7 @@ const desc = rows.length
   ? `${title}を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
   : `${title}を作品ごとに比較します。`;
 ---
-<Base title={`${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法の言い換え辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
+<Base title={`${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
   crumbs={[{ name: 'トップ', path: '/' }, { name: title, path: compareUrl(el, fx) }]}>
   <main class="wrap page chapters">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span>比べる</span><span>›</span><span aria-current="page">{title}</span></nav>

@@ -26,7 +26,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
     <path d="M0 -50 C4 -16 16 -4 50 0 C16 4 4 16 0 50 C-4 16 -16 4 -50 0 C-16 -4 -4 -16 0 -50 Z" fill="#8a2f1c"/>
   </g>
   <text x="110" y="150" font-family="${F}" font-size="30" fill="#8a2f1c" letter-spacing="6">✦ Lexicon Arcanum ✦</text>
-  <text x="106" y="265" font-family="${F}" font-weight="700" font-size="88" fill="#2a1f14">RPG魔法の言い換え辞典</text>
+  <text x="106" y="265" font-family="${F}" font-weight="700" font-size="88" fill="#2a1f14">RPG魔法辞典</text>
   <text x="110" y="345" font-family="${F}" font-size="38" fill="#4a3a28">あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？</text>
   <line x1="110" y1="405" x2="1090" y2="405" stroke="#d6c6a2" stroke-width="2" stroke-dasharray="8 6"/>
   <text x="110" y="490" font-family="${F}" font-weight="700" font-size="42" fill="#2a1f14">${words.join('<tspan fill="#ad9a78" font-weight="400" dx="14">≒</tspan><tspan dx="14">').replace(/<tspan dx="14">([^<]*)/g, '<tspan dx="14">$1</tspan>')}</text>

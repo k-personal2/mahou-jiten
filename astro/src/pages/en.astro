@@ -41,7 +41,7 @@ const title = 'RPG Spell Name Thesaurus | What is that spell called in other Jap
 const description = `Mera, Fire, Agi, PK Fire… The same spell goes by a different name in every Japanese RPG. Compare ${STATS.magics.toLocaleString('en-US')} spells from ${STATS.games} games, as named in the original Japanese releases.`;
 ---
 <Base {title} {description} lang="en" active="home" path="/en" hideSearch alternates={{ ja: '/', en: '/en' }}
-  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG Spell Name Thesaurus', alternateName: 'RPG魔法の言い換え辞典', url: new URL('/en', Astro.site).href, inLanguage: 'en', description: 'A dictionary comparing what Japanese RPGs call the same spell' }]}>
+  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG Spell Name Thesaurus', alternateName: 'RPG魔法辞典', url: new URL('/en', Astro.site).href, inLanguage: 'en', description: 'A dictionary comparing what Japanese RPGs call the same spell' }]}>
   <main>
     <section class="mast">
       <div class="wrap mast__in">

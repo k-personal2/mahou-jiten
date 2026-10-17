@@ -37,15 +37,15 @@ const curious = curData.map(({ m, g, E, chain }) => ({
   chain: chain.map((x) => x.name),
 }));
 ---
-<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch alternates={{ ja: '/', en: '/en' }}
+<Base title="RPG魔法辞典｜ドラクエ・FF・メガテンの魔法を比較" active="home" path="/" hideSearch alternates={{ ja: '/', en: '/en' }}
   description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${STATS.games}作品・${STATS.magics.toLocaleString()}種の魔法と、作品ごとの魔法体系を収録。`}
-  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法の言い換え辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
+  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
   <main>
     <section class="mast">
       <div class="wrap mast__in">
         <div>
           <p class="t-label">{statsText}</p>
-          <h1>RPG魔法の言い換え辞典</h1>
+          <h1>RPG魔法辞典</h1>
           <p class="mast__sub">あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？</p>
           <Search size="lg" />
           <div class="examples">

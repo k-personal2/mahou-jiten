@@ -41,7 +41,7 @@ const jsonld = [{
   ...(R && !isSeries ? { about: { '@type': 'VideoGame', name: g.name, datePublished: R.date, gamePlatform: R.platforms } } : {}),
 }];
 ---
-<Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)} jsonld={jsonld}
+<Base title={`${g.name}の魔法体系｜RPG魔法辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)} jsonld={jsonld}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }, { name: `${g.name}の魔法体系`, path: systemUrl(g.id) }]}>
   <main class="wrap page chapters">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span aria-current="page">{g.name}</span></nav>

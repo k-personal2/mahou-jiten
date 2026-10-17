@@ -5,7 +5,7 @@ import { NAMING } from '../lib/dict';
 
 const nGames = NAMING.reduce((a, t) => a + t.items.filter((i) => i.href).length, 0);
 ---
-<Base title="RPGで魔法を何と呼ぶ？ 呼び方の一覧｜RPG魔法の言い換え辞典" path="/names" active="names"
+<Base title="RPGで魔法を何と呼ぶ？ 呼び方の一覧｜RPG魔法辞典" path="/names" active="names"
   description={`呪文・魔法・術・PSI・策略・変身技…。RPGでは作品ごとに「魔法」の呼び方が違います。${NAMING.length}通りの呼び方と、それぞれの仕組み、使っている作品の一覧。`}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '魔法を何と呼ぶ？', path: '/names' }]}>
   <main class="wrap page">
