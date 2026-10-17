@@ -2,12 +2,19 @@
 import '../styles/global.css';
 import Search from '../components/Search.astro';
 import { statsText } from '../lib/dict';
-/** crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ */
+import { statsTextEn } from '../lib/en';
+/**
+ * crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ
+ * lang: 'en' は英語版トップ（/en）だけ。alternates: 日本語版と英語版の対（hreflang とヘッダーの言語切替に使う）
+ */
 interface Props {
   title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'blueprint' | 'about'; path?: string; hideSearch?: boolean;
   crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
+  lang?: 'ja' | 'en'; alternates?: { ja: string; en: string };
 }
-const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false } = Astro.props;
+const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false, lang = 'ja', alternates } = Astro.props;
+const en = lang === 'en';
+const siteName = en ? 'RPG Spell Name Thesaurus' : 'RPG魔法の言い換え辞典';
 const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
 // OGP 画像はサイト共通の1枚（scripts/make-og.mjs で生成）。SNS は絶対URLが必要
 const ogImage = new URL('/og.png', Astro.site ?? Astro.url).href;
@@ -20,7 +27,13 @@ const ld = [
   ...jsonld,
 ];
 const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho+B1:wght@700;800&display=swap';
-const nav = [
+const nav = en ? [
+  { key: 'home', label: 'Home', href: '/en' },
+  { key: 'compare', label: 'Compare by effect', href: '/element/fire' },
+  { key: 'games', label: 'Games', href: '/game' },
+  { key: 'names', label: 'What they call magic', href: '/names' },
+  { key: 'about', label: 'About', href: '/about' },
+] : [
   { key: 'home', label: 'トップ', href: '/' },
   { key: 'compare', label: '用途・属性で比べる', href: '/element/fire' },
   { key: 'games', label: '作品から探す', href: '/game' },
@@ -30,7 +43,7 @@ const nav = [
 ];
 ---
 <!doctype html>
-<html lang="ja">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -43,15 +56,20 @@ const nav = [
     <meta name="theme-color" content="#f1e9d6" />
     <meta name="google-site-verification" content="xtgTp9GaqCZJbzQf_eNLFUsGESCEf6iWNv42d084ivY" />
     {canonical && <link rel="canonical" href={canonical} />}
-    <meta property="og:type" content={path === '/' ? 'website' : 'article'} />
-    <meta property="og:site_name" content="RPG魔法の言い換え辞典" />
+    {alternates && <>
+      <link rel="alternate" hreflang="ja" href={abs(alternates.ja)} />
+      <link rel="alternate" hreflang="en" href={abs(alternates.en)} />
+      <link rel="alternate" hreflang="x-default" href={abs(alternates.ja)} />
+    </>}
+    <meta property="og:type" content={active === 'home' ? 'website' : 'article'} />
+    <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:locale" content="ja_JP" />
+    <meta property="og:locale" content={en ? 'en_US' : 'ja_JP'} />
     <meta name="twitter:card" content="summary_large_image" />
     {ld.map((x) => <script type="application/ld+json" set:html={JSON.stringify(x)} />)}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -71,18 +89,30 @@ const nav = [
   <body>
     <header class="hdr">
       <div class="wrap hdr__in">
-        <a class="logo" href="/"><span class="logo__seal" aria-hidden="true">魔</span><span class="logo__name">RPG魔法の言い換え辞典</span></a>
+        <a class="logo" href={en ? '/en' : '/'}><span class="logo__seal" aria-hidden="true">魔</span><span class="logo__name">{siteName}</span></a>
         <div class="hdr__sp"></div>
         {!hideSearch && <Search />}
         <nav class="gnav" aria-label="メイン">
-          {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined}>{n.label}</a>)}
+          {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} hreflang={en && n.key !== 'home' ? 'ja' : undefined}>{n.label}</a>)}
         </nav>
+        {alternates && (en
+          ? <a class="hdr__lang" href={alternates.ja} hreflang="ja" lang="ja">日本語</a>
+          : <a class="hdr__lang" href={alternates.en} hreflang="en" lang="en">English</a>)}
       </div>
     </header>
 
     <slot />
 
     <footer class="ftr">
+      {en ? (
+      <div class="wrap ftr__in">
+        <span class="ftr__name">{siteName}</span>
+        <span>{statsTextEn}</span>
+        <span>Spell names follow the original Japanese releases</span>
+        <a href="/about" hreflang="ja">About this site and its data (Japanese)</a>
+        <span>An unofficial fan site run by one person</span>
+      </div>
+      ) : (
       <div class="wrap ftr__in">
         <span class="ftr__name">RPG魔法の言い換え辞典</span>
         <span>{statsText}</span>
@@ -90,6 +120,7 @@ const nav = [
         <a href="/about">このサイトについて・データの集め方</a>
         <span>個人運営の非公式サイトです</span>
       </div>
+      )}
     </footer>
 
     <script>import '../scripts/site.ts';</script>

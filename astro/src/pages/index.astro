@@ -2,72 +2,42 @@
 import Base from '../layouts/Base.astro';
 import Search from '../components/Search.astro';
 import Chapter from '../components/Chapter.astro';
-import {
-  EL, FX, PAGE_MAGICS, NAMING, STATS, statsText, gameById, elById, fxById, chainsOf, chainOfMagic, splitNames,
-  compareRows, rowsTotal, compareUrl, magicUrl, elInk, todayMagic, jstDateStr,
-} from '../lib/dict';
+import { FX, NAMING, STATS, statsText, gameById, elById, fxById, magicUrl, elInk, jstDateStr } from '../lib/dict';
+import { today as tm, bands as bandData, fxRows, elRows as elData, sysTop, patterns as patData, curious as curData } from '../lib/home';
 
 const examples = ['ヒャド', 'ブリザド', 'サガ', 'ひょう', 'テイルズ'];
 
 // 今日の魔法（ビルド日で決まる）
-const tm = todayMagic();
 const tG = gameById[tm.game], tE = tm.el ? elById[tm.el] : null;
 const tMeta = [tG.sys, tE ? (tE.id === 'none' ? '無属性' : `${tE.name}属性`) : null, fxById[tm.fx].name].filter(Boolean).join(' ／ ');
 const dateStr = jstDateStr();
 
-// 呼び名の帯：作品ごとに系統の最初の名前を12件
-const bands = [
-  { label: '炎', el: 'fire', fx: 'atk', what: '炎の攻撃魔法' },
-  { label: '氷', el: 'ice', fx: 'atk', what: '氷の攻撃魔法' },
-  { label: '回復', el: null, fx: 'heal', what: '回復魔法' },
-].map((b) => {
-  const rows = compareRows(b.el, b.fx);
-  // 作品ごとに1件、なるべく違う名前を優先して12件
-  const perGame = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i);
-  const names = new Set<string>();
-  const distinct = perGame.filter((r) => !names.has(r.list[0].name) && names.add(r.list[0].name));
-  const firsts = [...distinct, ...perGame.filter((r) => !distinct.includes(r))].slice(0, 12).map((r) => ({ m: r.list[0], g: r.g }));
-  const nGames = new Set(rows.map((r) => r.g.id)).size;
-  return { ...b, firsts, href: compareUrl(b.el, b.fx), more: `${b.what}を${nGames}作品で比べる（${rowsTotal(rows)}件）` };
-});
+const BAND_JA: Record<string, { label: string; what: string }> = {
+  fire: { label: '炎', what: '炎の攻撃魔法' }, ice: { label: '氷', what: '氷の攻撃魔法' }, heal: { label: '回復', what: '回復魔法' },
+};
+const bands = bandData.map((b) => ({ ...b, ...BAND_JA[b.key], more: `${BAND_JA[b.key].what}を${b.nGames}作品で比べる（${b.total}件）` }));
+const elRows = elData.map((r) => ({ ...r, label: r.e.id === 'none' ? '無属性の攻撃魔法' : `${r.e.name}属性の攻撃魔法` }));
 
-// 探し方：数字は行き先の比較ページの件数と同じ
-const fxRows = FX.map((f) => ({
-  f, href: compareUrl(null, f.id),
-  c: f.id === 'atk' ? EL.reduce((a, e) => a + rowsTotal(compareRows(e.id, 'atk')), 0) : rowsTotal(compareRows(null, f.id)),
-}));
-const elRows = EL.map((e) => ({ e, c: rowsTotal(compareRows(e.id, 'atk')), label: e.id === 'none' ? '無属性の攻撃魔法' : `${e.name}属性の攻撃魔法` }));
-const sysTop = NAMING.map((t, i) => ({ ...t, i, games: t.items.filter((x) => x.href) }))
-  .sort((a, b) => b.games.length - a.games.length).slice(0, 6);
-
-// 名前の付け方：作品ごとの命名ルール（名前はデータから）
-const PAT: [string, string, string][] = [
-  ['dq', 'fire', '段階ごとに語形そのものが変わる'],
-  ['ff', 'fire', '語尾を入れ替える'],
-  ['mother', 'fire', 'ギリシャ文字で段階を表す'],
-  ['smt', 'fire', '語尾が伸びていく'],
-  ['goemon', 'fire', '頭に「ど」を付けると強化版'],
-  ['tenchi', 'fire', '「〜の計」の前が変わる'],
-  ['tengai', 'fire', '漢字二字の名前がまるごと変わる'],
-];
-const patterns = PAT.map(([gid, el, rule]) => {
-  const list = chainsOf(gid, el, 'atk')[0]?.list ?? [];
-  const parts = splitNames(list.map((m) => m.name));
-  return { g: gameById[gid], rule, items: list.map((m, i) => ({ ...parts[i], href: magicUrl(m) })) };
-}).filter((p) => p.items.length > 1);
+// 名前の付け方：作品ごとの命名ルール
+const RULE: Record<string, string> = {
+  dq: '段階ごとに語形そのものが変わる',
+  ff: '語尾を入れ替える',
+  mother: 'ギリシャ文字で段階を表す',
+  smt: '語尾が伸びていく',
+  goemon: '頭に「ど」を付けると強化版',
+  tenchi: '「〜の計」の前が変わる',
+  tengai: '漢字二字の名前がまるごと変わる',
+};
+const patterns = patData.map((p) => ({ ...p, rule: RULE[p.gid] }));
 
 // 名前だけではわからない魔法
-const CUR = ['昭和', 'いわし', 'グリコーン', 'だだぢぢ', '？？？？', '日立'];
-const curious = CUR.map((n) => PAGE_MAGICS.find((m) => m.name === n && !gameById[m.game].group)).filter((m) => m !== undefined).map((m) => {
-  const E = m.el ? elById[m.el] : null, G = gameById[m.game];
-  return {
-    m, g: G,
-    k: [G.sys, fxById[m.fx].name, E && E.id !== 'none' ? `${E.name}属性` : null].filter(Boolean).join(' ／ '),
-    chain: chainOfMagic(m).map((x) => x.name),
-  };
-});
+const curious = curData.map(({ m, g, E, chain }) => ({
+  m, g,
+  k: [g.sys, fxById[m.fx].name, E && E.id !== 'none' ? `${E.name}属性` : null].filter(Boolean).join(' ／ '),
+  chain: chain.map((x) => x.name),
+}));
 ---
-<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch
+<Base title="RPG魔法の言い換え辞典｜あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？" active="home" path="/" hideSearch alternates={{ ja: '/', en: '/en' }}
   description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${STATS.games}作品・${STATS.magics.toLocaleString()}種の魔法と、作品ごとの魔法体系を収録。`}
   jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法の言い換え辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
   <main>

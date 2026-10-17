@@ -1,0 +1,182 @@
+---
+/**
+ * 英語版トップ（/en）。英語にしているのはこのページだけで、リンク先は日本語のページ。
+ * 並べる魔法と件数は日本語版トップと同じ（src/lib/home.ts）。魔法名は日本語版の表記に、ローマ字の読みを添える
+ */
+import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
+import { FX, NAMING, STATS, gameById, elById, magicUrl, elInk, jstDateStr, compareUrl } from '../lib/dict';
+import { today as tm, bands as bandData, fxRows, elRows, sysTop, patterns as patData, curious } from '../lib/home';
+import { GAME_EN, EL_EN, FX_EN, SYS_EN, sysEn, statsTextEn, readingOf } from '../lib/en';
+
+const gEn = (id: string) => GAME_EN[id];
+const elLabel = (id: string) => (id === 'none' ? 'Non-elemental' : `${EL_EN[id]}-element`);
+
+// Spell of the day
+const tE = tm.el ? elById[tm.el] : null;
+const tMeta = [sysEn(gameById[tm.game].sys), tE ? elLabel(tE.id) : null, FX_EN[tm.fx]].filter(Boolean).join(' / ');
+const tRo = readingOf(tm);
+const dateStr = jstDateStr();
+
+const BAND_EN: Record<string, { label: string; what: string }> = {
+  fire: { label: 'Fire', what: 'Fire attack spells' }, ice: { label: 'Ice', what: 'Ice attack spells' }, heal: { label: 'Healing', what: 'Healing spells' },
+};
+const bands = bandData.map((b) => ({ ...b, ...BAND_EN[b.key], more: `Compare ${BAND_EN[b.key].what.toLowerCase()} across ${b.nGames} games (${b.total} spells, in Japanese)` }));
+
+const RULE: Record<string, string> = {
+  dq: 'The word itself changes at each tier',
+  ff: 'The ending is swapped',
+  mother: 'Greek letters mark the tier',
+  smt: 'The ending keeps growing',
+  goemon: 'Adding “do-” in front makes it stronger',
+  tenchi: 'The word before “-no-kei” (stratagem) changes',
+  tengai: 'A whole new two-kanji name each time',
+};
+const patterns = patData.map((p) => {
+  const ro = p.list.map((m) => readingOf(m));
+  return { ...p, rule: RULE[p.gid], ro: ro.every(Boolean) ? ro.join(' → ') : null };
+});
+
+const title = 'RPG Spell Name Thesaurus | What is that spell called in other Japanese RPGs?';
+const description = `Mera, Fire, Agi, PK Fire… The same spell goes by a different name in every Japanese RPG. Compare ${STATS.magics.toLocaleString('en-US')} spells from ${STATS.games} games, as named in the original Japanese releases.`;
+---
+<Base {title} {description} lang="en" active="home" path="/en" hideSearch alternates={{ ja: '/', en: '/en' }}
+  jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG Spell Name Thesaurus', alternateName: 'RPG魔法の言い換え辞典', url: new URL('/en', Astro.site).href, inLanguage: 'en', description: 'A dictionary comparing what Japanese RPGs call the same spell' }]}>
+  <main>
+    <section class="mast">
+      <div class="wrap mast__in">
+        <div>
+          <p class="t-label">{statsTextEn}</p>
+          <h1>RPG Spell Name Thesaurus</h1>
+          <p class="mast__sub">You know the spell from one game. What is it called in the next RPG?</p>
+          <p class="mast__sub">Fire is <span lang="ja">メラ</span> (Mera) in Dragon Quest, <span lang="ja">ファイア</span> (Faia) in Final Fantasy and <span lang="ja">アギ</span> (Agi) in Shin Megami Tensei. This dictionary lines up {STATS.magics.toLocaleString('en-US')} spells from {STATS.games} games by element and effect, so you can compare the names side by side.</p>
+          <div class="actions">
+            <a class="btn" href={compareUrl('fire', 'atk')} hreflang="ja">Compare fire spells</a>
+            <a class="more" href="#" data-random>Show a random spell</a>
+          </div>
+          <p class="mast__note">Only this page is in English. Spell names appear as written in the original Japanese releases, with a romanized reading; the pages they link to are in Japanese. English releases often rename spells — Dragon Quest’s <span lang="ja">メラ</span> (Mera) became Frizz, and <span lang="ja">ホイミ</span> (Hoimi) became Heal.</p>
+        </div>
+        <aside class="boxed" aria-labelledby="today-h">
+          <div class="boxed__head"><span id="today-h">Spell of the day</span><span class="t-num t-note">{dateStr}</span></div>
+          <div class="today__body">
+            <a class="today__name" href={magicUrl(tm)} hreflang="ja" lang="ja">{tm.name}</a>
+            {tRo && <span class="ro">{tRo}</span>}
+            <p class="today__game">{gEn(tm.game).name}</p>
+            <p class="today__meta">{tMeta}</p>
+            <p class="today__note">One half-remembered RPG spell, every day.</p>
+            <div class="actions">
+              <a class="btn" href={magicUrl(tm)} hreflang="ja">See this spell</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="band" aria-label="Examples of spell names">
+      <div class="wrap band__in">
+        <div class="band__tabs" role="tablist" aria-label="Examples of spell names">
+          {bands.map((b, i) => <button class="tab" type="button" role="tab" id={`band-tab-${i}`} aria-controls={`band-${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab>{b.label}</button>)}
+        </div>
+        {bands.map((b, i) => (
+          <div data-panel id={`band-${i}`} role="tabpanel" aria-labelledby={`band-tab-${i}`} hidden={i !== 0}>
+            <p class="band__lead">{b.what} are called…</p>
+            <div class="band__items">
+              {b.firsts.map(({ m, g }) => <a href={magicUrl(m)} hreflang="ja"><b lang="ja">{m.name}</b>{readingOf(m) && <i>{readingOf(m)}</i>}<small>{gEn(g.id).short}</small></a>)}
+            </div>
+            <a class="more" href={b.href} hreflang="ja">{b.more}</a>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <div class="wrap chapters" style="padding-block: var(--section-gap) 80px">
+      <section>
+        <Chapter title="Find spells" />
+        <div class="find">
+          <div>
+            <h3>By effect</h3>
+            <p class="t-note">{FX.length} effects, with the number of spells</p>
+            <ul class="find__fx rows">
+              {fxRows.map(({ f, c, href }) => <li><a class="row-link" href={href} hreflang="ja"><span class="row-link__main">{FX_EN[f.id]}</span><span class="row-link__num">{c.toLocaleString('en-US')}</span></a></li>)}
+            </ul>
+          </div>
+          <div>
+            <h3>Attack spells by element</h3>
+            <p class="t-note">The same element, named across games</p>
+            <ul class="rows">
+              {elRows.map(({ e, c }) => (
+                <li><a class="row-link" href={`/element/${e.id}`} hreflang="ja">
+                  <span class="find__el" style={`color:${elInk(e)}`} aria-hidden="true">{e.name}</span>
+                  <span class="row-link__main">{e.id === 'none' ? 'Non-elemental' : EL_EN[e.id]}</span><span class="row-link__num">{c}</span>
+                </a></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>By what a game calls magic</h3>
+            <p class="t-note">Not every game calls it “magic”</p>
+            <ul class="rows">
+              {sysTop.map((s) => (
+                <li><a class="row-link" href={`/names#t${s.i}`} hreflang="ja">
+                  <span class="find__sys" lang="ja">{s.term}</span>
+                  <span class="find__ro">{[SYS_EN[s.term]?.ro, sysEn(s.term)].filter(Boolean).join(' · ')}</span>
+                  <span class="row-link__num">{s.games.length} {s.games.length === 1 ? 'game' : 'games'}</span>
+                </a></li>
+              ))}
+            </ul>
+            <a class="more" href="/game" hreflang="ja">See all {STATS.games} games</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec">
+        <Chapter title="How the names grow stronger" />
+        <p class="intro">When a spell levels up, which part of its name changes? The underlined part is what changes at each tier.</p>
+        {patterns.map((p) => (
+          <div class="pat pat--rule">
+            <span class="pat__game">{gEn(p.gid).name}</span>
+            <span>
+              <span class="chain" lang="ja">
+                {p.items.map((it, i) => <>{i > 0 && <span class="chain__sep" aria-hidden="true">→</span>}<a href={it.href} hreflang="ja">{it.a}<span class:list={{ chain__diff: it.hl && it.b }}>{it.b}</span>{it.c}</a></>)}
+              </span>
+              {p.ro && <span class="pat__ro">{p.ro}</span>}
+            </span>
+            <span class="pat__rule">{p.rule}</span>
+          </div>
+        ))}
+        <a class="more" href="/names" hreflang="ja">Read about all {NAMING.length} words games use for magic</a>
+      </section>
+
+      <section class="sec">
+        <Chapter title="You can’t tell what these spells do from their names" />
+        <p class="intro">Every one of these is a real spell name from the data. Tap one to reveal the answer.</p>
+        <div class="cur">
+          {curious.map((c) => {
+            const ro = readingOf(c.m);
+            const meta = [sysEn(c.g.sys), FX_EN[c.m.fx], c.E && c.E.id !== 'none' ? elLabel(c.E.id) : null].filter(Boolean).join(' / ');
+            const chainRo = c.chain.map((x) => readingOf(x) ?? x.name).join(' → ');
+            return (
+              <details>
+                <summary><span class="cur__name" lang="ja">{c.m.name}</span>{ro && <span class="ro">{ro}</span>}<span class="cur__hint">Which game? What does it do? ▸ Reveal</span></summary>
+                <div class="cur__ans">
+                  <b>{gEn(c.g.id).name}</b>
+                  <span>{meta}</span>
+                  {c.chain.length > 1 && <span>{chainRo}</span>}
+                  <a href={magicUrl(c.m)} hreflang="ja">Open the page for <span lang="ja">{c.m.name}</span> (Japanese)</a>
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      </section>
+
+      <section class="essay" aria-label="About this dictionary">
+        <p class="essay__words">We were hooked back then.<br />One look at a spell’s name, and the adventure comes back.</p>
+        <div>
+          <p class="prose">The same ice spell is <span lang="ja">ヒャド</span> (Hyado) in Dragon Quest, <span lang="ja">ブリザド</span> (Burizado) in Final Fantasy and <span lang="ja">ブフ</span> (Bufu) in Shin Megami Tensei. This dictionary isn’t a strategy guide — it’s for looking at how differently games name things, and for moving from a name you know to one from a game you’ve never played.</p>
+          <a class="more" href="/about" hreflang="ja">About this site and how the data was collected (Japanese)</a>
+        </div>
+      </section>
+    </div>
+  </main>
+</Base>

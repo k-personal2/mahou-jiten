@@ -172,6 +172,8 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
 .gnav a { flex: none; display: flex; align-items: center; min-height: 36px; padding: 0 10px; border-bottom: 2px solid transparent; font-size: 14px; color: var(--ink); text-decoration: none; white-space: nowrap; }
 .gnav a:hover { color: var(--accent); }
 .gnav a[aria-current] { border-bottom-color: var(--accent); font-weight: 700; }
+.hdr__lang { flex: none; display: flex; align-items: center; min-height: 32px; padding: 0 10px; border: 1px solid var(--rule-dash); font-size: 14px; color: var(--ink); text-decoration: none; }
+.hdr__lang:hover { border-color: var(--accent); color: var(--accent); }
 @media (max-width: 759px) {
   /* スマホは検索とナビを含めて高くなるため固定しない */
   .hdr { position: static; }
@@ -260,6 +262,13 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
   .essay { grid-template-columns: minmax(0, 1fr); }
   .essay__words { font-size: 19px; }
 }
+/* 英語版トップ（/en）：日本語の魔法名にローマ字の読みを添える */
+.ro { display: block; margin-top: 4px; font-size: 15px; letter-spacing: .02em; color: var(--muted); }
+.mast__note { margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--rule-dash); font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+.mast .actions { margin-top: 20px; }
+.band__items i { font-style: normal; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.pat__ro { display: block; margin-top: 2px; font-size: 14px; color: var(--muted); }
+.find__ro { flex: 1; min-width: 0; font-size: 13px; color: var(--ink-2); }
 
 /* ---------- 魔法詳細 */
 .m-top { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px 56px; margin-top: 24px; align-items: start; }
