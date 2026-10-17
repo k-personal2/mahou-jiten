@@ -32,7 +32,9 @@
 ```jsonc
 {
   "games": [{ "id": "", "name": "日本語版の正式タイトル", "short": "短い名前", "sys": "作品内での魔法の呼び方", "slug": "url-slug",
-              "series": "シリーズ名", "basis": "基準にした機種・版", "group": "（シリーズの各作品のときだけ）代表の game id" }],
+              "series": "シリーズ名", "basis": "基準にした機種・版", "group": "（シリーズの各作品のときだけ）代表の game id",
+              "release": { "date": "最初の発売日 YYYY-MM-DD", "platforms": ["その日に出た機種"], "note": "（必要なときだけ）", "src": [{ "title": "", "url": "" }] } }],
+              // release の決まり（basis の版ではなく最初の発売・機種名の表記）は tools/research/RELEASE-SPEC.md に従う
   "systems": { "<game id>": {
       "overview": "100〜500文字。その作品が魔法をどう分類・命名・強化しているか（歴史やストーリーは書かない）。同じシリーズの前作との違いを必ず入れる",
       "rules": ["命名ルール 3〜5個"], "growth": ["強化・派生のルール 1〜4個"],

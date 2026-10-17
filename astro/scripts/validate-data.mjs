@@ -68,6 +68,23 @@ Object.entries(systems).forEach(([k, s]) => {
 catalog.forEach((c) => c.items.forEach((it) => { if (it.game && !gameIds.has(it.game)) errors.push(`catalog: 未定義の作品 ${it.game}`); }));
 games.forEach((g) => { if (!g.group && !catalog.some((c) => c.items.some((it) => it.game === g.id))) warns.push(`catalog に ${g.id} がない（作品一覧に出ない）`); });
 
+// 最初の発売日と機種（tools/research/RELEASE-SPEC.md。機種名はここの表記にそろえる）
+const PLATFORMS = new Set([
+  'Apple II', 'ファミリーコンピュータ', 'スーパーファミコン', 'ゲームボーイ', 'ゲームボーイアドバンス', 'PCエンジン SUPER CD-ROM²', 'メガドライブ', 'メガCD',
+  'セガサターン', 'プレイステーション', 'プレイステーション2', 'プレイステーション3', 'PlayStation 4', 'PlayStation 5', 'ニンテンドー64',
+  'ニンテンドーDS', 'ニンテンドー3DS', 'Wii', 'Nintendo Switch', 'Windows', 'Xbox Series X|S',
+]);
+games.forEach((g) => {
+  const r = g.release, w = `games.${g.id}.release`;
+  if (!r) return errors.push(`${w} がない`);
+  const [y, mo, d] = (r.date ?? '').split('-').map(Number);
+  if (!/^\d{4}(-\d{2}(-\d{2})?)?$/.test(r.date ?? '') || y < 1975 || y > new Date().getFullYear() || (mo && (mo < 1 || mo > 12)) || (d && new Date(y, mo - 1, d).getDate() !== d))
+    errors.push(`${w}.date は YYYY-MM-DD・YYYY-MM・YYYY のいずれか（${r.date}）`);
+  if (!r.platforms?.length) errors.push(`${w}.platforms がない`);
+  r.platforms?.forEach((p) => { if (!PLATFORMS.has(p)) errors.push(`${w}: 未定義の機種 ${p}（validate-data.mjs の PLATFORMS に足す）`); });
+  if (!srcOk(r.src, w)) errors.push(`${w}: 出典がない`);
+});
+
 // 魔法世界の設計図：段階の付け方（stages.json は tools/merge-stages.mjs で作る）
 const [stages, stageDoc] = ['stages', 'stage-types'].map(load);
 const stTypes = new Set(stageDoc.types.map((t) => t.id)), scTypes = new Set(stageDoc.scopeTypes.map((t) => t.id));

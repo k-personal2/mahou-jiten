@@ -13,7 +13,12 @@ export type Source = { title: string; url: string };
 export type Effect = { id: string; name: string; kanji: string; slug: string; phrase: string; kinds?: Record<string, string> };
 /** series: シリーズ名 / basis: どの作品・版の表記を基準にしているか */
 /** group: シリーズの各作品のとき、そのシリーズの代表作品の id（DQIII なら 'dq'） */
-export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string; group?: string };
+/** release: 最初に発売された日（YYYY-MM-DD・YYYY-MM・YYYY）と、その日に出た機種。basis の版とは別（tools/research/RELEASE-SPEC.md） */
+export type Release = { date: string; platforms: string[]; note?: string; src: Source[] };
+export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string; group?: string; release?: Release };
+/** 1986-05-27 → 1986年5月27日（分からない部分は省く） */
+export const releaseDate = (r: Release) => r.date.split('-').map((n, i) => `${Number(n)}${'年月日'[i]}`).join('');
+export const releaseYear = (r: Release) => Number(r.date.slice(0, 4));
 /**
  * kind: 用途内の細分類（眠り・毒など。作品横断の比較単位。effects.json の kinds に定義）
  * series: 同じ作品・属性・用途の中に別系統があるときの識別子（DQ のメラ系とギラ系など）

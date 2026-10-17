@@ -5,7 +5,7 @@ import Chain from '../../../components/Chain.astro';
 import NameLine from '../../../components/NameLine.astro';
 import {
   GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, elInk, systemUrl, chainOfMagic, type Game,
-  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL,
+  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL, releaseDate,
 } from '../../../lib/dict';
 
 export function getStaticPaths() {
@@ -30,11 +30,15 @@ const otherGames = REP_GAMES.filter((x) => x.id !== groupOf(g.id) && SYSTEMS[x.i
   return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
 });
 const ST = STAGES[g.id];
-const src = (S.src ?? []).filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
+const R = g.release;
+const src = [...(S.src ?? []), ...(R?.src ?? [])].filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
+// シリーズ単位の代表（DQ）は発売日がシリーズ第1作のものなので、ゲーム1本としては示さない
+const isSeries = g.name.endsWith('（シリーズ）');
 // 作品の魔法体系を、魔法ページ（DefinedTerm）がまとまる語彙集として示す
 const jsonld = [{
   '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: `${g.name}の魔法体系`, description: S.overview,
   url: new URL(systemUrl(g.id), Astro.site ?? Astro.url).href, inLanguage: 'ja',
+  ...(R && !isSeries ? { about: { '@type': 'VideoGame', name: g.name, datePublished: R.date, gamePlatform: R.platforms } } : {}),
 }];
 ---
 <Base title={`${g.name}の魔法体系｜RPG魔法の言い換え辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)} jsonld={jsonld}
@@ -43,7 +47,8 @@ const jsonld = [{
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span aria-current="page">{g.name}</span></nav>
     <p class="t-label" style="margin-top:20px">呼び方：{g.sys} ／ 収録 <span class="t-num">{count}</span>種</p>
     <h1 class="t-h1" style="margin-top:6px">{g.name}の魔法体系</h1>
-    {g.basis && <p class="t-note" style="margin-top:8px">{g.basis}</p>}
+    {R && <p class="t-note" style="margin-top:8px">最初の発売：<time datetime={R.date}>{releaseDate(R)}</time>（{R.platforms.join('・')}）{R.note && `。${R.note.replace(/。$/, '')}`}</p>}
+    {g.basis && <p class="t-note" style="margin-top:8px">収録の基準：{g.basis}</p>}
     {S.verdict && <p class="verdict"><span class="t-label">収録の判断</span><br />{S.verdict}</p>}
 
     <section class="sec">
