@@ -18,7 +18,7 @@ const plainSitemap = () => ({
 });
 
 export default defineConfig({
-  site: 'https://mahou-jiten.pages.dev', // Pages の URL と違う場合・独自ドメインを使う場合は変更
+  site: 'https://rpgspellbook.com', // 独自ドメイン。canonical・sitemap・OGP の URL はここから作る
   trailingSlash: 'never',
   // Cloudflare Pages は /foo/index.html を /foo/ にリダイレクトするため、
   // /foo.html で出力して /foo のまま配信させる（canonical とリンクを一致させる）

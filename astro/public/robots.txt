@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mahou-jiten.pages.dev/sitemap.xml
+Sitemap: https://rpgspellbook.com/sitemap.xml
