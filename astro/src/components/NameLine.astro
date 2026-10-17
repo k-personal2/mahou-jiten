@@ -1,0 +1,9 @@
+---
+/** 作品内の魔法名の並び。同じ系統で段階順なら →、そうでなければ ／ でつなぐ */
+import Chain from './Chain.astro';
+import { nameLine } from '../lib/dict';
+interface Props { game: string; names: string[]; class?: string }
+const { game, names, class: cls } = Astro.props;
+const line = nameLine(game, names);
+---
+<Chain line={line} class={cls} sep={line.linked ? '→' : '／'} />

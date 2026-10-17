@@ -5,6 +5,8 @@ import magicsData from '../data/magics.json';
 import systemsData from '../data/systems.json';
 import catalogData from '../data/catalog.json';
 import termsData from '../data/terms.json';
+import stagesData from '../data/stages.json';
+import stageDocData from '../data/stage-types.json';
 
 export type Element = { id: string; name: string; hue: number | null; phrase: string; aliases: string[] };
 export type Source = { title: string; url: string };
@@ -181,6 +183,34 @@ export const buildGroups = (game: string, fxList: string[], opts: { curId?: stri
       }),
     };
   });
+};
+
+// ---------- 魔法世界の設計図：段階の付け方（stages.json は tools/merge-stages.mjs で作る。型の説明は stage-types.json）
+/** linked：同じ系統の中で段階順に並んでいる（→ でつないでよい） */
+export type StageExample = { names: string[]; linked: boolean };
+export type Stage = {
+  primary: string; secondary: string[]; maxTier: number; desc: string; examples: StageExample[];
+  scope: { type: string; desc: string; examples: string[][] };
+  sameAsGroup?: boolean; diff?: string; insight: string; confidence: 'high' | 'mid' | 'low';
+};
+export type StageType = { id: string; name: string; sample: string | null; short: string; how: string; good: string; watch: string; ask: string };
+export const STAGES = stagesData as Record<string, Stage>;
+export const STAGE_DOC = stageDocData as {
+  types: StageType[]; scopeTypes: { id: string; name: string; how: string }[];
+  notes: { title: string; body: string; refs: { game: string; names: string[] }[] }[]; questions: string[];
+};
+export const stageTypeById = Object.fromEntries(STAGE_DOC.types.map((t) => [t.id, t])) as Record<string, StageType>;
+export const scopeTypeById = Object.fromEntries(STAGE_DOC.scopeTypes.map((t) => [t.id, t])) as Record<string, { id: string; name: string; how: string }>;
+export const BLUEPRINT_TIER_URL = '/blueprint/tier';
+export const stageTypeUrl = (type: string) => `${BLUEPRINT_TIER_URL}#${type}`;
+
+/** 作品内の魔法名の並びを系譜の1行に（名前はその作品のデータにあるもの。validate-data で確認済み） */
+export const nameLine = (game: string, names: string[]): ChainLine & { linked: boolean } => {
+  const ms = names.map((n) => MAGICS.find((m) => m.game === game && m.name === n)!);
+  const key = (m: Magic) => [m.el, m.fx, lineKey(m), m.line ?? 'base'].join('#');
+  const linked = ms.every((m, i) => i === 0 || (key(m) === key(ms[0]) && m.tier > ms[i - 1].tier));
+  const parts = splitNames(names);
+  return { label: '', showLabel: false, linked, items: ms.map((m, i) => ({ ...parts[i], cur: false, href: magicUrl(m) })) };
 };
 
 // ---------- 今日の魔法（ビルド日で決定。00:05 JST に毎日再ビルドする想定）

@@ -2,7 +2,11 @@
 import Base from '../../../layouts/Base.astro';
 import Chapter from '../../../components/Chapter.astro';
 import Chain from '../../../components/Chain.astro';
-import { GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, elInk, systemUrl, chainOfMagic, type Game } from '../../../lib/dict';
+import NameLine from '../../../components/NameLine.astro';
+import {
+  GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, elInk, systemUrl, chainOfMagic, type Game,
+  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL,
+} from '../../../lib/dict';
 
 export function getStaticPaths() {
   return GAMES.filter((g) => SYSTEMS[g.id]).map((g) => ({ params: { slug: g.slug }, props: { g } }));
@@ -25,6 +29,7 @@ const otherGames = REP_GAMES.filter((x) => x.id !== groupOf(g.id) && SYSTEMS[x.i
   const c = MAGICS.find((m) => m.game === x.id && m.fx === 'atk' && m.el === 'fire') ?? MAGICS.find((m) => m.game === x.id && m.fx === 'atk') ?? MAGICS.find((m) => m.game === x.id);
   return { x, sample: c ? chainOfMagic(c).map((m) => m.name).join(' → ') : '収録なし' };
 });
+const ST = STAGES[g.id];
 const src = (S.src ?? []).filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
 // 作品の魔法体系を、魔法ページ（DefinedTerm）がまとまる語彙集として示す
 const jsonld = [{
@@ -57,6 +62,37 @@ const jsonld = [{
         </div>
       </div>
     </section>
+
+    {ST && (
+      <section class="sec">
+        <Chapter title="段階の付け方" note="魔法世界の設計図" />
+        <div class="stage">
+          <dl>
+            <div>
+              <dt>段階</dt>
+              <dd>
+                <a class="stage__type" href={stageTypeUrl(ST.primary)}>{stageTypeById[ST.primary].name}</a>
+                <p>{ST.desc}</p>
+                {ST.examples.slice(0, 2).map((e) => <NameLine game={g.id} names={e.names} />)}
+              </dd>
+            </div>
+            <div>
+              <dt>範囲</dt>
+              <dd>
+                <b>{scopeTypeById[ST.scope.type].name}</b>
+                {ST.scope.desc && <p>{ST.scope.desc}</p>}
+                {ST.scope.examples.slice(0, 1).map((e) => <NameLine game={g.id} names={e} />)}
+              </dd>
+            </div>
+          </dl>
+          <div>
+            {ST.diff && (<><h3 class="t-label">シリーズ内の違い</h3><p class="prose">{ST.diff}</p></>)}
+            {ST.insight && (<><h3 class="t-label" style={ST.diff ? 'margin-top:16px' : undefined}>このサイトの見方</h3><p class="prose">{ST.insight}</p></>)}
+            <a class="more" href={BLUEPRINT_TIER_URL}>段階の付け方を、作品を横断して比べる →</a>
+          </div>
+        </div>
+      </section>
+    )}
 
     {S.categories && S.categories.length > 0 && (
       <section class="sec">

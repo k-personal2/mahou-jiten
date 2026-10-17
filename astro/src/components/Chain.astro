@@ -1,14 +1,14 @@
 ---
-/** 系譜を1行で。変わる部分（共通の接頭・接尾を除いた部分）に下線＋朱 */
+/** 系譜を1行で。変わる部分（共通の接頭・接尾を除いた部分）に下線＋朱。sep は段階順でない並び（／）に使う */
 import type { ChainLine } from '../lib/dict';
-interface Props { line: ChainLine; class?: string }
-const { line, class: cls } = Astro.props;
+interface Props { line: ChainLine; class?: string; sep?: string }
+const { line, class: cls, sep = '→' } = Astro.props;
 ---
 <span class:list={['chain', cls]}>
   {line.showLabel && <span class="t-label">{line.label}</span>}
   {line.items.map((it, i) => (
     <>
-      {i > 0 && <span class="chain__sep" aria-hidden="true">→</span>}
+      {i > 0 && <span class="chain__sep" aria-hidden="true">{sep}</span>}
       <a href={it.href} aria-current={it.cur ? 'page' : undefined}>{it.a}<span class:list={{ chain__diff: it.hl && it.b }}>{it.b}</span>{it.c}</a>
     </>
   ))}

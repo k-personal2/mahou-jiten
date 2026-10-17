@@ -125,10 +125,30 @@ input::placeholder, textarea::placeholder { color: var(--faint); }
 .pat__game { font-size: 14px; font-weight: 700; line-height: 1.6; }
 .pat .chain { font-size: 23px; }
 .pat__rule { font-size: 14px; color: var(--ink-2); }
+.pat--wide { grid-template-columns: 220px minmax(0, 1.1fr) minmax(0, 1fr); padding-block: 14px; }
+.pat__sub { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
 @media (max-width: 759px) {
-  .pat, .pat--rule { grid-template-columns: minmax(0, 1fr); }
+  .pat, .pat--rule, .pat--wide { grid-template-columns: minmax(0, 1fr); }
   .pat .chain { font-size: 19px; }
 }
+
+/* 読みどころ（見出し＋本文＋例の並び） */
+.note { padding: 18px 0; border-bottom: 1px solid var(--rule-soft); }
+.note h3 { font: 800 20px/1.5 var(--font-mincho); }
+.note .prose { margin-top: 6px; }
+.note__refs { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.note__refs > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.note__refs .t-label { flex: none; min-width: 7em; text-decoration: none; }
+.note__refs .chain { font-size: 19px; }
+
+/* 作品ページの「段階の付け方」 */
+.stage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 48px; align-items: start; }
+.stage dl > div { padding: 10px 0; border-bottom: 1px solid var(--rule-soft); }
+.stage dt { font-weight: 700; letter-spacing: .06em; font-size: 13px; color: var(--muted); }
+.stage dd { margin-top: 2px; font-size: 16px; line-height: 1.75; }
+.stage dd .chain { margin-top: 4px; font-size: 19px; }
+.stage__type { font: 800 19px var(--font-mincho); }
+@media (max-width: 759px) { .stage { grid-template-columns: minmax(0, 1fr); } }
 
 /* 表（PCは表、スマホは縦積み。同じDOMをCSSで組み替える）
    <table> の行を grid で並べる。display を変えると表の意味が落ちるブラウザがあるため、HTML 側に role も明示している */

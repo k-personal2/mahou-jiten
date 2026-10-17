@@ -4,7 +4,7 @@ import Search from '../components/Search.astro';
 import { statsText } from '../lib/dict';
 /** crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ */
 interface Props {
-  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'about'; path?: string; hideSearch?: boolean;
+  title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'blueprint' | 'about'; path?: string; hideSearch?: boolean;
   crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
 }
 const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false } = Astro.props;
@@ -25,6 +25,7 @@ const nav = [
   { key: 'compare', label: '用途・属性で比べる', href: '/element/fire' },
   { key: 'games', label: '作品から探す', href: '/game' },
   { key: 'names', label: '魔法の呼び方', href: '/names' },
+  { key: 'blueprint', label: '段階の付け方', href: '/blueprint/tier' },
   { key: 'about', label: 'このサイトについて', href: '/about' },
 ];
 ---

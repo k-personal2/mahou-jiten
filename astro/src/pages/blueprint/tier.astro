@@ -1,0 +1,122 @@
+---
+import Base from '../../layouts/Base.astro';
+import Chapter from '../../components/Chapter.astro';
+import NameLine from '../../components/NameLine.astro';
+import { GAMES, REP_GAMES, gameById, STAGES, STAGE_DOC, stageTypeById, systemUrl, BLUEPRINT_TIER_URL, type Game } from '../../lib/dict';
+
+// 数えるのは代表作品（作品一覧に並ぶ単位）。シリーズの各作品は、代表と型が違うものだけを並べる
+const rowsOf = (type: string) => [
+  ...REP_GAMES.filter((g) => STAGES[g.id].primary === type).map((g) => ({ g, rep: null as Game | null })),
+  ...GAMES.filter((g) => g.group && STAGES[g.id].primary === type && STAGES[g.group].primary !== type).map((g) => ({ g, rep: gameById[g.group!] })),
+];
+const types = STAGE_DOC.types.map((t) => {
+  const rows = rowsOf(t.id);
+  return { t, rows, n: rows.filter((r) => !r.rep).length, sample: t.sample ? { game: t.sample, names: STAGES[t.sample].examples[0].names } : null };
+}).filter((x) => x.rows.length);
+const scopes = STAGE_DOC.scopeTypes.map((s) => {
+  const games = REP_GAMES.filter((g) => STAGES[g.id].scope.type === s.id);
+  const ex = games.find((g) => STAGES[g.id].scope.examples.length);
+  return { s, n: games.length, sample: ex ? { game: ex.id, names: STAGES[ex.id].scope.examples[0] } : null };
+}).filter((x) => x.n);
+const nGames = REP_GAMES.length;
+const descOf = (id: string) => STAGES[id].desc + (STAGES[id].confidence === 'low' ? '（判断の材料が少ないため、暫定の分類です）' : '');
+
+const title = 'RPGの魔法は、強い版をどう名付ける？ 段階の付け方の型';
+const description = `メラ→メラミ→メラゾーマ、ファイア→ファイラ→ファイガ、PKファイアーα→Ω。RPG${nGames}作品の魔法の段階の付け方を${types.length}つの型に分け、仕組みと効き目、自分の魔法体系に使うときの考え方をまとめました。`;
+const jsonld = [{
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description, inLanguage: 'ja',
+  url: new URL(BLUEPRINT_TIER_URL, Astro.site ?? Astro.url).href,
+}];
+---
+<Base title={`${title}｜RPG魔法の言い換え辞典`} description={description} path={BLUEPRINT_TIER_URL} active="blueprint" jsonld={jsonld}
+  crumbs={[{ name: 'トップ', path: '/' }, { name: '魔法世界の設計図：段階の付け方', path: BLUEPRINT_TIER_URL }]}>
+  <main class="wrap page chapters">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">魔法世界の設計図：段階の付け方</span></nav>
+    <p class="t-label" style="margin-top:20px">魔法世界の設計図</p>
+    <h1 class="t-h1" style="margin-top:6px">魔法の段階は、どう名付ける？</h1>
+    <p class="lead">メラ → メラミ → メラゾーマ。ファイア → ファイラ → ファイガ。PKファイアー α → Ω。RPGの魔法は、強くなったときの名前の付け方に、作品ごとの決まりを持っています。</p>
+    <p class="desc">収録している{nGames}作品の決まりを、{types.length}つの型に分けました。型ごとに、仕組みと効き目、気をつけること、自分の魔法体系を考えるときのヒントを並べています。</p>
+    <nav class="toc" aria-label="型の目次">
+      {types.map(({ t }) => <a href={`#${t.id}`}>{t.name}</a>)}
+      <a href="#notes">読みどころ</a>
+      <a href="#scope">範囲の表し方</a>
+    </nav>
+
+    <section class="sec">
+      <Chapter title="型の一覧" note={`${nGames}作品`} />
+      <div>
+        {types.map(({ t, n, sample }) => (
+          <div class="pat pat--rule">
+            <a class="pat__game" href={`#${t.id}`}>{t.name}<span class="t-note">　{n}作品</span></a>
+            {sample ? <NameLine game={sample.game} names={sample.names} /> : <span class="t-note">—</span>}
+            <p class="pat__rule">{t.short}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {types.map(({ t, rows, n }) => (
+      <section class="sec term" id={t.id}>
+        <Chapter title={t.name} note={`${n}作品`} />
+        <p class="prose">{t.how}</p>
+        <div class="cats" style="margin-top:16px">
+          <div><b>効き目</b><p>{t.good}</p></div>
+          <div><b>気をつけること</b><p>{t.watch}</p></div>
+          <div><b>自分の世界で使うなら</b><p>{t.ask}</p></div>
+        </div>
+        <h3 class="t-label" style="margin-top:24px">この型の作品</h3>
+        <div>
+          {rows.map(({ g, rep }) => {
+            const ex = STAGES[g.id].examples[0];
+            return (
+              <div class="pat pat--wide">
+                <span class="pat__game">
+                  <a href={systemUrl(g.id)}>{g.name}</a>
+                  {rep && <small class="pat__sub">シリーズの代表（{rep.short}）は{stageTypeById[STAGES[rep.id].primary].name}</small>}
+                </span>
+                {ex ? <NameLine game={g.id} names={ex.names} /> : <span class="t-note">—</span>}
+                <p class="pat__rule">{descOf(g.id)}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    <section class="sec term" id="notes">
+      <Chapter title="読みどころ" note="型の境目で起きていること" />
+      {STAGE_DOC.notes.map((nt) => (
+        <article class="note">
+          <h3>{nt.title}</h3>
+          <p class="prose">{nt.body}</p>
+          <div class="note__refs">
+            {nt.refs.map((r) => (
+              <div><a class="t-label" href={systemUrl(r.game)}>{gameById[r.game].short}</a><NameLine game={r.game} names={r.names} /></div>
+            ))}
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="sec term" id="scope">
+      <Chapter title="範囲の表し方" note={`${nGames}作品`} />
+      <p class="prose">段階と混ざりやすいのが、範囲（単体・全体）の表し方です。段階と同じ語を範囲にも使うと、読む人が迷います。</p>
+      <div style="margin-top:12px">
+        {scopes.map(({ s, n, sample }) => (
+          <div class="pat pat--rule">
+            <span class="pat__game">{s.name}<span class="t-note">　{n}作品</span></span>
+            {sample ? <NameLine game={sample.game} names={sample.names} /> : <span class="t-note">—</span>}
+            <p class="pat__rule">{s.how}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="sec">
+      <Chapter title="自分の世界で使うなら" note="型を選ぶための問い" />
+      <ol class="nums">{STAGE_DOC.questions.map((q, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{q}</span></li>)}</ol>
+    </section>
+
+    <p class="t-note" style="margin-top:32px">※ 型は、各作品の魔法体系ページにある命名のルールと収録データをもとに、生成AI（Claude）で下書きして分類しました。例に挙げた魔法名は、すべて収録データにあるものです。「→」は同じ系統の中で段階順に並んでいるもの、「／」は強さの順をデータで確かめられない並びです。シリーズの各作品は、代表作品と型が違うものだけを並べています。データの集め方は<a href="/about">このサイトについて</a>にあります。</p>
+  </main>
+</Base>

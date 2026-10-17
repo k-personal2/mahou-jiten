@@ -68,6 +68,23 @@ Object.entries(systems).forEach(([k, s]) => {
 catalog.forEach((c) => c.items.forEach((it) => { if (it.game && !gameIds.has(it.game)) errors.push(`catalog: 未定義の作品 ${it.game}`); }));
 games.forEach((g) => { if (!g.group && !catalog.some((c) => c.items.some((it) => it.game === g.id))) warns.push(`catalog に ${g.id} がない（作品一覧に出ない）`); });
 
+// 魔法世界の設計図：段階の付け方（stages.json は tools/merge-stages.mjs で作る）
+const [stages, stageDoc] = ['stages', 'stage-types'].map(load);
+const stTypes = new Set(stageDoc.types.map((t) => t.id)), scTypes = new Set(stageDoc.scopeTypes.map((t) => t.id));
+const hasName = (gid, n) => magics.some((m) => m.game === gid && m.name === n);
+const namesOk = (gid, names, where) => names.forEach((n) => { if (!hasName(gid, n)) errors.push(`${where}: ${gid} に「${n}」がない`); });
+games.forEach((g) => { if (!stages[g.id]) errors.push(`stages に ${g.id} がない`); });
+Object.entries(stages).forEach(([k, s]) => {
+  if (!gameIds.has(k)) errors.push(`stages.${k} に対応する作品がない`);
+  if (!stTypes.has(s.primary)) errors.push(`stages.${k}: 未定義の型 ${s.primary}`);
+  s.secondary.forEach((t) => { if (!stTypes.has(t)) errors.push(`stages.${k}: 未定義の型 ${t}`); });
+  if (!scTypes.has(s.scope.type)) errors.push(`stages.${k}: 未定義の範囲の型 ${s.scope.type}`);
+  s.examples.forEach((e) => namesOk(k, e.names, `stages.${k} の例`));
+  s.scope.examples.forEach((e) => namesOk(k, e, `stages.${k} の範囲の例`));
+});
+stageDoc.types.forEach((t) => { if (t.sample && !stages[t.sample]?.examples.length) errors.push(`stage-types.${t.id}: sample ${t.sample} に例がない`); });
+stageDoc.notes.forEach((n) => n.refs.forEach((r) => { if (!gameIds.has(r.game)) errors.push(`stage-types の読みどころ: 未定義の作品 ${r.game}`); else namesOk(r.game, r.names, `読みどころ「${n.title}」`); }));
+
 if (noSrc) warns.push(`出典のない魔法 ${noSrc} 件`);
 warns.forEach((w) => console.warn('⚠ ' + w));
 if (errors.length) {
