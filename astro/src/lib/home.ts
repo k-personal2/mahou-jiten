@@ -3,48 +3,33 @@
  * 表示する文言は各ページ側で持つ
  */
 import {
-  EL, FX, PAGE_MAGICS, NAMING, gameById, elById, chainsOf, chainOfMagic, splitNames,
+  EL, FX, PAGE_MAGICS, REP_GAMES, NAMING, STAGE_DOC, gameById, chainsOf, chainOfMagic, leadParts,
   compareRows, rowsTotal, compareUrl, magicUrl, todayMagic,
 } from './dict';
 
-// 今日の魔法（ビルド日で決まる）
+// 今日の魔法（ビルド日で決まる）と、その系統
 export const today = todayMagic();
+export const todayLead = leadParts(today);
+export const todayChain = chainOfMagic(today).map((m) => ({ m, href: magicUrl(m), cur: m.id === today.id }));
 
-// 呼び名の帯：作品ごとに系統の最初の名前を12件
-export const bands = [
-  { key: 'fire', el: 'fire', fx: 'atk' },
-  { key: 'ice', el: 'ice', fx: 'atk' },
-  { key: 'heal', el: null, fx: 'heal' },
-].map((b) => {
-  const rows = compareRows(b.el, b.fx);
-  // 作品ごとに1件、なるべく違う名前を優先して12件
-  const perGame = rows.filter((r, i) => rows.findIndex((x) => x.g.id === r.g.id) === i);
-  const names = new Set<string>();
-  const distinct = perGame.filter((r) => !names.has(r.list[0].name) && names.add(r.list[0].name));
-  const firsts = [...distinct, ...perGame.filter((r) => !distinct.includes(r))].slice(0, 12).map((r) => ({ m: r.list[0], g: r.g }));
-  return { ...b, firsts, href: compareUrl(b.el, b.fx), nGames: new Set(rows.map((r) => r.g.id)).size, total: rowsTotal(rows) };
+// 「たとえば」の一文：同じ氷の攻撃魔法を、4つのシリーズで
+export const EG_GAMES = ['dq', 'ff', 'smt', 'mother'] as const;
+export const eg = EG_GAMES.flatMap((gid) => {
+  const m = chainsOf(gid, 'ice', 'atk')[0]?.list[0];
+  return m ? [{ gid, g: gameById[gid], m }] : [];
 });
+const iceRows = compareRows('ice', 'atk');
+export const egCompare = { href: compareUrl('ice', 'atk'), nGames: new Set(iceRows.map((r) => r.g.id)).size, total: rowsTotal(iceRows) };
 
-// 探し方：数字は行き先の比較ページの件数と同じ
-export const fxRows = FX.map((f) => ({
-  f, href: compareUrl(null, f.id),
-  c: f.id === 'atk' ? EL.reduce((a, e) => a + rowsTotal(compareRows(e.id, 'atk')), 0) : rowsTotal(compareRows(null, f.id)),
-}));
-export const elRows = EL.map((e) => ({ e, c: rowsTotal(compareRows(e.id, 'atk')) }));
-export const sysTop = NAMING.map((t, i) => ({ ...t, i, games: t.items.filter((x) => x.href) }))
-  .sort((a, b) => b.games.length - a.games.length).slice(0, 6);
+// 読みもの：段階の付け方・魔法の呼び方（既にあるページ）
+export const reading = {
+  tierTypes: STAGE_DOC.types.length,
+  tierGames: REP_GAMES.length,
+  namingTerms: NAMING.length,
+};
 
-// 名前の付け方：作品ごとの命名ルール（名前はデータから。ルールの説明文は各ページで gid ごとに持つ）
-export const PATTERN_GAMES = ['dq', 'ff', 'mother', 'smt', 'goemon', 'tenchi', 'tengai'] as const;
-export type PatternGame = (typeof PATTERN_GAMES)[number];
-export const patterns = PATTERN_GAMES.map((gid) => {
-  const list = chainsOf(gid, 'fire', 'atk')[0]?.list ?? [];
-  const parts = splitNames(list.map((m) => m.name));
-  return { gid, g: gameById[gid], list, items: list.map((m, i) => ({ ...parts[i], href: magicUrl(m) })) };
-}).filter((p) => p.items.length > 1);
-
-// 名前だけではわからない魔法
-const CUR = ['昭和', 'いわし', 'グリコーン', 'だだぢぢ', '？？？？', '日立'];
-export const curious = CUR.map((n) => PAGE_MAGICS.find((m) => m.name === n && !gameById[m.game].group)).filter((m) => m !== undefined).map((m) => ({
-  m, g: gameById[m.game], E: m.el ? elById[m.el] : null, chain: chainOfMagic(m),
-}));
+// 探す：属性（収録のあるものだけ）と、件数の多い用途
+export const findEls = EL.filter((e) => PAGE_MAGICS.some((m) => m.el === e.id && m.fx === 'atk'));
+export const findFx = FX.filter((f) => f.id !== 'atk' && f.id !== 'misc')
+  .map((f) => ({ f, c: rowsTotal(compareRows(null, f.id)) }))
+  .sort((a, b) => b.c - a.c).slice(0, 6).map((x) => x.f);

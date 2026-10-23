@@ -1,10 +1,10 @@
 ---
-/** 章見出し：太罫＋番号＋明朝。番号は親の .chapters の中で CSS が自動で振る（plain で番号なし） */
-interface Props { title: string; id?: string; note?: string; plain?: boolean }
-const { title, id, note, plain = false } = Astro.props;
+/** 節の見出し：❖ と明朝。右に補足（note）やリンク（slot） */
+interface Props { title: string; id?: string; note?: string }
+const { title, id, note } = Astro.props;
 ---
-<div class:list={['chapter', { 'chapter--plain': plain }]}>
-  <h2 id={id}>{title}</h2>
-  {note && <span class="t-note">{note}</span>}
+<div class="sec-head">
+  <h2 class="h2" id={id}>{title}</h2>
+  {note && <span class="note">{note}</span>}
   <slot />
 </div>

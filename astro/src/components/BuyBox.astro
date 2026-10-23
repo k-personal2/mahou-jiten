@@ -1,0 +1,23 @@
+---
+/** 収録作品の購入リンク（Amazon アソシエイト）。表紙風の枠は文字だけで組む（画像は使わない） */
+import { amazonUrl, releaseYear, type Game, type Shop } from '../lib/dict';
+interface Props { game: Game; item?: Shop; compact?: boolean; en?: boolean }
+const { game, item = game.shop?.[0], compact = false, en = false } = Astro.props;
+const R = game.release;
+const isSeries = game.name.endsWith('（シリーズ）');
+const meta = R && !isSeries ? [`${releaseYear(R)}`, R.platforms[0]].filter(Boolean).join(' ／ ') : '';
+---
+{item && (
+  <aside class:list={['buy', { 'buy-sm': compact }]} aria-label={en ? 'Play this game' : '収録作品'}>
+    <div class="buy-cover" aria-hidden="true">
+      <span class="buy-cover-t">{item.label}</span>
+      {meta && <span class="buy-cover-m">{meta}</span>}
+    </div>
+    <div class="buy-body">
+      <span class="buy-lbl">{en ? 'Play this game' : '収録作品'}<span class="note">　PR</span></span>
+      <span class="buy-title" lang={en ? 'ja' : undefined}>{item.label}</span>
+      {meta && <span class="buy-meta">{en ? 'First released ' : '最初の発売 '}{meta}</span>}
+      <a class="btn btn-line buy-btn" href={amazonUrl(item)} target="_blank" rel="sponsored nofollow noopener">{en ? (item.asin ? 'View on Amazon.co.jp' : 'Find on Amazon.co.jp') : item.asin ? 'Amazonで見る' : 'Amazonで探す'}</a>
+    </div>
+  </aside>
+)}

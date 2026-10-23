@@ -10,20 +10,21 @@ const nGames = NAMING.reduce((a, t) => a + t.items.filter((i) => i.href).length,
   crumbs={[{ name: 'トップ', path: '/' }, { name: '魔法を何と呼ぶ？', path: '/names' }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">魔法を何と呼ぶ？</span></nav>
-    <h1 class="t-h1">魔法を何と呼ぶ？</h1>
-    <p class="lead">ドラゴンクエストは「呪文」、MOTHERは「PSI」、サガは「術」。RPGの「魔法」は、作品によって呼び方も仕組みも違います。</p>
-    <p class="desc">収録{nGames}作品の呼び方を、{NAMING.length}通りに分けて並べました。作品名から、その作品の魔法体系へ進めます。</p>
+    <h1 class="p-title">魔法を何と呼ぶ？</h1>
+    <p class="p-lead">ドラゴンクエストは「呪文」、MOTHERは「PSI」、サガは「術」。RPGの「魔法」は、作品によって呼び方も仕組みも違います。収録{nGames}作品の呼び方を、{NAMING.length}通りに分けて並べました。</p>
     <nav class="toc" aria-label="呼び方の目次">
-      {NAMING.map((t, i) => <a href={`#t${i}`}>{t.term}</a>)}
+      {NAMING.map((t, i) => <a class="chip" href={`#t${i}`}>{t.term}<span class="note">{t.items.length}</span></a>)}
     </nav>
 
     {NAMING.map((t, i) => (
-      <section class="sec term" id={`t${i}`}>
-        <Chapter title={t.term} note={`${t.items.length}作品`} plain />
-        {t.desc ? <p class="prose">{t.desc}</p> : <p class="t-note">この呼び方の作品は準備中です。</p>}
-        <ul class="term-games">
-          {t.items.map((it) => <li>{it.href ? <a href={it.href}>{it.name}</a> : <span class="t-note">{it.name}（準備中）</span>}</li>)}
-        </ul>
+      <section class="sec" id={`t${i}`}>
+        <Chapter title={t.term} note={`${t.items.length}作品`} />
+        <div class="card box">
+          {t.desc ? <p class="prose">{t.desc}</p> : <p class="note">この呼び方の作品は準備中です。</p>}
+          <div class="term-games">
+            {t.items.map((it) => (it.href ? <a class="chip" href={it.href}>{it.name}</a> : <span class="chip" style="color:var(--mut)">{it.name}（準備中）</span>))}
+          </div>
+        </div>
       </section>
     ))}
   </main>

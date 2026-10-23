@@ -26,20 +26,28 @@ const ld = [
     : []),
   ...jsonld,
 ];
-const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Shippori+Mincho+B1:wght@700;800&display=swap';
+const FONT_CSS = 'https://fonts.googleapis.com/css2?family=DotGothic16&family=IBM+Plex+Mono&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@700;800&display=swap';
 const nav = en ? [
   { key: 'home', label: 'Home', href: '/en' },
-  { key: 'compare', label: 'Compare by effect', href: '/element/fire' },
+  { key: 'compare', label: 'Compare', href: '/element/fire' },
   { key: 'games', label: 'Games', href: '/game' },
   { key: 'names', label: 'What they call magic', href: '/names' },
-  { key: 'about', label: 'About', href: '/about' },
 ] : [
   { key: 'home', label: 'トップ', href: '/' },
-  { key: 'compare', label: '用途・属性で比べる', href: '/element/fire' },
-  { key: 'games', label: '作品から探す', href: '/game' },
+  { key: 'compare', label: '横断比較', href: '/element/fire' },
+  { key: 'games', label: '作品一覧', href: '/game' },
   { key: 'names', label: '魔法の呼び方', href: '/names' },
   { key: 'blueprint', label: '段階の付け方', href: '/blueprint/tier' },
-  { key: 'about', label: 'このサイトについて', href: '/about' },
+];
+// スマホの下部タブ（グローバルナビの代わり）。1字の印は明朝
+const tabs = en ? [
+  { key: 'home', label: 'Home', glyph: '辞', href: '/en' },
+  { key: 'compare', label: 'Compare', glyph: '較', href: '/element/fire' },
+  { key: 'games', label: 'Games', glyph: '作', href: '/game' },
+] : [
+  { key: 'home', label: 'トップ', glyph: '辞', href: '/' },
+  { key: 'compare', label: '比較', glyph: '較', href: '/element/fire' },
+  { key: 'games', label: '作品', glyph: '作', href: '/game' },
 ];
 ---
 <!doctype html>
@@ -53,7 +61,7 @@ const nav = en ? [
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#f1e9d6" />
+    <meta name="theme-color" content="#f7f6f2" />
     <meta name="google-site-verification" content="xtgTp9GaqCZJbzQf_eNLFUsGESCEf6iWNv42d084ivY" />
     {canonical && <link rel="canonical" href={canonical} />}
     {alternates && <>
@@ -88,16 +96,17 @@ const nav = en ? [
   </head>
   <body>
     <header class="hdr">
-      <div class="wrap hdr__in">
-        <a class="logo" href={en ? '/en' : '/'}><span class="logo__seal" aria-hidden="true">魔</span><span class="logo__name">{siteName}</span></a>
-        <div class="hdr__sp"></div>
+      <div class="wrap hdr-in">
+        <a class="logo" href={en ? '/en' : '/'}><span class="seal" aria-hidden="true">魔</span><span>{siteName}</span></a>
+        <div class="hdr-sp"></div>
         {!hideSearch && <Search />}
-        <nav class="gnav" aria-label="メイン">
+        <nav class="gnav" aria-label={en ? 'Main' : 'メイン'}>
           {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} hreflang={en && n.key !== 'home' ? 'ja' : undefined}>{n.label}</a>)}
+          <a href="#" data-random>{en ? 'Random' : 'ランダム'}</a>
         </nav>
         {alternates && (en
-          ? <a class="hdr__lang" href={alternates.ja} hreflang="ja" lang="ja">日本語</a>
-          : <a class="hdr__lang" href={alternates.en} hreflang="en" lang="en">English</a>)}
+          ? <a class="hdr-lang" href={alternates.ja} hreflang="ja" lang="ja">日本語</a>
+          : <a class="hdr-lang" href={alternates.en} hreflang="en" lang="en">English</a>)}
       </div>
     </header>
 
@@ -105,23 +114,39 @@ const nav = en ? [
 
     <footer class="ftr">
       {en ? (
-      <div class="wrap ftr__in">
-        <span class="ftr__name">{siteName}</span>
+      <div class="wrap">
+        <strong>{siteName}</strong>
         <span>{statsTextEn}</span>
         <span>Spell names follow the original Japanese releases</span>
-        <a href="/about" hreflang="ja">About this site and its data (Japanese)</a>
         <span>An unofficial fan site run by one person</span>
+        <span>As an Amazon Associate, this site earns from qualifying purchases.</span>
+        <nav class="ftr-nav" aria-label="Site">
+          <a href="/about" hreflang="ja">About this site and its data (Japanese)</a>
+          <a href="/names" hreflang="ja">What they call magic</a>
+          <a href="/blueprint/tier" hreflang="ja">How spells are tiered</a>
+          <a href="/" hreflang="ja" lang="ja">日本語</a>
+        </nav>
       </div>
       ) : (
-      <div class="wrap ftr__in">
-        <span class="ftr__name">RPG魔法辞典</span>
+      <div class="wrap">
+        <strong>RPG魔法辞典</strong>
         <span>{statsText}</span>
         <span>魔法名は各作品の日本語版表記に準拠</span>
-        <a href="/about">このサイトについて・データの集め方</a>
         <span>個人運営の非公式サイトです</span>
+        <span>Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</span>
+        <nav class="ftr-nav" aria-label="サイト">
+          <a href="/about" aria-current={active === 'about' ? 'page' : undefined}>このサイトについて・データの集め方</a>
+          <a href="/names">魔法の呼び方</a>
+          <a href="/blueprint/tier">段階の付け方</a>
+          <a href="/en" hreflang="en" lang="en">English</a>
+        </nav>
       </div>
       )}
     </footer>
+    <nav class="tabbar" aria-label={en ? 'Main (bottom bar)' : 'メイン（画面下）'}>
+      {tabs.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} hreflang={en && n.key !== 'home' ? 'ja' : undefined}><b aria-hidden="true">{n.glyph}</b>{n.label}</a>)}
+      <a href="#" data-random><b aria-hidden="true">運</b>{en ? 'Random' : 'ランダム'}</a>
+    </nav>
 
     <script>import '../scripts/site.ts';</script>
   </body>

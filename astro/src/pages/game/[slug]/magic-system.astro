@@ -3,9 +3,10 @@ import Base from '../../../layouts/Base.astro';
 import Chapter from '../../../components/Chapter.astro';
 import Chain from '../../../components/Chain.astro';
 import NameLine from '../../../components/NameLine.astro';
+import BuyBox from '../../../components/BuyBox.astro';
 import {
-  GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, elInk, systemUrl, chainOfMagic, type Game,
-  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL, releaseDate, amazonUrl,
+  GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, markStyle, systemUrl, chainOfMagic, type Game,
+  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL, releaseDate,
 } from '../../../lib/dict';
 
 export function getStaticPaths() {
@@ -43,58 +44,60 @@ const jsonld = [{
 ---
 <Base title={`${g.name}の魔法体系｜RPG魔法辞典`} description={S.overview.slice(0, 110)} active="games" path={systemUrl(g.id)} jsonld={jsonld}
   crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }, { name: `${g.name}の魔法体系`, path: systemUrl(g.id) }]}>
-  <main class="wrap page chapters">
-    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span aria-current="page">{g.name}</span></nav>
-    <p class="t-label" style="margin-top:20px">呼び方：{g.sys} ／ 収録 <span class="t-num">{count}</span>種</p>
-    <h1 class="t-h1" style="margin-top:6px">{g.name}の魔法体系</h1>
-    {R && <p class="t-note" style="margin-top:8px">最初の発売：<time datetime={R.date}>{releaseDate(R)}</time>（{R.platforms.join('・')}）{R.note && `。${R.note.replace(/。$/, '')}`}</p>}
-    {g.basis && <p class="t-note" style="margin-top:8px">収録の基準：{g.basis}</p>}
-    {S.verdict && <p class="verdict"><span class="t-label">収録の判断</span><br />{S.verdict}</p>}
-
-    <section class="sec">
-      <Chapter title="概要と命名のルール" />
-      <div class="split">
-        <p class="prose">{S.overview}</p>
-        <div>
-          <h3 class="t-label">命名のルール</h3>
-          <ol class="nums">{S.rules.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
-          {S.growth && S.growth.length > 0 && (
-            <>
-              <h3 class="t-label" style="margin-top:20px">強化・派生のルール</h3>
-              <ol class="nums">{S.growth.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
-            </>
-          )}
-        </div>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/game">作品から探す</a><span>›</span><span>{g.name}</span><span>›</span><span aria-current="page">魔法体系</span></nav>
+    <div class="p-meta"><span class="lbl">呼び方：{g.sys} ・ 収録 {count}種</span><span class="url">{systemUrl(g.id)}</span></div>
+    <h1 class="p-title is-kicker">{g.name}の魔法体系</h1>
+    {(R || g.basis) && (
+      <div class="p-notes">
+        {R && <p>最初の発売：<time datetime={R.date}>{releaseDate(R)}</time>（{R.platforms.join('・')}）{R.note && `。${R.note.replace(/。$/, '')}`}</p>}
+        {g.basis && <p>収録の基準：{g.basis}</p>}
       </div>
-    </section>
+    )}
+    {S.verdict && <div class="card verdict"><span class="lbl">収録の判断</span><p>{S.verdict}</p></div>}
+
+    <div class="two" style="margin-top:20px">
+      <div class="card box"><h2 class="lbl">概要</h2><p class="prose prose-lg">{S.overview}</p></div>
+      <div>
+        <div class="card box">
+          <h2 class="lbl">命名のルール</h2>
+          <ol class="rules">{S.rules.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
+        </div>
+        {S.growth && S.growth.length > 0 && (
+          <div class="card box">
+            <h2 class="lbl">強化・派生のルール</h2>
+            <ol class="rules">{S.growth.map((t, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{t}</span></li>)}</ol>
+          </div>
+        )}
+      </div>
+    </div>
 
     {ST && (
       <section class="sec">
-        <Chapter title="段階の付け方" note="魔法世界の設計図" />
-        <div class="stage">
-          <dl>
+        <Chapter title="段階の付け方" note="魔法世界の設計図">
+          <a class="more" href={BLUEPRINT_TIER_URL}>作品を横断して比べる →</a>
+        </Chapter>
+        <div class="two">
+          <div class="card sys-card">
             <div>
-              <dt>段階</dt>
-              <dd>
-                <a class="stage__type" href={stageTypeUrl(ST.primary)}>{stageTypeById[ST.primary].name}</a>
-                <p>{ST.desc}</p>
-                {ST.examples.slice(0, 2).map((e) => <NameLine game={g.id} names={e.names} />)}
-              </dd>
+              <span class="lbl">段階</span>
+              <p class="grp-head"><a class="min" style="font-size:20px" href={stageTypeUrl(ST.primary)}>{stageTypeById[ST.primary].name}</a></p>
+              <p class="prose-sans">{ST.desc}</p>
             </div>
-            <div>
-              <dt>範囲</dt>
-              <dd>
-                <b>{scopeTypeById[ST.scope.type].name}</b>
-                {ST.scope.desc && <p>{ST.scope.desc}</p>}
-                {ST.scope.examples.slice(0, 1).map((e) => <NameLine game={g.id} names={e} />)}
-              </dd>
+            {ST.examples.slice(0, 2).map((e) => <NameLine game={g.id} names={e.names} />)}
+            <div class="sys-mini">
+              <span class="lbl">範囲</span>
+              <p class="grp-head">{scopeTypeById[ST.scope.type].name}</p>
+              {ST.scope.desc && <p class="prose-sans">{ST.scope.desc}</p>}
+              {ST.scope.examples.slice(0, 1).map((e) => <NameLine game={g.id} names={e} />)}
             </div>
-          </dl>
-          <div>
-            {ST.diff && (<><h3 class="t-label">シリーズ内の違い</h3><p class="prose">{ST.diff}</p></>)}
-            {ST.insight && (<><h3 class="t-label" style={ST.diff ? 'margin-top:16px' : undefined}>このサイトの見方</h3><p class="prose">{ST.insight}</p></>)}
-            <a class="more" href={BLUEPRINT_TIER_URL}>段階の付け方を、作品を横断して比べる →</a>
           </div>
+          {(ST.diff || ST.insight) && (
+            <div class="card box">
+              {ST.diff && (<><span class="lbl">シリーズ内の違い</span><p class="prose">{ST.diff}</p></>)}
+              {ST.insight && (<><span class="lbl" style={ST.diff ? 'display:block;margin-top:16px' : undefined}>このサイトの見方</span><p class="prose">{ST.insight}</p></>)}
+            </div>
+          )}
         </div>
       </section>
     )}
@@ -102,16 +105,16 @@ const jsonld = [{
     {S.categories && S.categories.length > 0 && (
       <section class="sec">
         <Chapter title={`${g.sys}の分類`} />
-        <div class="cats">{S.categories.map((c) => <div><b>{c.name}</b><p>{c.desc}</p></div>)}</div>
+        <div class="og-grid">{S.categories.map((c) => <div class="card og"><span class="min">{c.name}</span><p>{c.desc}</p></div>)}</div>
       </section>
     )}
 
     {elements.length > 0 && (
       <section class="sec">
-        <Chapter title="属性の呼び名" note="押すと属性ごとの比較へ" />
-        <div class="eln">
+        <Chapter title="属性体系" note="作品内での属性の呼び名。押すと横断比較へ" />
+        <div class="el-names">
           {elements.map(({ e, local }) => (
-            <div><a href={`/element/${e.id}`} style={`color:${elInk(e)}`}>{e.name}属性</a><b>{local ?? e.name}</b></div>
+            <a href={`/element/${e.id}`}><span class="mark" style={markStyle(e, 28)} aria-hidden="true">{e.name}</span><span class="min">{local ?? e.name}</span>{local && <small>＝{e.name}属性</small>}</a>
           ))}
         </div>
       </section>
@@ -120,11 +123,11 @@ const jsonld = [{
     {sections.map((s) => (
       <section class="sec">
         <Chapter title={s.title} note={`${s.n}種`} />
-        <div class="sys-rows">
+        <div class="card sys-table">
           {s.groups.map((gp) => (
-            <div>
-              <span class="sys-rows__lbl" style={gp.el ? `color:${elInk(gp.el)}` : undefined}>{gp.label}</span>
-              <div>{gp.lines.map((ln) => <Chain line={ln} />)}</div>
+            <div class="sys-row">
+              <div class="grp-head"><span class="mark" style={markStyle(gp.el, 24)} aria-hidden="true">{gp.mark}</span>{gp.label}</div>
+              <Chain lines={gp.lines} />
             </div>
           ))}
         </div>
@@ -134,45 +137,33 @@ const jsonld = [{
     {siblings.length > 1 && (
       <section class="sec">
         <Chapter title={`${g.series ?? 'シリーズ'}の各作品`} note="作品ごとに命名や分類が少しずつ違います" />
-        <p class="inline-links">
-          {siblings.map((x) => <a href={systemUrl(x.id)} aria-current={x.id === g.id ? 'page' : undefined}>{x.short}{!x.group && '（代表）'}</a>)}
-        </p>
+        <div class="chips">
+          {siblings.map((x) => <a class="chip" href={systemUrl(x.id)} aria-current={x.id === g.id ? 'page' : undefined}>{x.short}{!x.group && '（代表）'}</a>)}
+        </div>
+      </section>
+    )}
+
+    {g.shop && g.shop.length > 0 && (
+      <section class="sec">
+        <Chapter title="この作品を遊ぶ" note="PR" />
+        <div class="buys">{g.shop.map((x) => <BuyBox game={g} item={x} />)}</div>
+        <p class="note" style="margin-top:8px">Amazonのアソシエイトとして、RPG魔法辞典は適格販売により収入を得ています。</p>
       </section>
     )}
 
     <section class="sec">
       <Chapter title="他の作品の魔法体系" />
-      <div class="rows rows--top">
-        {otherGames.map(({ x, sample }) => (
-          <a class="row-link" href={systemUrl(x.id)}>
-            <span class="row-link__game">{x.name}</span>
-            <span class="row-link__chain">{sample}</span>
-          </a>
-        ))}
+      <div class="og-grid">
+        {otherGames.map(({ x, sample }) => <a class="card og" href={systemUrl(x.id)}><b>{x.name}</b><span class="min">{sample}</span></a>)}
       </div>
     </section>
 
-    {g.shop && g.shop.length > 0 && (
-      <section class="sec">
-        <Chapter title="この作品を遊ぶ" note="PR" />
-        <div class="rows rows--top">
-          {g.shop.map((x) => (
-            <a class="row-link" href={amazonUrl(x)} rel="sponsored nofollow noopener" target="_blank">
-              <span class="row-link__main">{x.label}</span>
-              <span class="row-link__num">{x.asin ? 'Amazonで見る' : 'Amazonで探す'} →</span>
-            </a>
-          ))}
-        </div>
-        <p class="t-note" style="margin-top:8px">Amazonのアソシエイトとして、RPG魔法辞典は適格販売により収入を得ています。</p>
-      </section>
-    )}
-
     {src.length > 0 && (
-      <section class="src" aria-labelledby="src-h">
-        <h2 id="src-h">出典</h2>
-        <ul>{src.map((x) => <li><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
+      <section class="sec" aria-labelledby="src-h">
+        <Chapter id="src-h" title="出典" />
+        <ul class="src-list">{src.map((x) => <li><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
       </section>
     )}
-    <p class="t-note" style="margin-top:32px">※ 魔法名・分類・系統は攻略資料などで確認して掲載していますが、作品・版によって表記や仕様が異なる場合があります。</p>
+    <p class="disclaimer">※ 魔法名・分類・系統は攻略資料などで確認して掲載していますが、作品・版によって表記や仕様が異なる場合があります。</p>
   </main>
 </Base>

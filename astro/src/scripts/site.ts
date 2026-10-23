@@ -47,8 +47,8 @@ document.querySelectorAll<HTMLFormElement>('[data-search]').forEach((box) => {
     if (!input.value.trim()) { show(false); return; }
     show(true);
     list.innerHTML = items.length
-      ? items.map((i, j) => `<a class="sug__item" id="${list.id}-${j}" role="option" aria-selected="false" href="${i.href}"><span class="sug__kind">${i.kind}</span><span class="sug__label">${esc(i.label)}</span><span class="sug__sub">${esc(i.sub)}</span></a>`).join('')
-      : '<p class="sug__empty" role="status">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
+      ? items.map((i, j) => `<a class="sug-item" id="${list.id}-${j}" role="option" aria-selected="false" href="${i.href}"><span class="sug-kind">${i.kind}</span><span class="sug-label">${esc(i.label)}</span><span class="sug-sub">${esc(i.sub)}</span></a>`).join('')
+      : '<p class="sug-empty" role="status">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
   };
   const renderAsync = () => { if (IDX) render(); else loadIdx().then(render); };
   input.addEventListener('input', renderAsync);

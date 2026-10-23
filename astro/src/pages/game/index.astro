@@ -18,7 +18,8 @@ const cats = CATALOG.map((cat) => ({
     return {
       name: it.name, sys: it.sys, href: g ? systemUrl(g.id) : undefined, cnt: own.length,
       ex: sample ? chainOfMagic(sample).map((m) => m.name).join(' → ') : '',
-      series: sib.length ? `シリーズ：${sib.map((x) => x.short).join('・')}` : '',
+      series: sib.map((x) => ({ name: x.short, href: systemUrl(x.id) })),
+      basis: g?.basis,
       key: [it.name, g?.short, it.sys, ALIAS[it.game ?? ''], ...sib.map((x) => x.name + ' ' + x.short)].filter(Boolean).join(' '),
     };
   }),
@@ -29,46 +30,55 @@ const cats = CATALOG.map((cat) => ({
   crumbs={[{ name: 'トップ', path: '/' }, { name: '作品から探す', path: '/game' }]}>
   <main class="wrap page">
     <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span aria-current="page">作品から探す</span></nav>
-    <h1 class="t-h1">作品から探す</h1>
-    <p class="desc">収録{STATS.games}作品。作品の中で魔法を何と呼ぶかと、収録件数、代表的な系統を載せています。作品名を押すと、その作品の魔法体系へ進みます。シリーズ（ドラゴンクエスト・FINAL FANTASYなど）は1作品として数えています。</p>
+    <h1 class="p-title">作品から探す</h1>
+    <p class="p-lead">収録{STATS.games}作品と、各作品での魔法の呼び方。行を開くと代表的な系統とシリーズの各作品が出ます。シリーズ（ドラゴンクエスト・FINAL FANTASYなど）は1作品として数えています。</p>
 
-    <div class="wbar" data-wbar>
-      <div class="search__box">
+    <div class="wbar">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
         <input type="search" aria-label="作品名で絞り込み" placeholder="作品名で絞り込み（例：サガ、テイルズ）" data-wq />
-        <button class="wbar__clear" type="button" aria-label="絞り込みを解除" data-wclear hidden>解除</button>
+        <button class="wbar-clear" type="button" aria-label="絞り込みを解除" data-wclear hidden>解除</button>
       </div>
-      <div class="wbar__views" role="group" aria-label="並べ方">
-        <span class="t-label">並べ方</span>
-        <button class="tab" type="button" aria-pressed="true" data-view="cat">カテゴリ</button>
-        <button class="tab" type="button" aria-pressed="false" data-view="sys">呼び方</button>
-        <button class="tab" type="button" aria-pressed="false" data-view="cnt">収録数</button>
+      <div class="wbar-views" role="group" aria-label="並べ方">
+        <span class="lbl">並べ方</span>
+        <button type="button" aria-pressed="true" data-view="cat">カテゴリ</button>
+        <button type="button" aria-pressed="false" data-view="sys">呼び方</button>
+        <button type="button" aria-pressed="false" data-view="cnt">収録数</button>
       </div>
-      <span class="t-note" role="status" data-wcount></span>
+      <span class="note" role="status" data-wcount></span>
     </div>
 
-    <div class="wgrid">
-      <nav class="windex" aria-label="グループへ移動" data-windex>
-        {cats.map((c, i) => <a href={`#wg${i}`}><span>{c.name}</span><span>{c.items.length}</span></a>)}
-      </nav>
-      <div class="wgroups" data-wgroups>
-        {cats.map((c, i) => (
-          <section class="wgroup" id={`wg${i}`}>
-            <Chapter title={c.name} note={`${c.items.length}作品`} plain />
-            {c.items.map((w) => (
-              <div class="wrow" data-cat={i} data-sys={w.sys} data-cnt={w.cnt} data-key={w.key}>
-                <div>
-                  {w.href ? <a class="wrow__name" href={w.href}>{w.name}</a> : <span class="wrow__name">{w.name}</span>}
-                  {w.series && <span class="wrow__series">{w.series}</span>}
+    <div data-wgroups>
+      {cats.map((c, i) => (
+        <section class="g-cat">
+          <Chapter title={c.name} note={`${c.items.length}作品`} />
+          <div class="card glist">
+            <div class="g-row g-head" aria-hidden="true"><span>作品</span><span>魔法の呼び方</span><span style="text-align:right">収録</span><span>代表的な系統</span><span></span></div>
+            {c.items.map((w) => w.href ? (
+              <details class="g-item" data-cat={i} data-sys={w.sys} data-cnt={w.cnt} data-key={w.key}>
+                <summary class="g-row">
+                  <span><span class="g-name">{w.name}</span><span class="g-sp">{w.sys} · {w.cnt}件</span></span>
+                  <span class="g-sys">{w.sys}</span><span class:list={['g-num', { 'is-zero': !w.cnt }]}>{w.cnt}件</span><span class="g-ex">{w.ex}</span>
+                </summary>
+                <div class="g-body">
+                  <a class="more" style="font-weight:700" href={w.href}>{w.name}の魔法体系を読む →</a>
+                  {w.ex && <p class="note">代表的な系統：<span class="min" style="font-size:16px;color:var(--ink)">{w.ex}</span></p>}
+                  {w.series.length > 0 && <div class="chips">{w.series.map((x) => <a class="chip" href={x.href}>{x.name}</a>)}</div>}
+                  {w.basis && <p class="note">収録の基準：{w.basis}</p>}
                 </div>
-                <span class="wrow__sys">{w.sys}</span>
-                <span class:list={['wrow__cnt', { 'is-zero': !w.cnt }]}>{w.cnt}件</span>
-                <span class="wrow__ex">{w.ex}</span>
+              </details>
+            ) : (
+              <div class="g-item is-off" data-cat={i} data-sys={w.sys} data-cnt="0" data-key={w.key}>
+                <div class="g-row">
+                  <span><span class="g-name">{w.name}</span><span class="g-sp">{w.sys} · 準備中</span></span>
+                  <span class="g-sys">{w.sys}</span><span class="g-num">準備中</span><span class="g-ex"></span><span></span>
+                </div>
               </div>
             ))}
-          </section>
-        ))}
-        <p class="empty" data-wempty hidden></p>
-      </div>
+          </div>
+        </section>
+      ))}
+      <p class="empty" data-wempty hidden></p>
     </div>
   </main>
 </Base>
@@ -76,15 +86,16 @@ const cats = CATALOG.map((cat) => ({
 <script>
   // 絞り込みと並べ方の切り替え。行の DOM はそのまま使い、グループだけ組み直す
   const root = document.querySelector<HTMLElement>('[data-wgroups]')!;
-  const index = document.querySelector<HTMLElement>('[data-windex]')!;
   const input = document.querySelector<HTMLInputElement>('[data-wq]')!;
   const clear = document.querySelector<HTMLButtonElement>('[data-wclear]')!;
   const count = document.querySelector<HTMLElement>('[data-wcount]')!;
   const empty = document.querySelector<HTMLElement>('[data-wempty]')!;
   const views = [...document.querySelectorAll<HTMLButtonElement>('[data-view]')];
-  const rows = [...root.querySelectorAll<HTMLElement>('.wrow')];
-  const catNames = [...root.querySelectorAll('.wgroup h2')].map((h) => h.textContent!);
+  const rows = [...root.querySelectorAll<HTMLElement>('.g-item')];
+  const catNames = [...root.querySelectorAll('.g-cat h2')].map((h) => h.textContent!);
+  const head = root.querySelector('.g-head')!.cloneNode(true);
   const kata = (s: string) => s.toLowerCase().replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60)).replace(/\s+/g, '');
+  const el = (tag: string, cls: string, text?: string) => Object.assign(document.createElement(tag), { className: cls, ...(text ? { textContent: text } : {}) });
   let view = 'cat';
 
   const render = () => {
@@ -100,22 +111,16 @@ const cats = CATALOG.map((cat) => ({
     } else {
       groups = catNames.map((n, i) => [n, hit.filter((r) => r.dataset.cat === String(i))] as [string, HTMLElement[]]).filter((g) => g[1].length);
     }
-    root.querySelectorAll('.wgroup').forEach((s) => s.remove());
-    index.replaceChildren();
-    groups.forEach(([name, list], i) => {
-      const sec = document.createElement('section');
-      sec.className = 'wgroup';
-      sec.id = 'wg' + i;
-      const head = document.createElement('div');
-      head.className = 'chapter chapter--plain';
-      head.append(Object.assign(document.createElement('h2'), { textContent: name }), Object.assign(document.createElement('span'), { className: 't-note', textContent: `${list.length}作品` }));
-      sec.append(head, ...list);
+    root.querySelectorAll('.g-cat').forEach((s) => s.remove());
+    groups.forEach(([name, list]) => {
+      const sec = el('section', 'g-cat');
+      const sh = el('div', 'sec-head');
+      sh.append(el('h2', 'h2', name), el('span', 'note', `${list.length}作品`));
+      const card = el('div', 'card glist');
+      card.append(head.cloneNode(true), ...list);
+      sec.append(sh, card);
       root.insertBefore(sec, empty);
-      const a = Object.assign(document.createElement('a'), { href: '#' + sec.id });
-      a.append(Object.assign(document.createElement('span'), { textContent: name }), Object.assign(document.createElement('span'), { textContent: String(list.length) }));
-      index.append(a);
     });
-    index.hidden = groups.length < 2;
     clear.hidden = !input.value;
     count.textContent = q ? `${hit.length}作品が該当` : '';
     empty.hidden = hit.length > 0;

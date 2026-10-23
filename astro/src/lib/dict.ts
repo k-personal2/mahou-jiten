@@ -95,6 +95,15 @@ export const compareUrl = (el: string | null, fx: string) =>
 // ---------- 見た目
 /** 属性の色（文字色にだけ使う。意味は必ず文字でも示す） */
 export const elInk = (el?: Element | null) => (el && el.hue != null ? `oklch(0.45 0.13 ${el.hue})` : 'var(--ink-2)');
+/** 属性の印（四角に1字）の地と文字の色。属性がなければ灰色 */
+export const tone = (el?: Element | null) =>
+  el && el.hue != null
+    ? { bg: `oklch(0.89 0.045 ${el.hue})`, ink: `oklch(0.45 0.14 ${el.hue})` }
+    : { bg: '#ebe9e3', ink: '#3a3d47' };
+export const markStyle = (el?: Element | null, size = 24) => {
+  const t = tone(el);
+  return `--s:${size}px;--bg:${t.bg};--fg:${t.ink}`;
+};
 
 // ---------- 検索・分類ロジック
 const lineKey = (m: Pick<Magic, 'kind' | 'series'>) => `${m.kind ?? ''}|${m.series ?? ''}`;
