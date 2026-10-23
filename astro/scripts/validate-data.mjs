@@ -68,6 +68,14 @@ Object.entries(systems).forEach(([k, s]) => {
 catalog.forEach((c) => c.items.forEach((it) => { if (it.game && !gameIds.has(it.game)) errors.push(`catalog: 未定義の作品 ${it.game}`); }));
 games.forEach((g) => { if (!g.group && !catalog.some((c) => c.items.some((it) => it.game === g.id))) warns.push(`catalog に ${g.id} がない（作品一覧に出ない）`); });
 
+// 作品ページの Amazon リンク（asin か検索語 q のどちらか一方）
+games.forEach((g) => (g.shop ?? []).forEach((x, i) => {
+  const w = `games.${g.id}.shop[${i}]`;
+  if (!x.label?.trim()) errors.push(`${w}: label がない`);
+  if (!x.asin === !x.q) errors.push(`${w}: asin と q はどちらか一方だけ`);
+  if (x.asin && !/^[A-Z0-9]{10}$/.test(x.asin)) errors.push(`${w}: asin は英大文字と数字の10桁（${x.asin}）`);
+}));
+
 // 最初の発売日と機種（tools/research/RELEASE-SPEC.md。機種名はここの表記にそろえる）
 const PLATFORMS = new Set([
   'Apple II', 'ファミリーコンピュータ', 'スーパーファミコン', 'ゲームボーイ', 'ゲームボーイアドバンス', 'PCエンジン SUPER CD-ROM²', 'メガドライブ', 'メガCD',

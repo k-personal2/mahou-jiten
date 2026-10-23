@@ -15,7 +15,13 @@ export type Effect = { id: string; name: string; kanji: string; slug: string; ph
 /** group: シリーズの各作品のとき、そのシリーズの代表作品の id（DQIII なら 'dq'） */
 /** release: 最初に発売された日（YYYY-MM-DD・YYYY-MM・YYYY）と、その日に出た機種。basis の版とは別（tools/research/RELEASE-SPEC.md） */
 export type Release = { date: string; platforms: string[]; note?: string; src: Source[] };
-export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string; group?: string; release?: Release };
+/** 作品ページの「この作品を遊ぶ」に出す Amazon のリンク。asin があれば商品ページ、なければ q で検索した結果へ */
+export type Shop = { label: string; asin?: string; q?: string };
+export type Game = { id: string; name: string; short: string; sys: string; slug: string; series?: string; basis?: string; group?: string; release?: Release; shop?: Shop[] };
+export const AMAZON_TAG = 'sakani-22';
+export const amazonUrl = (s: Shop) => s.asin
+  ? `https://www.amazon.co.jp/dp/${s.asin}?tag=${AMAZON_TAG}`
+  : `https://www.amazon.co.jp/s?k=${encodeURIComponent(s.q ?? '')}&tag=${AMAZON_TAG}`;
 /** 1986-05-27 → 1986年5月27日（分からない部分は省く） */
 export const releaseDate = (r: Release) => r.date.split('-').map((n, i) => `${Number(n)}${'年月日'[i]}`).join('');
 export const releaseYear = (r: Release) => Number(r.date.slice(0, 4));

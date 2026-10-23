@@ -5,7 +5,7 @@ import Chain from '../../../components/Chain.astro';
 import NameLine from '../../../components/NameLine.astro';
 import {
   GAMES, REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, buildGroups, elnOf, elInk, systemUrl, chainOfMagic, type Game,
-  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL, releaseDate,
+  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL, releaseDate, amazonUrl,
 } from '../../../lib/dict';
 
 export function getStaticPaths() {
@@ -151,6 +151,21 @@ const jsonld = [{
         ))}
       </div>
     </section>
+
+    {g.shop && g.shop.length > 0 && (
+      <section class="sec">
+        <Chapter title="この作品を遊ぶ" note="PR" />
+        <div class="rows rows--top">
+          {g.shop.map((x) => (
+            <a class="row-link" href={amazonUrl(x)} rel="sponsored nofollow noopener" target="_blank">
+              <span class="row-link__main">{x.label}</span>
+              <span class="row-link__num">{x.asin ? 'Amazonで見る' : 'Amazonで探す'} →</span>
+            </a>
+          ))}
+        </div>
+        <p class="t-note" style="margin-top:8px">Amazonのアソシエイトとして、RPG魔法辞典は適格販売により収入を得ています。</p>
+      </section>
+    )}
 
     {src.length > 0 && (
       <section class="src" aria-labelledby="src-h">
