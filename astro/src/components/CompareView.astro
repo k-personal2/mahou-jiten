@@ -2,24 +2,23 @@
 import Base from '../layouts/Base.astro';
 import Chapter from './Chapter.astro';
 import FilterBar from './FilterBar.astro';
-import {
-  EL, FX, SYSTEMS, elById, fxById, kindName, titleOf, subOf, compareRows, firstNames, rowsTotal,
-  tone, markStyle, magicUrl, systemUrl, compareUrl,
-} from '../lib/dict';
-interface Props { el: string | null; fx: string }
-const { el, fx } = Astro.props;
+import { EL, FX, SYSTEMS, elById, fxById, compareRows, firstNames, rowsTotal, tone, markStyle } from '../lib/dict';
+import { L, type Lang } from '../lib/i18n';
+interface Props { el: string | null; fx: string; lang?: Lang }
+const { el, fx, lang = 'ja' } = Astro.props;
+const t = L(lang), en = t.en;
 const E = el ? elById[el] : null, F = fxById[fx];
-const title = titleOf(el, fx);
+const title = t.title(el, fx);
 const rows = compareRows(el, fx);
 const total = rowsTotal(rows);
 const nGames = new Set(rows.map((r) => r.g.id)).size;
 const names = firstNames(rows);
-const top3 = names.slice(0, 3).map((n) => n.name);
+const top3 = names.slice(0, 3).map((n) => t.name(n.magic));
 
-// 作品ごとのカード：系統の最初の名前を大きく。長い名前は文字を小さくする
+// 作品ごとのカード：系統の最初の名前を大きく。長い名前は文字を小さくする（英語版はローマ字の長さで）
 const cards = rows.map(({ g, list, kind }) => {
-  const b = list[0], L = [...b.name].length;
-  return { g, b, kn: kindName(fx, kind), sys: subOf(b), k: L <= 4 ? 1 : L <= 6 ? 0.84 : L <= 9 ? 0.7 : 0.56, rest: list.slice(1) };
+  const b = list[0], nm = t.name(b), L_ = en ? Math.ceil(nm.length / 2) : [...nm].length;
+  return { g, b, nm, off: t.official(b), kn: t.kind(fx, kind), sys: t.sub(b), k: L_ <= 4 ? 1 : L_ <= 6 ? 0.84 : L_ <= 9 ? 0.7 : 0.56, rest: list.slice(1) };
 });
 
 // 段階対応表の列数
@@ -32,88 +31,101 @@ const elNames = (() => {
   if (!el) return [];
   const m = new Map<string, string[]>();
   rows.forEach(({ g }) => {
-    const local = SYSTEMS[g.id]?.elementNames?.[el];
-    if (local && !m.get(local)?.includes(g.short)) m.set(local, [...(m.get(local) ?? []), g.short]);
+    const local = en ? t.eln(g.id, el) : SYSTEMS[g.id]?.elementNames?.[el];
+    const short = t.game(g).short;
+    if (local && !m.get(local)?.includes(short)) m.set(local, [...(m.get(local) ?? []), short]);
   });
   return [...m].map(([local, games]) => ({ local, games }));
 })();
 
 // ほかの比較：属性ページは次の属性2つ＋回復、用途ページは次の用途3つ
-const sample = (e: string | null, f: string) => firstNames(compareRows(e, f)).slice(0, 4).map((x) => x.name).join(' ／ ');
+const sample = (e: string | null, f: string) => firstNames(compareRows(e, f)).slice(0, 4).map((x) => t.name(x.magic)).join(en ? ' / ' : ' ／ ');
 const related = (el
   ? [...EL.filter((e) => e.id !== 'none'), ...EL.filter((e) => e.id !== 'none')].slice(EL.findIndex((e) => e.id === el) + 1).slice(0, 2).map((e) => ({ e: e.id as string | null, f: 'atk' })).concat(fx === 'heal' ? [] : [{ e: null, f: 'heal' }])
   : [...FX, ...FX].slice(FX.findIndex((f) => f.id === fx) + 1).filter((f) => f.id !== 'atk').slice(0, 3).map((f) => ({ e: null as string | null, f: f.id }))
-).map(({ e, f }) => ({ title: `${titleOf(e, f)}の言い換え一覧`, href: compareUrl(e, f), ex: sample(e, f) })).filter((x) => x.ex);
+).map(({ e, f }) => ({ title: en ? `${t.title(e, f)} compared` : `${t.title(e, f)}の言い換え一覧`, href: t.compare(e, f), ex: sample(e, f) })).filter((x) => x.ex);
 
-const what = E ? `${E.id === 'none' ? '無属性' : E.name}の${F.name}魔法` : `${F.name}魔法`;
-const desc = rows.length
-  ? `${title}を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。`
-  : `${title}を作品ごとに比較します。`;
+const what = en
+  ? (E ? `${E.id === 'none' ? 'Non-elemental' : t.el(E)} ${fx === 'atk' ? 'attack' : t.fx(F).toLowerCase()} spells` : `${t.fx(F)} spells`)
+  : E ? `${E.id === 'none' ? '無属性' : E.name}の${F.name}魔法` : `${F.name}魔法`;
+const pageTitle = en
+  ? `${title} in ${nGames} RPGs: ${names.length} different names compared | RPG Spell Name Thesaurus`
+  : `${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法辞典`;
+const desc = en
+  ? (rows.length ? `What are ${title.toLowerCase()} called in each RPG? ${names.slice(0, 3).map((x) => `${t.name(x.magic)} (${t.game(x.games[0]).short})`).join(', ')} and more: ${names.length} names across ${nGames} games, with how each game tiers them.` : `${title} compared across games.`)
+  : (rows.length ? `${title}を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。` : `${title}を作品ごとに比較します。`);
+const tier = (i: number) => (en ? `Tier ${i}` : `${i}段目`);
 ---
-<Base title={`${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法辞典`} description={desc} active="compare" path={compareUrl(el, fx)}
-  crumbs={[{ name: 'トップ', path: '/' }, { name: title, path: compareUrl(el, fx) }]}>
+<Base title={pageTitle} description={desc} active="compare" path={t.compare(el, fx)} lang={lang}
+  crumbs={[{ name: en ? 'Home' : 'トップ', path: t.url('/') }, { name: title, path: t.compare(el, fx) }]}>
   <main class="wrap page">
-    <nav class="crumbs" aria-label="パンくず"><a href="/">トップ</a><span>›</span><span>横断比較</span><span>›</span><span aria-current="page">{title}</span></nav>
+    <nav class="crumbs" aria-label={en ? 'Breadcrumb' : 'パンくず'}><a href={t.url('/')}>{en ? 'Home' : 'トップ'}</a><span>›</span><span>{en ? 'Compare' : '横断比較'}</span><span>›</span><span aria-current="page">{title}</span></nav>
 
     <header class="cmp-head">
       <span class="mark" style={markStyle(E, 72)} aria-hidden="true">{E ? E.name : F.kanji}</span>
       <div>
-        <h1><span class="lbl cmp-kicker">{title}の言い換え一覧</span><span class="cmp-h1">{what}、<br />ゲームによってこんなに違う。</span></h1>
-        <p class="lbl">{nGames}作品 · {total}件</p>
-        {rows.length > 0 && <p class="cmp-lead">{top3.join('、')}。{nGames}作品の{title}を、{names.length}通りの呼び名で読み比べ。カードは各作品の系統の最初の名前です。</p>}
+        <h1>
+          <span class="lbl cmp-kicker">{en ? `${title} compared across games` : `${title}の言い換え一覧`}</span>
+          <span class="cmp-h1">{en ? <>{what}:<br />every RPG calls them something else.</> : <>{what}、<br />ゲームによってこんなに違う。</>}</span>
+        </h1>
+        <p class="lbl">{en ? `${nGames} games · ${total} spells` : `${nGames}作品 · ${total}件`}</p>
+        {rows.length > 0 && <p class="cmp-lead">{en
+          ? `${top3.join(', ')}... ${title} in ${nGames} games go by ${names.length} different names. Each card shows the first spell of a line in one game. Names are the original Japanese ones, romanized; the English-release name is shown where we could confirm it.`
+          : `${top3.join('、')}。${nGames}作品の${title}を、${names.length}通りの呼び名で読み比べ。カードは各作品の系統の最初の名前です。`}</p>}
       </div>
     </header>
 
-    <FilterBar el={el} fx={fx} />
+    <FilterBar el={el} fx={fx} lang={lang} />
 
     {rows.length === 0 ? (
-      <div class="empty"><strong>この組み合わせの魔法はまだ収録されていません</strong><p>別の属性・用途を選んでください。</p></div>
+      <div class="empty"><strong>{en ? 'No spells of this kind yet' : 'この組み合わせの魔法はまだ収録されていません'}</strong><p>{en ? 'Try another element or effect.' : '別の属性・用途を選んでください。'}</p></div>
     ) : (
       <>
-        <section class="cards" aria-label="作品ごとの呼び名">
+        <section class="cards" aria-label={en ? 'Names by game' : '作品ごとの呼び名'}>
           {cards.map((c) => (
-            <a class="card cmp-card" href={magicUrl(c.b)}>
-              <span class="cmp-card-top"><span class="cmp-game">{c.g.name}{c.kn && `・${c.kn}`}</span><span class="tag dot">{c.sys}</span></span>
-              <span class="cmp-name" style={`--k:${c.k}`}>{c.b.name}</span>
-              <span class="cmp-rest">{c.rest.length ? '› ' + c.rest.map((r) => r.name).join(' › ') : 'この系統はこの1種'}</span>
+            <a class="card cmp-card" href={t.magic(c.b)}>
+              <span class="cmp-card-top"><span class="cmp-game">{t.game(c.g).name}{c.kn && (en ? ` · ${c.kn}` : `・${c.kn}`)}</span><span class="tag dot">{c.sys}</span></span>
+              <span class="cmp-name" style={`--k:${c.k}`}>{c.nm}</span>
+              {en && <span class="cmp-ja" lang="ja">{c.b.name}{c.off && <span class="cmp-off" lang="en">English: {c.off.en}</span>}</span>}
+              <span class="cmp-rest">{c.rest.length ? '› ' + c.rest.map((r) => t.name(r)).join(' › ') : en ? 'The only spell in this line' : 'この系統はこの1種'}</span>
             </a>
           ))}
         </section>
 
         <section class="sec pc-only">
-          <Chapter title="段階対応表" note="各作品の系統の中で何段目か。威力の厳密な一致ではありません" />
+          <Chapter title={en ? 'Tiers side by side' : '段階対応表'} note={en ? 'Where each spell sits in its own line. Not an exact match of power across games.' : '各作品の系統の中で何段目か。威力の厳密な一致ではありません'} />
           <div class="card others tbl-wrap" style={`--g:${gaugeColor}`}>
-            <table class="tbl mx" aria-label={`${title}の段階対応表`}>
+            <table class="tbl mx" aria-label={en ? `Tiers of ${title.toLowerCase()}` : `${title}の段階対応表`}>
               <thead>
                 <tr>
-                  <th scope="col">作品</th><th scope="col">分類</th>
+                  <th scope="col">{en ? 'Game' : '作品'}</th><th scope="col">{en ? 'Type' : '分類'}</th>
                   {cols.map((i) => (
-                    <th scope="col"><span class="mx-th"><span class="gauge" aria-hidden="true">{cols.map((j) => <i class:list={{ on: j <= i }}></i>)}</span>{i + 1}段目</span></th>
+                    <th scope="col"><span class="mx-th"><span class="gauge" aria-hidden="true">{cols.map((j) => <i class:list={{ on: j <= i }}></i>)}</span>{tier(i + 1)}</span></th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {rows.map(({ g, list, kind }, ri) => (
                   <tr data-more-item={ri >= 16 ? 'mx' : undefined} hidden={ri >= 16}>
-                    <th scope="row"><a class="mx-game" href={systemUrl(g.id)}>{g.name}</a></th>
-                    <td><span class="tag">{subOf(list[0])}{kindName(fx, kind) && `・${kindName(fx, kind)}`}</span></td>
+                    <th scope="row"><a class="mx-game" href={t.system(g.id)}>{t.game(g).name}</a></th>
+                    <td><span class="tag">{t.sub(list[0])}{t.kind(fx, kind) && (en ? ` · ${t.kind(fx, kind)}` : `・${t.kind(fx, kind)}`)}</span></td>
                     {cols.map((i) => (
-                      <td>{list[i] ? <a class="mx-cell" href={magicUrl(list[i])}><span class="min">{list[i].name}</span><small>{list[i].scope}</small></a> : <span class="mx-none">—</span>}</td>
+                      <td>{list[i] ? <a class="mx-cell" href={t.magic(list[i])}><span class="min">{t.name(list[i])}</span><small>{t.scope(list[i].scope)}</small></a> : <span class="mx-none">—</span>}</td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {rows.length > 16 && <button class="btn btn-line btn-more" type="button" data-more="mx" data-less="16系統に戻す" aria-expanded="false">残り{rows.length - 16}系統を表示（全{rows.length}系統）</button>}
+          {rows.length > 16 && <button class="btn btn-line btn-more" type="button" data-more="mx" data-less={en ? 'Show fewer' : '16系統に戻す'} aria-expanded="false">{en ? `Show ${rows.length - 16} more lines (${rows.length} total)` : `残り${rows.length - 16}系統を表示（全${rows.length}系統）`}</button>}
         </section>
 
         {E && elNames.length > 0 && (
           <section class="sec">
-            <Chapter title={`作品の中では、${E.name}をどう呼ぶ？`} />
-            <p class="sec-intro">サイトでは共通の「{E.name}」にまとめていますが、作品の中の分類はそろっていません。作品の呼び名をそのまま載せます。</p>
+            <Chapter title={en ? `What do the games themselves call ${t.el(E).toLowerCase()}?` : `作品の中では、${E.name}をどう呼ぶ？`} />
+            <p class="sec-intro">{en ? `This site groups them all as "${t.el(E)}", but each game classifies elements its own way. Here are the names the games use.` : `サイトでは共通の「${E.name}」にまとめていますが、作品の中の分類はそろっていません。作品の呼び名をそのまま載せます。`}</p>
             <div class="el-names">
-              {elNames.map((x) => <div><span class="mark" style={markStyle(E, 28)} aria-hidden="true">{E.name}</span><span class="min">{x.local}</span><small>{x.games.join('・')}</small></div>)}
+              {elNames.map((x) => <div><span class="mark" style={markStyle(E, 28)} aria-hidden="true">{E.name}</span><span class="min">{x.local}</span><small>{x.games.join(en ? ', ' : '・')}</small></div>)}
             </div>
           </section>
         )}
@@ -122,7 +134,7 @@ const desc = rows.length
 
     {related.length > 0 && (
       <section class="sec">
-        <Chapter title="ほかの言い換えも比べる" />
+        <Chapter title={en ? 'Compare more spells' : 'ほかの言い換えも比べる'} />
         <div class="og-grid">
           {related.map((x) => <a class="card og" href={x.href}><b>{x.title}</b><span class="min">{x.ex}</span></a>)}
         </div>

@@ -1,0 +1,84 @@
+---
+/** 英語版の「このサイトについて」。日本語版（/about）と同じ内容に、英語版での名前の扱いと翻訳の説明を足す */
+import Base from '../../layouts/Base.astro';
+import { MAGICS, FX, STATS } from '../../lib/dict';
+import enNames from '../../data/en/names.json';
+
+const nSrc = new Set(MAGICS.flatMap((m) => (m.src ?? []).map((s) => s.url))).size;
+const nOfficial = Object.keys((enNames as { magics: Record<string, unknown> }).magics).length;
+const rules = [
+  'We list whatever a game itself classes as magic: magic, incantations (jumon), arts (jutsu), PSI, stratagems and so on.',
+  'Only spells the player can use. Spells used only by enemies are generally left out.',
+  'Regular attacks, weapon techniques, special moves, items and equipment effects are not magic, so they are not listed.',
+  'Summons are listed when the game treats them as magic (under the effect "Other").',
+  'Games with almost no magic system (such as Metal Max) get no invented spells; we explain that decision on the game\'s page instead.',
+];
+---
+<Base title="About this site and how the data was collected | RPG Spell Name Thesaurus" path="/en/about" active="about" lang="en"
+  description="What the RPG Spell Name Thesaurus is for, what it lists, how the spell data was collected and sourced, how names are written on the English pages, and how the English text was produced."
+  crumbs={[{ name: 'Home', path: '/en' }, { name: 'About', path: '/en/about' }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/en">Home</a><span>›</span><span aria-current="page">About</span></nav>
+    <article class="reading">
+      <h1 class="p-title">About this site</h1>
+      <div class="card reading-words">
+        <p>We were hooked back then.</p>
+        <p>One look at a spell's name, and the adventure comes back.<br />A world you haven't played yet starts to call.<br />And you want to talk about it with someone who was there too.</p>
+        <p>This is where the adventures we remember meet the ones still ahead.</p>
+      </div>
+
+      <section>
+        <h2 class="h2">What this dictionary is for</h2>
+        <div class="prose-sans">
+          <p>The same kind of spell goes by a different name in every RPG. This dictionary lines them up across games. A basic fire attack is Mera in Dragon Quest, Faia (Fire) in Final Fantasy, Agi in Shin Megami Tensei and PK Faiā (PK Fire) in EarthBound.</p>
+          <p>It is not a strategy guide. It is for enjoying how each game sorts and names its magic, and for finding your way from a name you know to a name from a game you have never played.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="h2">How names are written on the English pages</h2>
+        <div class="prose-sans">
+          <p>This site started in Japanese, and every spell is listed under the name used in the original Japanese release. On the English pages, each name is shown romanized (Hepburn, with long vowels marked: ā, ī, ū, ē, ō), with the Japanese name alongside.</p>
+          <p>Many games renamed their spells for English releases. Dragon Quest's Hyado became Crack, for example. Where we could confirm the English-release name against a source that lists both names, we show it as "English release" on the spell's page and in comparisons ({nOfficial.toLocaleString('en-US')} spells so far). We use the name from the most recent official English release, and note older ones where they differed. Games that never had an official English release keep the romanized Japanese names; fan translations are not used.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="h2">How much is listed</h2>
+        <div class="prose-sans">
+          <p>{STATS.games} games and {STATS.magics.toLocaleString('en-US')} spells, sorted into {FX.length} effects.</p>
+          <p>A series such as Dragon Quest, Final Fantasy, Shin Megami Tensei or Persona counts as one game (the unit on the game list). Counting each game in those series separately gives {STATS.titles} games. The spell count is the number of spell pages; a spell with the same name across a series counts once.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="h2">What gets listed</h2>
+        <ol class="rules">{rules.map((r, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{r}</span></li>)}</ol>
+      </section>
+
+      <section>
+        <h2 class="h2">How the data was collected</h2>
+        <div class="prose-sans">
+          <p>Spell names, elements, effects, costs and users were checked against strategy wikis, fan sites, databases and official manuals, cross-checking several sources wherever possible. The sources are listed on each spell's page (about {nSrc.toLocaleString('en-US')} in total, mostly in Japanese).</p>
+          <p>Research and organization were done with the help of generative AI (Claude). Every value is recorded with its source URL. Values that conflict between sources, or that only one source confirms, are flagged in the spell's notes. Anything we could not confirm is left blank rather than guessed.</p>
+          <p>Spell lines and tiers (Mera → Merami → Merazōma and so on) are only assigned where a source confirms the order. Similar-sounding names are not treated as one line on that basis alone.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="h2">About the English text</h2>
+        <div class="prose-sans">
+          <p>Headings, tables and labels on the English pages are generated from the same data as the Japanese pages. Descriptions, notes and the write-ups on each game's magic system were machine-translated from Japanese with generative AI (Claude), and each translated page says so. If a translation reads oddly or gets something wrong, the Japanese page is the reference; every English page links to its Japanese version.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="h2">Notes</h2>
+        <div class="prose-sans">
+          <p>The site uses a common set of elements (Fire, Ice, Lightning, Wind, Water, Earth, Light, Darkness, Non-elemental) and keeps each game's own element names separately. Where a game differs between versions, the version we based it on is noted on the game's page.</p>
+          <p>This is an unofficial hobby site run by one person. All game titles, spell names and other names belong to their respective owners. We try hard to be accurate, but mistakes are possible.</p>
+        </div>
+      </section>
+    </article>
+  </main>
+</Base>

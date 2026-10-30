@@ -1,0 +1,138 @@
+---
+/** 魔法世界の設計図：段階の付け方（日本語版 /blueprint/tier と英語版 /en/blueprint/tier で共通） */
+import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
+import NameLine from '../components/NameLine.astro';
+import { GAMES, REP_GAMES, gameById, STAGES, BLUEPRINT_TIER_URL, type Game } from '../lib/dict';
+import { L, type Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'ja' } = Astro.props;
+const t = L(lang), en = t.en, D = t.doc;
+const typeName = (id: string) => D.types.find((x) => x.id === id)?.name ?? id;
+// 数えるのは代表作品（作品一覧に並ぶ単位）。シリーズの各作品は、代表と型が違うものだけを並べる
+const rowsOf = (type: string) => [
+  ...REP_GAMES.filter((g) => STAGES[g.id].primary === type).map((g) => ({ g, rep: null as Game | null })),
+  ...GAMES.filter((g) => g.group && STAGES[g.id].primary === type && STAGES[g.group].primary !== type).map((g) => ({ g, rep: gameById[g.group!] })),
+];
+const types = D.types.map((x) => {
+  const rows = rowsOf(x.id);
+  return { t: x, rows, n: rows.filter((r) => !r.rep).length, sample: x.sample ? { game: x.sample, names: STAGES[x.sample].examples[0].names } : null };
+}).filter((x) => x.rows.length);
+const scopes = D.scopeTypes.map((s) => {
+  const games = REP_GAMES.filter((g) => STAGES[g.id].scope.type === s.id);
+  const ex = games.find((g) => STAGES[g.id].scope.examples.length);
+  return { s, n: games.length, sample: ex ? { game: ex.id, names: STAGES[ex.id].scope.examples[0] } : null };
+}).filter((x) => x.n);
+const nGames = REP_GAMES.length;
+const descOf = (id: string) => (t.stage(id).desc ?? '') + (STAGES[id].confidence === 'low' ? (en ? ' (Provisional: there is little to go on.)' : '（判断の材料が少ないため、暫定の分類です）') : '');
+
+const title = en ? 'How do RPGs name the stronger version of a spell? Types of spell tiers' : 'RPGの魔法は、強い版をどう名付ける？ 段階の付け方の型';
+const description = en
+  ? `Mera → Merami → Merazōma, Faia → Faira → Faiga, PK Faiā α → Ω. How ${nGames} RPGs name the tiers of their spells, sorted into ${types.length} types, with what each type does well and how to use it in your own magic system.`
+  : `メラ→メラミ→メラゾーマ、ファイア→ファイラ→ファイガ、PKファイアーα→Ω。RPG${nGames}作品の魔法の段階の付け方を${types.length}つの型に分け、仕組みと効き目、自分の魔法体系に使うときの考え方をまとめました。`;
+const jsonld = [{
+  '@context': 'https://schema.org', '@type': 'Article', headline: title, description, inLanguage: lang,
+  url: new URL(t.url(BLUEPRINT_TIER_URL), Astro.site ?? Astro.url).href,
+}];
+const home = en ? 'Home' : 'トップ';
+const crumb = en ? 'Magic world blueprint: spell tiers' : '魔法世界の設計図：段階の付け方';
+---
+<Base title={en ? `${title} | RPG Spell Name Thesaurus` : `${title}｜RPG魔法辞典`} description={description} path={t.url(BLUEPRINT_TIER_URL)} active="blueprint" jsonld={jsonld} lang={lang}
+  crumbs={[{ name: home, path: t.url('/') }, { name: crumb, path: t.url(BLUEPRINT_TIER_URL) }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label={en ? 'Breadcrumb' : 'パンくず'}><a href={t.url('/')}>{home}</a><span>›</span><span aria-current="page">{crumb}</span></nav>
+    <div class="p-meta"><span class="lbl">{en ? 'Magic world blueprint' : '魔法世界の設計図'}</span></div>
+    <h1 class="p-title is-kicker">{en ? 'How are spell tiers named?' : '魔法の段階は、どう名付ける？'}</h1>
+    <p class="p-lead">{en
+      ? `Mera → Merami → Merazōma. Faia → Faira → Faiga. PK Faiā α → Ω. Every RPG has its own rule for naming the stronger version of a spell. We sorted the rules of the ${nGames} games in this dictionary into ${types.length} types, with how each works, what it does well, what to watch for, and tips for designing your own magic system.`
+      : `メラ → メラミ → メラゾーマ。ファイア → ファイラ → ファイガ。PKファイアー α → Ω。RPGの魔法は、強くなったときの名前の付け方に、作品ごとの決まりを持っています。収録している${nGames}作品の決まりを${types.length}つの型に分け、仕組みと効き目、気をつけること、自分の魔法体系を考えるときのヒントを並べました。`}</p>
+    <nav class="toc" aria-label={en ? 'Contents' : '型の目次'}>
+      {types.map(({ t: ty, n }) => <a class="chip" href={`#${ty.id}`}>{ty.name}<span class="note">{n}</span></a>)}
+      <a class="chip" href="#notes">{en ? 'Highlights' : '読みどころ'}</a>
+      <a class="chip" href="#scope">{en ? 'Showing range' : '範囲の表し方'}</a>
+    </nav>
+
+    <section class="sec">
+      <Chapter title={en ? 'All types' : '型の一覧'} note={en ? `${nGames} games` : `${nGames}作品`} />
+      <div class="card pat-list">
+        {types.map(({ t: ty, n, sample }) => (
+          <div class="pat">
+            <a class="pat-name" href={`#${ty.id}`}>{ty.name}<small>{en ? `${n} games` : `${n}作品`}</small></a>
+            <div class="pat-body">
+              {sample ? <NameLine game={sample.game} names={sample.names} lang={lang} /> : <span class="note">—</span>}
+              <p>{ty.short}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {types.map(({ t: ty, rows, n }) => (
+      <section class="sec" id={ty.id}>
+        <Chapter title={ty.name} note={en ? `${n} games` : `${n}作品`} />
+        <p class="prose" style="max-width:820px">{ty.how}</p>
+        <div class="og-grid" style="margin-top:16px">
+          <div class="card og"><b>{en ? 'What it does well' : '効き目'}</b><p>{ty.good}</p></div>
+          <div class="card og"><b>{en ? 'What to watch for' : '気をつけること'}</b><p>{ty.watch}</p></div>
+          <div class="card og"><b>{en ? 'Using it in your own world' : '自分の世界で使うなら'}</b><p>{ty.ask}</p></div>
+        </div>
+        <h3 class="lbl" style="margin:24px 0 8px">{en ? 'Games of this type' : 'この型の作品'}</h3>
+        <div class="card pat-list">
+          {rows.map(({ g, rep }) => {
+            const ex = STAGES[g.id].examples[0];
+            return (
+              <div class="pat">
+                <a class="pat-name" href={t.system(g.id)}>{t.game(g).name}{rep && <small>{en ? `The series' main entry (${t.game(rep).short}) is ${typeName(STAGES[rep.id].primary)}` : `シリーズの代表（${rep.short}）は${typeName(STAGES[rep.id].primary)}`}</small>}</a>
+                <div class="pat-body">
+                  {ex ? <NameLine game={g.id} names={ex.names} lang={lang} /> : <span class="note">—</span>}
+                  <p>{descOf(g.id)}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+
+    <section class="sec" id="notes">
+      <Chapter title={en ? 'Highlights' : '読みどころ'} note={en ? 'What happens at the borders between types' : '型の境目で起きていること'} />
+      {D.notes.map((nt) => (
+        <article class="card notes-card">
+          <h3>{nt.title}</h3>
+          <p class="prose">{nt.body}</p>
+          <div class="note-refs">
+            {nt.refs.map((r) => (
+              <div><a class="lbl" href={t.system(r.game)}>{t.game(gameById[r.game]).short}</a><NameLine game={r.game} names={r.names} lang={lang} /></div>
+            ))}
+          </div>
+        </article>
+      ))}
+    </section>
+
+    <section class="sec" id="scope">
+      <Chapter title={en ? 'Showing range' : '範囲の表し方'} note={en ? `${nGames} games` : `${nGames}作品`} />
+      <p class="sec-intro">{en ? 'Easy to confuse with tiers is how a game shows range (single target vs. all). If the same word marks both, players get lost.' : '段階と混ざりやすいのが、範囲（単体・全体）の表し方です。段階と同じ語を範囲にも使うと、読む人が迷います。'}</p>
+      <div class="card pat-list">
+        {scopes.map(({ s, n, sample }) => (
+          <div class="pat">
+            <span class="pat-name">{s.name}<small>{en ? `${n} games` : `${n}作品`}</small></span>
+            <div class="pat-body">
+              {sample ? <NameLine game={sample.game} names={sample.names} lang={lang} /> : <span class="note">—</span>}
+              <p>{s.how}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="sec">
+      <Chapter title={en ? 'Using it in your own world' : '自分の世界で使うなら'} note={en ? 'Questions for choosing a type' : '型を選ぶための問い'} />
+      <div class="card box"><ol class="rules" style="margin-top:0">{D.questions.map((q, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{q}</span></li>)}</ol></div>
+    </section>
+
+    <p class="disclaimer">{en
+      ? <>The types were drafted and sorted with generative AI (Claude), based on each game's naming rules and the data in this dictionary, and this page was machine-translated from the Japanese edition. Every spell name in the examples is in the data. "→" marks spells in tier order within one line; "／" marks names whose order of strength the data can't confirm. For series, only games whose type differs from the main entry are listed. See <a href="/en/about">About</a> for how the data was collected.</>
+      : <>※ 型は、各作品の魔法体系ページにある命名のルールと収録データをもとに、生成AI（Claude）で下書きして分類しました。例に挙げた魔法名は、すべて収録データにあるものです。「→」は同じ系統の中で段階順に並んでいるもの、「／」は強さの順をデータで確かめられない並びです。シリーズの各作品は、代表作品と型が違うものだけを並べています。データの集め方は<a href="/about">このサイトについて</a>にあります。</>}</p>
+  </main>
+</Base>

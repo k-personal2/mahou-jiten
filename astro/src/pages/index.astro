@@ -14,7 +14,7 @@ const dateStr = jstDateStr();
 const KANJI = ['一', '二', '三', '四', '五', '六', '七', '八'];
 const sysName = tG.sys === 'なし' ? '魔法' : tG.sys;
 ---
-<Base title="RPG魔法辞典｜ドラクエ・FF・メガテンの魔法を比較" active="home" path="/" hideSearch alternates={{ ja: '/', en: '/en' }}
+<Base title="RPG魔法辞典｜ドラクエ・FF・メガテンの魔法を比較" active="home" path="/" hideSearch
   description={`メラ・ファイア・アギ・PKファイアー…同じ役割の魔法が、RPGごとにどう呼ばれているかを比較する辞典。${STATS.games}作品・${STATS.magics.toLocaleString()}種の魔法と、作品ごとの魔法体系を収録。`}
   jsonld={[{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'RPG魔法辞典', url: Astro.site?.href, inLanguage: 'ja', description: 'RPGの魔法の呼び名を作品横断で比較する辞典' }]}>
   <main class="home2">

@@ -1,15 +1,22 @@
 type Idx = {
-  magics: { id: string; n: string; k?: string; g: string }[];
+  magics: { id: string; n: string; k?: string; e?: string; g: string }[];
   els: { name: string; al: string[]; href: string }[];
   fxs: { name: string; href: string }[];
   games: { name: string; short: string; href: string }[];
 };
+// 英語版（/en/ 以下）は英語の索引と文言を使う
+const EN = document.documentElement.lang === 'en';
+const P = EN ? '/en' : '';
+const TXT = EN
+  ? { magic: 'Spell', el: 'Element', fx: 'Effect', game: 'Game', elLabel: (n: string) => `${n} attack spells`, fxLabel: (n: string) => `${n} spells`, cmp: 'Compare', sys: 'Magic system', empty: 'No matches. Try the Japanese name, its romanized reading, or the English name.' }
+  : { magic: '魔法', el: '属性', fx: '用途', game: '作品', elLabel: (n: string) => `${n}属性の攻撃魔法`, fxLabel: (n: string) => `${n}魔法`, cmp: '横断比較', sys: '魔法体系', empty: '見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。' };
 // 検索インデックスは初回の検索・ランダム時に取得（全ページへの埋め込みを避ける）
 let IDX: Idx | null = null;
 let loading: Promise<Idx> | null = null;
-const loadIdx = () => (loading ??= fetch('/search-index.json').then((r) => r.json() as Promise<Idx>).then((d) => (IDX = d)));
+const loadIdx = () => (loading ??= fetch(`${P}/search-index.json`).then((r) => r.json() as Promise<Idx>).then((d) => (IDX = d)));
 const kata = (s: string) => s.replace(/[\u3041-\u3096]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
-const norm = (s: string) => kata((s || '').toLowerCase()).replace(/属性|魔法|呪文/g, '').trim();
+// 長音記号（ā など）とハイフン・空白は無視して比べる（Faiā → faia、PK Fire → pkfire）
+const norm = (s: string) => kata((s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()).replace(/属性|魔法|呪文|[\s\-・]/g, '').trim();
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 type Sug = { kind: string; label: string; sub: string; href: string };
@@ -18,13 +25,13 @@ function suggest(q: string): Sug[] {
   if (!n || !IDX) return [];
   const out: Sug[] = [];
   IDX.magics
-    .filter((m) => norm(m.n).includes(n) || (m.k && norm(m.k).includes(n)) || m.id.includes(n))
-    .sort((a, b) => Number(norm(b.n).startsWith(n)) - Number(norm(a.n).startsWith(n)))
+    .filter((m) => norm(m.n).includes(n) || (m.k && norm(m.k).includes(n)) || (m.e && norm(m.e).includes(n)) || m.id.includes(n))
+    .sort((a, b) => Number(norm(b.n).startsWith(n) || (!!b.e && norm(b.e).startsWith(n))) - Number(norm(a.n).startsWith(n) || (!!a.e && norm(a.e).startsWith(n))))
     .slice(0, 6)
-    .forEach((m) => out.push({ kind: '魔法', label: m.n, sub: m.g, href: '/magic/' + m.id }));
-  IDX.els.forEach((e) => { if (e.al.some((a) => norm(a).includes(n) || n.includes(norm(a)))) out.push({ kind: '属性', label: e.name + '属性の攻撃魔法', sub: '横断比較', href: e.href }); });
-  IDX.fxs.forEach((f) => { if (norm(f.name).includes(n)) out.push({ kind: '用途', label: f.name + '魔法', sub: '横断比較', href: f.href }); });
-  IDX.games.forEach((g) => { if (norm(g.name).includes(n) || norm(g.short).includes(n)) out.push({ kind: '作品', label: g.name, sub: '魔法体系', href: g.href }); });
+    .forEach((m) => out.push({ kind: TXT.magic, label: m.e && EN ? `${m.n} (${m.e})` : m.n, sub: m.g, href: `${P}/magic/${m.id}` }));
+  IDX.els.forEach((e) => { if (e.al.some((a) => norm(a).includes(n) || n.includes(norm(a)))) out.push({ kind: TXT.el, label: TXT.elLabel(e.name), sub: TXT.cmp, href: e.href }); });
+  IDX.fxs.forEach((f) => { if (norm(f.name).includes(n)) out.push({ kind: TXT.fx, label: TXT.fxLabel(f.name), sub: TXT.cmp, href: f.href }); });
+  IDX.games.forEach((g) => { if (norm(g.name).includes(n) || norm(g.short).includes(n)) out.push({ kind: TXT.game, label: g.name, sub: TXT.sys, href: g.href }); });
   return out.slice(0, 9);
 }
 
@@ -48,7 +55,7 @@ document.querySelectorAll<HTMLFormElement>('[data-search]').forEach((box) => {
     show(true);
     list.innerHTML = items.length
       ? items.map((i, j) => `<a class="sug-item" id="${list.id}-${j}" role="option" aria-selected="false" href="${i.href}"><span class="sug-kind">${i.kind}</span><span class="sug-label">${esc(i.label)}</span><span class="sug-sub">${esc(i.sub)}</span></a>`).join('')
-      : '<p class="sug-empty" role="status">見つかりませんでした。別の表記（ひらがな・カタカナ）でも試せます。</p>';
+      : `<p class="sug-empty" role="status">${TXT.empty}</p>`;
   };
   const renderAsync = () => { if (IDX) render(); else loadIdx().then(render); };
   input.addEventListener('input', renderAsync);
@@ -85,7 +92,7 @@ document.querySelectorAll<HTMLElement>('[data-fill]').forEach((b) =>
 document.querySelectorAll<HTMLElement>('[data-random]').forEach((b) =>
   b.addEventListener('click', (e) => {
     e.preventDefault();
-    loadIdx().then((d) => { location.href = '/magic/' + d.magics[Math.floor(Math.random() * d.magics.length)].id; });
+    loadIdx().then((d) => { location.href = `${P}/magic/` + d.magics[Math.floor(Math.random() * d.magics.length)].id; });
   }),
 );
 

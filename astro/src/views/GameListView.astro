@@ -1,0 +1,150 @@
+---
+/** 作品一覧（日本語版 /game と英語版 /en/game で共通） */
+import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
+import { MAGICS, STATS, gameById, seriesGames, chainOfMagic } from '../lib/dict';
+import { L, type Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'ja' } = Astro.props;
+const t = L(lang), en = t.en;
+// 絞り込みで引けるようにする略称・通称（作品名・短縮名・呼び方に加えて）
+const ALIAS: Record<string, string> = {
+  dq: 'ドラクエ Dragon Warrior', ff: 'ファイナルファンタジー FF', smt: 'メガテン 女神転生 SMT', persona: 'メガテン P5R', rsaga: 'サガ SaGa', rsaga2: 'サガ SaGa', rsaga3: 'サガ SaGa',
+  sf: 'サガ SaGa', sf2: 'サガ SaGa', saga1: 'サガ SaGa', saga2: 'サガ SaGa', saga3: 'サガ SaGa', tales: 'テイルズ', mother: 'マザー EarthBound', kh: 'キングダムハーツ',
+};
+const cats = t.catalog.map((cat) => ({
+  name: cat.name,
+  items: cat.items.map((it) => {
+    const g = it.game ? gameById[it.game] : null;
+    const own = g ? MAGICS.filter((m) => m.game === g.id) : [];
+    const sample = own.find((m) => m.fx === 'atk' && m.el === 'fire') ?? own.find((m) => m.fx === 'atk') ?? own[0];
+    const sib = g ? seriesGames(g.id).filter((x) => x.group) : [];
+    return {
+      name: it.label, ja: it.name, sys: t.sys(it.sys), href: g ? t.system(g.id) : undefined, cnt: own.length,
+      ex: sample ? chainOfMagic(sample).map((m) => t.name(m)).join(' → ') : '',
+      series: sib.map((x) => ({ name: t.game(x).short, href: t.system(x.id) })),
+      basis: g ? t.basis(g) : undefined,
+      key: [it.name, it.label, g?.short, g && t.game(g).short, it.sys, t.sys(it.sys), ALIAS[it.game ?? ''], ...sib.map((x) => `${x.name} ${x.short} ${t.game(x).name}`)].filter(Boolean).join(' '),
+    };
+  }),
+}));
+const title = en ? `All ${STATS.games} games and what they call magic | RPG Spell Name Thesaurus` : `収録${STATS.games}作品の一覧と魔法の呼び方｜RPG魔法辞典`;
+const description = en
+  ? `Dragon Quest, Final Fantasy, Shin Megami Tensei, EarthBound, SaGa and more: the ${STATS.games} games in this dictionary, what each one calls magic (incantations, arts, PSI...), how many spells we list and a typical spell line.`
+  : `ドラゴンクエスト、FINAL FANTASY、真・女神転生、MOTHER、サガシリーズなど、収録${STATS.games}作品の一覧。作品ごとに「魔法」を何と呼ぶか（呪文・術・PSIなど）と、収録件数、代表的な系統を見られます。`;
+const h = en ? 'Find by game' : '作品から探す';
+const home = en ? 'Home' : 'トップ';
+---
+<Base title={title} active="games" path={t.url('/game')} lang={lang} description={description}
+  crumbs={[{ name: home, path: t.url('/') }, { name: h, path: t.url('/game') }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label={en ? 'Breadcrumb' : 'パンくず'}><a href={t.url('/')}>{home}</a><span>›</span><span aria-current="page">{h}</span></nav>
+    <h1 class="p-title">{h}</h1>
+    <p class="p-lead">{en
+      ? `All ${STATS.games} games in the dictionary and what each one calls magic. Open a row to see a typical spell line and the games in the series. A series such as Dragon Quest or Final Fantasy counts as one game.`
+      : `収録${STATS.games}作品と、各作品での魔法の呼び方。行を開くと代表的な系統とシリーズの各作品が出ます。シリーズ（ドラゴンクエスト・FINAL FANTASYなど）は1作品として数えています。`}</p>
+
+    <div class="wbar" data-wbar data-en={en ? '1' : undefined}>
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
+        <input type="search" aria-label={en ? 'Filter by game title' : '作品名で絞り込み'} placeholder={en ? 'Filter by title (e.g. SaGa, Tales)' : '作品名で絞り込み（例：サガ、テイルズ）'} data-wq />
+        <button class="wbar-clear" type="button" aria-label={en ? 'Clear the filter' : '絞り込みを解除'} data-wclear hidden>{en ? 'Clear' : '解除'}</button>
+      </div>
+      <div class="wbar-views" role="group" aria-label={en ? 'Group by' : '並べ方'}>
+        <span class="lbl">{en ? 'Group by' : '並べ方'}</span>
+        <button type="button" aria-pressed="true" data-view="cat">{en ? 'Category' : 'カテゴリ'}</button>
+        <button type="button" aria-pressed="false" data-view="sys">{en ? 'Name for magic' : '呼び方'}</button>
+        <button type="button" aria-pressed="false" data-view="cnt">{en ? 'Spell count' : '収録数'}</button>
+      </div>
+      <span class="note" role="status" data-wcount></span>
+    </div>
+
+    <div data-wgroups>
+      {cats.map((c, i) => (
+        <section class="g-cat">
+          <Chapter title={c.name} note={en ? `${c.items.length} games` : `${c.items.length}作品`} />
+          <div class="card glist">
+            <div class="g-row g-head" aria-hidden="true"><span>{en ? 'Game' : '作品'}</span><span>{en ? 'Calls magic' : '魔法の呼び方'}</span><span style="text-align:right">{en ? 'Spells' : '収録'}</span><span>{en ? 'Typical line' : '代表的な系統'}</span><span></span></div>
+            {c.items.map((w) => w.href ? (
+              <details class="g-item" data-cat={i} data-sys={w.sys} data-cnt={w.cnt} data-key={w.key}>
+                <summary class="g-row">
+                  <span><span class="g-name">{w.name}</span><span class="g-sp">{w.sys} · {en ? `${w.cnt} spells` : `${w.cnt}件`}</span></span>
+                  <span class="g-sys">{w.sys}</span><span class:list={['g-num', { 'is-zero': !w.cnt }]}>{en ? w.cnt : `${w.cnt}件`}</span><span class="g-ex">{w.ex}</span>
+                </summary>
+                <div class="g-body">
+                  <a class="more" style="font-weight:700" href={w.href}>{en ? `Read about magic in ${w.name} →` : `${w.name}の魔法体系を読む →`}</a>
+                  {en && <p class="note" lang="ja">{w.ja}</p>}
+                  {w.ex && <p class="note">{en ? 'Typical line: ' : '代表的な系統：'}<span class="min" style="font-size:16px;color:var(--ink)">{w.ex}</span></p>}
+                  {w.series.length > 0 && <div class="chips">{w.series.map((x) => <a class="chip" href={x.href}>{x.name}</a>)}</div>}
+                  {w.basis && <p class="note">{en ? 'Based on: ' : '収録の基準：'}{w.basis}</p>}
+                </div>
+              </details>
+            ) : (
+              <div class="g-item is-off" data-cat={i} data-sys={w.sys} data-cnt="0" data-key={w.key}>
+                <div class="g-row">
+                  <span><span class="g-name">{w.name}</span><span class="g-sp">{w.sys} · {en ? 'coming soon' : '準備中'}</span></span>
+                  <span class="g-sys">{w.sys}</span><span class="g-num">{en ? 'soon' : '準備中'}</span><span class="g-ex"></span><span></span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+      <p class="empty" data-wempty hidden></p>
+    </div>
+  </main>
+</Base>
+
+<script>
+  // 絞り込みと並べ方の切り替え。行の DOM はそのまま使い、グループだけ組み直す
+  const root = document.querySelector<HTMLElement>('[data-wgroups]')!;
+  const en = !!document.querySelector<HTMLElement>('[data-wbar]')!.dataset.en;
+  const input = document.querySelector<HTMLInputElement>('[data-wq]')!;
+  const clear = document.querySelector<HTMLButtonElement>('[data-wclear]')!;
+  const count = document.querySelector<HTMLElement>('[data-wcount]')!;
+  const empty = document.querySelector<HTMLElement>('[data-wempty]')!;
+  const views = [...document.querySelectorAll<HTMLButtonElement>('[data-view]')];
+  const rows = [...root.querySelectorAll<HTMLElement>('.g-item')];
+  const catNames = [...root.querySelectorAll('.g-cat h2')].map((h) => h.textContent!);
+  const head = root.querySelector('.g-head')!.cloneNode(true);
+  const kata = (s: string) => s.toLowerCase().replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60)).replace(/\s+/g, '');
+  const el = (tag: string, cls: string, text?: string) => Object.assign(document.createElement(tag), { className: cls, ...(text ? { textContent: text } : {}) });
+  let view = 'cat';
+
+  const render = () => {
+    const q = kata(input.value);
+    const hit = rows.filter((r) => !q || kata(r.dataset.key!).includes(q));
+    let groups: [string, HTMLElement[]][];
+    if (view === 'sys') {
+      const m = new Map<string, HTMLElement[]>();
+      hit.forEach((r) => m.set(r.dataset.sys!, [...(m.get(r.dataset.sys!) ?? []), r]));
+      groups = [...m].sort((a, b) => b[1].length - a[1].length);
+    } else if (view === 'cnt') {
+      groups = [[en ? 'Most spells first' : '収録数の多い順', [...hit].sort((a, b) => +b.dataset.cnt! - +a.dataset.cnt!)]];
+    } else {
+      groups = catNames.map((n, i) => [n, hit.filter((r) => r.dataset.cat === String(i))] as [string, HTMLElement[]]).filter((g) => g[1].length);
+    }
+    root.querySelectorAll('.g-cat').forEach((s) => s.remove());
+    groups.forEach(([name, list]) => {
+      const sec = el('section', 'g-cat');
+      const sh = el('div', 'sec-head');
+      sh.append(el('h2', 'h2', name), el('span', 'note', en ? `${list.length} games` : `${list.length}作品`));
+      const card = el('div', 'card glist');
+      card.append(head.cloneNode(true), ...list);
+      sec.append(sh, card);
+      root.insertBefore(sec, empty);
+    });
+    clear.hidden = !input.value;
+    count.textContent = q ? (en ? `${hit.length} games match` : `${hit.length}作品が該当`) : '';
+    empty.hidden = hit.length > 0;
+    empty.textContent = en ? `No game matches "${input.value}". Try a short name such as DQ or SaGa.` : `「${input.value}」に当てはまる作品はありません。略称（ロマサガ、DQなど）でも探せます。`;
+  };
+  input.addEventListener('input', render);
+  clear.addEventListener('click', () => { input.value = ''; render(); input.focus(); });
+  views.forEach((b) => b.addEventListener('click', () => {
+    view = b.dataset.view!;
+    views.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  }));
+</script>

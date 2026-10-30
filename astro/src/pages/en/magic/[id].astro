@@ -1,0 +1,10 @@
+---
+import MagicView from '../../../views/MagicView.astro';
+import { PAGE_MAGICS, type Magic } from '../../../lib/dict';
+
+export function getStaticPaths() {
+  return PAGE_MAGICS.map((m) => ({ params: { id: m.id }, props: { m } }));
+}
+const { m } = Astro.props as { m: Magic };
+---
+<MagicView m={m} lang="en" />

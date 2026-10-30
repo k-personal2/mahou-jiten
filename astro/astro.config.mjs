@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import { copyFileSync, existsSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync } from 'node:fs';
 
 /**
  * Search Console に登録しやすいよう、/sitemap.xml（URL を直接並べた1ファイル）も出力する。
@@ -17,12 +17,20 @@ const plainSitemap = () => ({
   },
 });
 
+// 英語の魔法ページは、英語版の公式名が確認できたものだけサイトマップに入れる（それ以外は noindex。src/lib/i18n.ts の enIndexable と同じ判定）
+const enNamed = new Set(Object.keys(JSON.parse(readFileSync(new URL('./src/data/en/names.json', import.meta.url), 'utf8')).magics));
+const inSitemap = (page) => {
+  if (page.endsWith('/404')) return false;
+  const m = page.match(/\/en\/magic\/([^/]+)$/);
+  return !m || enNamed.has(m[1]);
+};
+
 export default defineConfig({
   site: 'https://rpgspellbook.com', // 独自ドメイン。canonical・sitemap・OGP の URL はここから作る
   trailingSlash: 'never',
   // Cloudflare Pages は /foo/index.html を /foo/ にリダイレクトするため、
   // /foo.html で出力して /foo のまま配信させる（canonical とリンクを一致させる）
   build: { format: 'file' },
-  // sitemap-index.xml を出力（404 ページは除外）。plainSitemap はその後に動かす
-  integrations: [sitemap({ filter: (page) => !page.endsWith('/404') }), plainSitemap()],
+  // sitemap-index.xml を出力（404 ページと noindex の英語の魔法ページは除外）。plainSitemap はその後に動かす
+  integrations: [sitemap({ filter: inSitemap }), plainSitemap()],
 });

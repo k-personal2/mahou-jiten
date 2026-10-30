@@ -9,7 +9,7 @@ const listId = `sug-${size}`;
     <svg width={lg ? 20 : 16} height={lg ? 20 : 16} viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
     <input type="search" name="q" autocomplete="off" aria-label={en ? 'Search spells' : '魔法を検索'}
       role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls={listId}
-      placeholder={lg ? (en ? 'Spell or game name (in Japanese)' : '「ヒャド」「ケアル」「天外魔境」など') : '魔法名・作品名で検索'} />
+      placeholder={lg ? (en ? 'Spell or game, e.g. Fire, Hyado, Persona' : '「ヒャド」「ケアル」「天外魔境」など') : en ? 'Search spells or games' : '魔法名・作品名で検索'} />
     {lg && <button class="btn btn-solid" type="submit">{en ? 'Search' : '検索'}</button>}
   </div>
   <div class="sug" id={listId} role="listbox" aria-label={en ? 'Suggestions' : '検索候補'} data-sug hidden></div>

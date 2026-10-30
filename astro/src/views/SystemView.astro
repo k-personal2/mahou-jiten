@@ -1,0 +1,185 @@
+---
+/** 作品ごとの魔法体系（日本語版 /game/[slug]/magic-system と英語版 /en/game/[slug]/magic-system で共通） */
+import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
+import Chain from '../components/Chain.astro';
+import NameLine from '../components/NameLine.astro';
+import BuyBox from '../components/BuyBox.astro';
+import {
+  REP_GAMES, seriesGames, groupOf, EL, MAGICS, SYSTEMS, markStyle, chainOfMagic, type Game,
+  STAGES, stageTypeById, scopeTypeById, stageTypeUrl, BLUEPRINT_TIER_URL,
+} from '../lib/dict';
+import { L, type Lang } from '../lib/i18n';
+
+interface Props { g: Game; lang?: Lang }
+const { g, lang = 'ja' } = Astro.props;
+const t = L(lang), en = t.en, GN = t.game(g);
+const SJ = SYSTEMS[g.id], S = t.system_(g.id);
+const count = MAGICS.filter((m) => m.game === g.id).length;
+const SECS: [string, string, string[]][] = [
+  ['攻撃魔法', 'Attack spells', ['atk']], ['回復魔法', 'Healing spells', ['heal']], ['補助魔法', 'Buffs', ['atkup', 'defup', 'spdup']], ['弱体魔法', 'Debuffs', ['atkdown', 'defdown', 'spddown']],
+  ['状態異常・即死', 'Status ailments & instant death', ['ailment', 'death']], ['治療・蘇生', 'Cures & revival', ['cure', 'revive']], ['防御・移動・その他', 'Barriers, travel & other', ['barrier', 'field', 'misc']],
+];
+const sections = SECS.map(([ja, enT, fl]) => {
+  const groups = t.groups(g.id, fl);
+  const n = groups.reduce((a, gp) => a + gp.lines.reduce((b, l) => b + l.items.length, 0), 0);
+  return { title: en ? enT : ja, groups, n };
+}).filter((s) => s.groups.length);
+const elements = EL.filter((e) => MAGICS.some((m) => m.game === g.id && m.el === e.id)).map((e) => ({ e, local: t.eln(g.id, e.id) }));
+const siblings = seriesGames(g.id).filter((x) => SYSTEMS[x.id]);
+const otherGames = REP_GAMES.filter((x) => x.id !== groupOf(g.id) && SYSTEMS[x.id] && MAGICS.some((m) => m.game === x.id)).map((x) => {
+  const c = MAGICS.find((m) => m.game === x.id && m.fx === 'atk' && m.el === 'fire') ?? MAGICS.find((m) => m.game === x.id && m.fx === 'atk') ?? MAGICS.find((m) => m.game === x.id);
+  return { x, sample: c ? chainOfMagic(c).map((m) => t.name(m)).join(' → ') : en ? 'No spells yet' : '収録なし' };
+});
+const ST = STAGES[g.id], STX = ST ? t.stage(g.id) : null;
+const R = g.release;
+const src = [...(SJ.src ?? []), ...(R?.src ?? [])].filter((s, i, a) => a.findIndex((x) => x.url === s.url) === i);
+// シリーズ単位の代表（DQ）は発売日がシリーズ第1作のものなので、ゲーム1本としては示さない
+const isSeries = g.name.endsWith('（シリーズ）');
+const sysTitle = en ? `Magic in ${GN.name}` : `${g.name}の魔法体系`;
+const overview = S.overview;
+// 作品の魔法体系を、魔法ページ（DefinedTerm）がまとまる語彙集として示す
+const jsonld = [{
+  '@context': 'https://schema.org', '@type': 'DefinedTermSet', name: sysTitle, ...(overview ? { description: overview } : {}),
+  url: new URL(t.system(g.id), Astro.site ?? Astro.url).href, inLanguage: lang,
+  ...(R && !isSeries ? { about: { '@type': 'VideoGame', name: en ? GN.name : g.name, datePublished: R.date, gamePlatform: en ? t.platforms(R).split(', ') : R.platforms } } : {}),
+}];
+const home = en ? 'Home' : 'トップ', byGame = en ? 'Find by game' : '作品から探す';
+const pageTitle = en ? `Magic in ${GN.name}: how spells are named and tiered | RPG Spell Name Thesaurus` : `${g.name}の魔法体系｜RPG魔法辞典`;
+const description = en
+  ? (overview ? overview.slice(0, 155) : `How ${GN.name} names, groups and tiers its ${t.sys(g.sys).toLowerCase()}: ${count} spells listed.`)
+  : SJ.overview.slice(0, 110);
+const releaseNote = t.releaseNote(g), basis = t.basis(g);
+---
+<Base title={pageTitle} description={description} active="games" path={t.system(g.id)} jsonld={jsonld} lang={lang}
+  crumbs={[{ name: home, path: t.url('/') }, { name: byGame, path: t.url('/game') }, { name: sysTitle, path: t.system(g.id) }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label={en ? 'Breadcrumb' : 'パンくず'}><a href={t.url('/')}>{home}</a><span>›</span><a href={t.url('/game')}>{byGame}</a><span>›</span><span>{GN.name}</span><span>›</span><span aria-current="page">{en ? 'Magic system' : '魔法体系'}</span></nav>
+    <div class="p-meta"><span class="lbl">{en ? `Calls magic: ${t.sys(g.sys)} · ${count} spells listed` : `呼び方：${g.sys} ・ 収録 ${count}種`}</span><span class="url">{t.system(g.id)}</span></div>
+    <h1 class="p-title is-kicker">{sysTitle}</h1>
+    {(R || basis) && (
+      <div class="p-notes">
+        {en && <p lang="ja">{g.name}</p>}
+        {R && <p>{en ? 'First released: ' : '最初の発売：'}<time datetime={R.date}>{t.release(R)}</time>{en ? ` (${t.platforms(R)})` : `（${t.platforms(R)}）`}{releaseNote && (en ? `. ${releaseNote.replace(/\.$/, '')}` : `。${releaseNote.replace(/。$/, '')}`)}</p>}
+        {basis && <p>{en ? 'Based on: ' : '収録の基準：'}{basis}</p>}
+      </div>
+    )}
+    {S.verdict && <div class="card verdict"><span class="lbl">{en ? 'Why we list it this way' : '収録の判断'}</span><p>{S.verdict}</p></div>}
+
+    {(overview || (S.rules && S.rules.length > 0)) && (
+      <div class="two" style="margin-top:20px">
+        {overview && <div class="card box"><h2 class="lbl">{en ? 'Overview' : '概要'}</h2><p class="prose prose-lg">{overview}</p></div>}
+        <div>
+          {S.rules && S.rules.length > 0 && (
+            <div class="card box">
+              <h2 class="lbl">{en ? 'Naming rules' : '命名のルール'}</h2>
+              <ol class="rules">{S.rules.map((x, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{x}</span></li>)}</ol>
+            </div>
+          )}
+          {S.growth && S.growth.length > 0 && (
+            <div class="card box">
+              <h2 class="lbl">{en ? 'How spells grow stronger' : '強化・派生のルール'}</h2>
+              <ol class="rules">{S.growth.map((x, i) => <li><b>{String(i + 1).padStart(2, '0')}</b><span>{x}</span></li>)}</ol>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
+    {ST && STX && (STX.desc || !en) && (
+      <section class="sec">
+        <Chapter title={en ? 'How tiers are named' : '段階の付け方'} note={en ? 'Magic world blueprint' : '魔法世界の設計図'}>
+          <a class="more" href={t.url(stageTypeUrl(ST.primary))}>{en ? 'Compare across games →' : '作品を横断して比べる →'}</a>
+        </Chapter>
+        <div class="two">
+          <div class="card sys-card">
+            <div>
+              <span class="lbl">{en ? 'Tiers' : '段階'}</span>
+              <p class="grp-head"><a class="min" style="font-size:20px" href={t.url(stageTypeUrl(ST.primary))}>{t.doc.types.find((x) => x.id === ST.primary)?.name ?? stageTypeById[ST.primary].name}</a></p>
+              {STX.desc && <p class="prose-sans">{STX.desc}</p>}
+            </div>
+            {ST.examples.slice(0, 2).map((e) => <NameLine game={g.id} names={e.names} lang={lang} />)}
+            <div class="sys-mini">
+              <span class="lbl">{en ? 'Range' : '範囲'}</span>
+              <p class="grp-head">{t.doc.scopeTypes.find((x) => x.id === ST.scope.type)?.name ?? scopeTypeById[ST.scope.type].name}</p>
+              {STX.scopeDesc && <p class="prose-sans">{STX.scopeDesc}</p>}
+              {ST.scope.examples.slice(0, 1).map((e) => <NameLine game={g.id} names={e} lang={lang} />)}
+            </div>
+          </div>
+          {(STX.diff || STX.insight) && (
+            <div class="card box">
+              {STX.diff && (<><span class="lbl">{en ? 'Differences within the series' : 'シリーズ内の違い'}</span><p class="prose">{STX.diff}</p></>)}
+              {STX.insight && (<><span class="lbl" style={STX.diff ? 'display:block;margin-top:16px' : undefined}>{en ? 'How we read it' : 'このサイトの見方'}</span><p class="prose">{STX.insight}</p></>)}
+            </div>
+          )}
+        </div>
+      </section>
+    )}
+
+    {S.categories && S.categories.length > 0 && (
+      <section class="sec">
+        <Chapter title={en ? `Types of ${t.sys(g.sys).toLowerCase()}` : `${g.sys}の分類`} />
+        <div class="og-grid">{S.categories.map((c) => <div class="card og"><span class="min">{c.name}</span><p>{c.desc}</p></div>)}</div>
+      </section>
+    )}
+
+    {elements.length > 0 && (
+      <section class="sec">
+        <Chapter title={en ? 'Elements' : '属性体系'} note={en ? 'What this game calls each element. Tap to compare across games.' : '作品内での属性の呼び名。押すと横断比較へ'} />
+        <div class="el-names">
+          {elements.map(({ e, local }) => (
+            <a href={t.url(`/element/${e.id}`)}><span class="mark" style={markStyle(e, 28)} aria-hidden="true">{e.name}</span><span class="min">{local ?? t.el(e)}</span>{local && <small>{en ? `= ${t.elAttr(e)}` : `＝${e.name}属性`}</small>}</a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {sections.map((s) => (
+      <section class="sec">
+        <Chapter title={s.title} note={en ? `${s.n} spells` : `${s.n}種`} />
+        <div class="card sys-table">
+          {s.groups.map((gp) => (
+            <div class="sys-row">
+              <div class="grp-head"><span class="mark" style={markStyle(gp.el, 24)} aria-hidden="true">{gp.mark}</span>{gp.label}</div>
+              <Chain lines={gp.lines} />
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    {siblings.length > 1 && (
+      <section class="sec">
+        <Chapter title={en ? `Other games in the ${GN.name.replace(/ \(series\)$/, '')} series` : `${g.series ?? 'シリーズ'}の各作品`} note={en ? 'Naming and categories differ a little from game to game.' : '作品ごとに命名や分類が少しずつ違います'} />
+        <div class="chips">
+          {siblings.map((x) => <a class="chip" href={t.system(x.id)} aria-current={x.id === g.id ? 'page' : undefined}>{t.game(x).short}{!x.group && (en ? ' (main)' : '（代表）')}</a>)}
+        </div>
+      </section>
+    )}
+
+    {g.shop && g.shop.length > 0 && (
+      <section class="sec">
+        <Chapter title={en ? 'Play this game' : 'この作品を遊ぶ'} note="PR" />
+        <div class="buys">{g.shop.map((x) => <BuyBox game={g} item={x} en={en} />)}</div>
+        <p class="note" style="margin-top:8px">{en ? 'As an Amazon Associate, this site earns from qualifying purchases (links go to Amazon.co.jp).' : 'Amazonのアソシエイトとして、RPG魔法辞典は適格販売により収入を得ています。'}</p>
+      </section>
+    )}
+
+    <section class="sec">
+      <Chapter title={en ? 'Magic in other games' : '他の作品の魔法体系'} />
+      <div class="og-grid">
+        {otherGames.map(({ x, sample }) => <a class="card og" href={t.system(x.id)}><b>{t.game(x).name}</b><span class="min">{sample}</span></a>)}
+      </div>
+    </section>
+
+    {src.length > 0 && (
+      <section class="sec" aria-labelledby="src-h">
+        <Chapter id="src-h" title={en ? 'Sources' : '出典'} note={en ? 'Mostly in Japanese' : undefined} />
+        <ul class="src-list">{src.map((x) => <li><a href={x.url} rel="nofollow noopener" target="_blank">{x.title}</a></li>)}</ul>
+      </section>
+    )}
+    <p class="disclaimer">{en
+      ? 'Spell names, categories and lines were checked against strategy guides and other references, but notation and details can differ between games and versions. The text on this page was machine-translated from the Japanese edition with generative AI (Claude).'
+      : '※ 魔法名・分類・系統は攻略資料などで確認して掲載していますが、作品・版によって表記や仕様が異なる場合があります。'}</p>
+  </main>
+</Base>

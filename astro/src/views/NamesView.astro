@@ -1,0 +1,43 @@
+---
+/** 魔法を何と呼ぶ？（日本語版 /names と英語版 /en/names で共通） */
+import Base from '../layouts/Base.astro';
+import Chapter from '../components/Chapter.astro';
+import { L, namingOf, type Lang } from '../lib/i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'ja' } = Astro.props;
+const t = L(lang), en = t.en;
+const naming = namingOf(lang);
+const nGames = naming.reduce((a, x) => a + x.items.filter((i) => i.href).length, 0);
+const h = en ? 'What do RPGs call magic?' : '魔法を何と呼ぶ？';
+const home = en ? 'Home' : 'トップ';
+---
+<Base path={t.url('/names')} active="names" lang={lang}
+  title={en ? 'What do RPGs call magic? Spells, arts, PSI and more | RPG Spell Name Thesaurus' : 'RPGで魔法を何と呼ぶ？ 呼び方の一覧｜RPG魔法辞典'}
+  description={en
+    ? `Incantations, magic, arts, PSI, stratagems, transformation arts... Every RPG has its own word for magic. ${naming.length} words, how each system works and which games use it.`
+    : `呪文・魔法・術・PSI・策略・変身技…。RPGでは作品ごとに「魔法」の呼び方が違います。${naming.length}通りの呼び方と、それぞれの仕組み、使っている作品の一覧。`}
+  crumbs={[{ name: home, path: t.url('/') }, { name: h, path: t.url('/names') }]}>
+  <main class="wrap page">
+    <nav class="crumbs" aria-label={en ? 'Breadcrumb' : 'パンくず'}><a href={t.url('/')}>{home}</a><span>›</span><span aria-current="page">{h}</span></nav>
+    <h1 class="p-title">{h}</h1>
+    <p class="p-lead">{en
+      ? `Dragon Quest has incantations (jumon), EarthBound has PSI, SaGa has arts (jutsu). What an RPG calls "magic" says a lot about how its magic works. Here are the ${nGames} games in this dictionary, sorted into ${naming.length} words for magic.`
+      : `ドラゴンクエストは「呪文」、MOTHERは「PSI」、サガは「術」。RPGの「魔法」は、作品によって呼び方も仕組みも違います。収録${nGames}作品の呼び方を、${naming.length}通りに分けて並べました。`}</p>
+    <nav class="toc" aria-label={en ? 'Contents' : '呼び方の目次'}>
+      {naming.map((x) => <a class="chip" href={`#t${x.i}`}>{x.label}<span class="note">{x.items.length}</span></a>)}
+    </nav>
+
+    {naming.map((x) => (
+      <section class="sec" id={`t${x.i}`}>
+        <Chapter title={en ? `${x.label}${x.term !== x.label ? ` (${x.term}${x.ro ? `, ${x.ro}` : ''})` : ''}` : x.term} note={en ? `${x.items.length} games` : `${x.items.length}作品`} />
+        <div class="card box">
+          {x.desc ? <p class="prose">{x.desc}</p> : <p class="note">{en ? 'No game with this word is listed yet.' : 'この呼び方の作品は準備中です。'}</p>}
+          <div class="term-games">
+            {x.items.map((it) => (it.href ? <a class="chip" href={it.href}>{it.label}</a> : <span class="chip" style="color:var(--mut)">{it.label}{en ? ' (coming soon)' : '（準備中）'}</span>))}
+          </div>
+        </div>
+      </section>
+    ))}
+  </main>
+</Base>

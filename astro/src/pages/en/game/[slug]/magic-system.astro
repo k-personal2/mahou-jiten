@@ -1,0 +1,10 @@
+---
+import SystemView from '../../../../views/SystemView.astro';
+import { GAMES, SYSTEMS, type Game } from '../../../../lib/dict';
+
+export function getStaticPaths() {
+  return GAMES.filter((g) => SYSTEMS[g.id]).map((g) => ({ params: { slug: g.slug }, props: { g } }));
+}
+const { g } = Astro.props as { g: Game };
+---
+<SystemView g={g} lang="en" />

@@ -249,6 +249,8 @@ a.card:hover { border-color: var(--ink); }
 .cmp-game { flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--ink2); }
 .cmp-name { margin-top: 18px; font: 800 calc(46px * var(--k, 1)) / 1.1 var(--f-min); word-break: keep-all; overflow-wrap: anywhere; }
 .cmp-card:hover .cmp-name { color: var(--acc); }
+.cmp-ja { margin-top: 6px; font: 700 15px/1.5 var(--f-min); color: var(--ink2); }
+.cmp-off { display: block; margin-top: 2px; font: 600 13px/1.5 var(--f-sans); color: var(--acc); }
 .cmp-rest { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--mut); }
 @media (max-width: 760px) { .cmp-card { padding: 14px 16px 16px; } .cmp-name { margin-top: 12px; font-size: calc(36px * var(--k, 1)); } }
 .empty { margin-top: 32px; padding: 48px 24px; text-align: center; border: 1px dashed var(--off); border-radius: 4px; color: var(--mut); }
@@ -286,6 +288,11 @@ a.card:hover { border-color: var(--ink); }
 .m-name.is-long { font-size: 60px; }
 @media (max-width: 760px) { .m-name { font-size: 52px; } .m-name.is-long { font-size: 38px; } }
 .m-kana { margin-top: 2px; font-size: 16px; color: var(--mut); letter-spacing: 0.1em; }
+.m-official { margin-top: 10px; font-size: 16px; color: var(--ink2); }
+.m-official b { font-size: 20px; color: var(--acc); }
+.m-official span { font-size: 14px; color: var(--mut); }
+.m-older { display: block; margin-top: 2px; }
+.names-ro { font-size: 12px; font-weight: 400; color: var(--mut); }
 .m-lead { margin: 16px 0 0; font: 700 clamp(19px, 2.4vw, 26px)/1.7 var(--f-min); text-wrap: pretty; }
 .m-toc { margin: 24px 0 0; max-width: 640px; border-top: 1px solid var(--ink); }
 .m-toc a { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }

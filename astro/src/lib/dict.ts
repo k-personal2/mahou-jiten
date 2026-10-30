@@ -168,7 +168,7 @@ export const splitNames = (names: string[]) => {
   return names.map((n) => ({ a: pre, b: n.slice(pre.length, n.length - post.length), c: post, hl }));
 };
 
-export type ChainLine = { label: string; showLabel: boolean; items: { a: string; b: string; c: string; hl: boolean; cur: boolean; href: string }[] };
+export type ChainLine = { label: string; showLabel: boolean; items: { a: string; b: string; c: string; hl: boolean; cur: boolean; href: string; m: Magic }[] };
 export type ChainGroup = { el: Element | null; mark: string; label: string; lines: ChainLine[] };
 
 /** 作品×用途の系譜図データ。属性×用途×細分類で1グループ、その中の系統（series×単体/全体）を1行ずつ */
@@ -199,7 +199,7 @@ export const buildGroups = (game: string, fxList: string[], opts: { curId?: stri
       label: kn ? `${base}・${kn}` : base,
       lines: chains.map(({ lk, ln }) => {
         const ch = chainOf(game, el, fx, ln, lk), parts = splitNames(ch.map((c) => c.name));
-        return { label: ln === 'all' ? '全体' : '単体', showLabel: hasAll, items: ch.map((c, i) => ({ ...parts[i], cur: c.id === opts.curId, href: magicUrl(c) })) };
+        return { label: ln === 'all' ? '全体' : '単体', showLabel: hasAll, items: ch.map((c, i) => ({ ...parts[i], cur: c.id === opts.curId, href: magicUrl(c), m: c })) };
       }),
     };
   });
@@ -230,7 +230,7 @@ export const nameLine = (game: string, names: string[]): ChainLine & { linked: b
   const key = (m: Magic) => [m.el, m.fx, lineKey(m), m.line ?? 'base'].join('#');
   const linked = ms.every((m, i) => i === 0 || (key(m) === key(ms[0]) && m.tier > ms[i - 1].tier));
   const parts = splitNames(names);
-  return { label: '', showLabel: false, linked, items: ms.map((m, i) => ({ ...parts[i], cur: false, href: magicUrl(m) })) };
+  return { label: '', showLabel: false, linked, items: ms.map((m, i) => ({ ...parts[i], cur: false, href: magicUrl(m), m })) };
 };
 
 // ---------- 今日の魔法（ビルド日で決定。00:05 JST に毎日再ビルドする想定）

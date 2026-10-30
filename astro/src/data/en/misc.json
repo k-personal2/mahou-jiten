@@ -1,0 +1,1168 @@
+{
+ "stageDoc": {
+  "types": [
+   {
+    "id": "suffix",
+    "name": "Shared suffix type",
+    "sample": "ff",
+    "short": "A suffix shared by every family marks the tier",
+    "how": "A suffix shared by all families is swapped or added after the base name. The -ra and -ga of FINAL FANTASY and the -dyne of Shin Megami Tensei and Persona are this type.",
+    "good": "Once you learn what the suffixes mean, you can read the strength of a spell you have never seen. Adding more families does not add more rules to learn.",
+    "watch": "If the same suffix also carries another meaning, such as an all-targets version, readers get confused. When the base name and the suffix collide in sound, the form can break down, as in Wōta to Wotara.",
+    "ask": "How many tiers the tier suffixes will cover, and whether those suffixes can be kept free of any meaning other than tier."
+   },
+   {
+    "id": "morph",
+    "name": "Word-form change type",
+    "sample": "dq",
+    "short": "The opening sound stays, and each family changes its shape in its own way",
+    "how": "The opening sound of a family stays, while the rest of the name changes in a different way for each family. Dragon Quest's Mera to Merami to Merazōma and Io to Iora to Ionazun are this type.",
+    "good": "Each name gets its own character, and higher tiers sound longer and heavier, which conveys strength. The names themselves become the face of the game.",
+    "watch": "With no fixed rule, players have to memorize the names one by one. The number of tiers may also differ from family to family.",
+    "ask": "If you fix the opening sound that marks each family first, it is easier to add tier names later. The basic principle is to make higher tiers longer and heavier in sound."
+   },
+   {
+    "id": "prefix",
+    "name": "Prefix type",
+    "sample": "octopath",
+    "short": "A shared word placed in front makes the upgraded version",
+    "how": "A word shared by all families is placed in front of the base name. The 大 (large) and 特大 (extra large) of Octopath Traveler, the \"Hai\" and \"Mega\" of Wild Arms, and the Gi and Na of Phantasy Star II are this type.",
+    "good": "The part that shows strength comes first, so you see the strength the moment you see the name. If you use words with clear meanings such as 大, Hai, and Mega, no explanation is needed.",
+    "watch": "If the prefix also carries another meaning, such as range, it causes confusion. The \"Mega\" of the Knight Gundam Monogatari series marked a tier in one game and an all-targets version in another.",
+    "ask": "Whether to make the prefix a Japanese word (大, 特大), an English word (Hai, Mega), or a coined one (Gi, Na). If you coin one, decide its meaning as a word of your world."
+   },
+   {
+    "id": "compound",
+    "name": "Compound-word type",
+    "sample": "goldensun",
+    "short": "The base word stays and is combined with another word for the upgrade",
+    "how": "The word for the family stays, and another word expressing strength or shape is added before or after it. Golden Sun's Kueiku to Āsukueiku and Momotarō Densetsu's 小波 (small wave) to 大波 (big wave) to 津波 (tsunami) are this type.",
+    "good": "The added word lets you picture how the spell grew stronger. Because the base word remains, you can also tell at a glance which family the spell belongs to.",
+    "watch": "If there is no rule for the added words, you cannot tell which tier a spell is from its name alone.",
+    "ask": "The kept word shows the family, and the added word paints the picture of strength. Deciding whether the added words will always express scale, shape, or motion gives the names a sense of unity."
+   },
+   {
+    "id": "combination",
+    "name": "Combination type",
+    "sample": "sf2",
+    "short": "The name shows a combination of ingredients, not strength",
+    "how": "The name shows not strength but what was combined with what. In SaGa Frontier 2, the name of an art is decided by the combination of Anima, such as tree and fire, and its strength rises with the user's skill.",
+    "good": "If you fix the basic ingredients of the world (elements or spirits), you can multiply the number of spells through combinations. The spell names also explain how the world is built.",
+    "watch": "You cannot read strength from the name. The more combinations there are, the more players have to remember.",
+    "ask": "How many kinds of basic ingredients the world will have, and how many combinations will be allowed."
+   },
+   {
+    "id": "symbol",
+    "name": "Symbol type",
+    "sample": "mother",
+    "short": "The name stays and a symbol or number marks the tier",
+    "how": "The name of the kind stays as it is, and a symbol or number is added after it. The α to β to γ to Ω of the MOTHER series and the Kearu to Kearu II to Kearu III of FINAL FANTASY XI are this type.",
+    "good": "The same yardstick applies to every kind of spell, so strength is easiest to compare. With numbers, you can keep adding tiers as long as you like.",
+    "watch": "The symbols themselves carry no worldview. The fun of feeling strength through the sound of a name is weaker.",
+    "ask": "Whether to fix the last symbol (such as Ω) as the \"peak\", or keep adding with no upper limit."
+   },
+   {
+    "id": "distinct",
+    "name": "Renamed type",
+    "sample": "tengai",
+    "short": "Each tier gets a name with no sound connection to the others",
+    "how": "When the tier goes up, the name becomes an entirely different word. Tengai Makyō's 鬼火 (will-o'-the-wisp) to 火天 (fire heaven) to 神炎 (divine flame) and Trials of Mana's Faiabōru to Ekusupurōdo to Bureizuwōru are this type. The link lies in meaning and image, not in sound.",
+    "good": "Each name paints a scene, so the sound of the words builds the worldview. Strength can be felt as the scale of a phenomenon.",
+    "watch": "You cannot read the tier from the name, so the order of strength has to be conveyed by numbers or explanations.",
+    "ask": "What to use to link the tiers in place of sound. For example, the scale of the phenomenon, a ranking of metals (copper, silver, gold), or the seasons."
+   },
+   {
+    "id": "same-name",
+    "name": "Same-name type",
+    "sample": "shiningforce",
+    "short": "The name stays the same, and the spell grows with level or mastery",
+    "how": "No names for upgraded versions are made; the same spell simply grows. The proficiency of FINAL FANTASY II, the magic levels of Secret of Mana, and the Lv1 to 4 of Shining Force are this type.",
+    "good": "You can show growth while keeping the number of spells small. It also creates an attachment to \"my own spell, raised through use.\"",
+    "watch": "The name alone does not convey strength.",
+    "ask": "What will express growth. For example, the number of times used (proficiency), the level chosen at casting, or equipment."
+   },
+   {
+    "id": "none",
+    "name": "No tiers",
+    "sample": null,
+    "short": "The idea of tiers does not exist",
+    "how": "Most spells have a single tier and no names for upgraded versions. This type is common in games with few spells and in games where magic is not the star.",
+    "good": "If magic is not at the center of the world, having no tiers is also a design choice. Each individual spell leaves a stronger impression.",
+    "watch": "It becomes harder to make magic a source of growth fun.",
+    "ask": "In that world, does magic grow, or is it complete the moment you obtain it?"
+   }
+  ],
+  "scopeTypes": [
+   {
+    "id": "affix",
+    "name": "Add a range word",
+    "how": "A word showing range is added to make the all-targets version (the Maha- of Shin Megami Tensei, the -ga of FINAL FANTASY X, and so on)."
+   },
+   {
+    "id": "separate-name",
+    "name": "A separate name for each range",
+    "how": "The single-target and all-targets versions get separate names with similar sounds (Dragon Quest's Sukara and Sukuruto, for example)."
+   },
+   {
+    "id": "toggle",
+    "name": "Switch with the same name",
+    "how": "The name does not change, and you choose single or all targets when you use the spell."
+   },
+   {
+    "id": "tier-linked",
+    "name": "Widens with the tier",
+    "how": "The range widens as the tier goes up. No name shows range alone."
+   },
+   {
+    "id": "none",
+    "name": "Not shown in the name",
+    "how": "The range is fixed for each spell and the name does not express it."
+   },
+   {
+    "id": "other",
+    "name": "Original method",
+    "how": "Methods that fit none of the above, such as showing range with a symbol (the Σ of MOTHER) or having the place of use decide the range."
+   }
+  ],
+  "notes": [
+   {
+    "title": "The same \"-ga\" has two meanings",
+    "body": "In FINAL FANTASY X, the -ga marks the third tier for attack spells but the all-targets version for support spells. The same suffix is used for both tier and range, so readers have to reinterpret its meaning depending on the kind of spell. Bravely Default uses it the same way.",
+    "refs": [
+     {
+      "game": "ff10",
+      "names": [
+       "ファイア",
+       "ファイラ",
+       "ファイガ"
+      ]
+     },
+     {
+      "game": "ff10",
+      "names": [
+       "ヘイスト",
+       "ヘイスガ"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "\"Mega\" changed from a tier mark to a range mark",
+    "body": "In the first Knight Gundam Monogatari game, \"Mega\" was a tier mark. In the third game, Densetsu no Kishidan, it becomes a mark that widens the target to all enemies. It is a good example of how the meaning of a prefix is decided within each game's own system.",
+    "refs": [
+     {
+      "game": "knightgundam",
+      "names": [
+       "サーベ",
+       "ムービサーベ",
+       "メガサーベ"
+      ]
+     },
+     {
+      "game": "knightgundam4",
+      "names": [
+       "フレア",
+       "メガフレア"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "When the suffixes run out, switch to a new name",
+    "body": "For the White Mage's attack spells in FINAL FANTASY XIV, the tier rises four times by suffix from Sutōn to Sutonja, then at a high level the spell is replaced by a different name, Gurea, and the tiers continue from there. It is a device for keeping on adding higher spells in a long-running game.",
+    "refs": [
+     {
+      "game": "ff14",
+      "names": [
+       "ストーン",
+       "ストンラ",
+       "ストンガ",
+       "ストンジャ"
+      ]
+     },
+     {
+      "game": "ff14",
+      "names": [
+       "グレア",
+       "グレアガ"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Dragon Quest started as a \"prefix type\"",
+    "body": "The first Dragon Quest had only two tiers. Both upgraded versions were made by adding \"Be\" to the front. In III, when the number of spells grew, the current form took shape, in which each family changes its word form its own way. It shows that a system can grow along with the series.",
+    "refs": [
+     {
+      "game": "dq1",
+      "names": [
+       "ホイミ",
+       "ベホイミ"
+      ]
+     },
+     {
+      "game": "dq3",
+      "names": [
+       "メラ",
+       "メラミ",
+       "メラゾーマ"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Strength shown by a ranking of metals",
+    "body": "The healing stratagems of Tenchi o Kurau II show strength by a ranking of metals: 銅仙 (copper), 銀仙 (silver), 金仙 (gold). Even if the sounds of the names are not connected, borrowing an order everyone knows conveys the strength.",
+    "refs": [
+     {
+      "game": "tenchi",
+      "names": [
+       "銅仙の計",
+       "銀仙の計",
+       "金仙の計"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "The language itself is the grammar",
+    "body": "In Treasure of the Rudras, a word for an element is combined with a rank word shared by all elements to make a spell with six tiers. The rank words come in pairs for single and multiple targets, so the choice of word also decides the range. It is a system that fixes the meaning of the parts and leaves the combinations free, and it is the most useful example for anyone who wants to build a world where spells are assembled.",
+    "refs": [
+     {
+      "game": "rudra",
+      "names": [
+       "イグ",
+       "イグルス",
+       "イグトーム",
+       "イグレクス",
+       "イグティーオ",
+       "イグティウム"
+      ]
+     },
+     {
+      "game": "rudra",
+      "names": [
+       "イグルス",
+       "イグムル"
+      ]
+     }
+    ]
+   },
+   {
+    "title": "Tier at the front, range at the end",
+    "body": "Wild Arms shows tier with the \"Hai\" at the front and range with the \"Purasu\" at the end. Because the two roles are split by position, stacking them does not cause misreading. Phantasy Star II also stacks the tier marks Gi and Na and the range mark Sa, but all at the front.",
+    "refs": [
+     {
+      "game": "wildarms",
+      "names": [
+       "ヒール",
+       "ハイ・ヒール",
+       "ハイ・ヒール・プラス"
+      ]
+     },
+     {
+      "game": "phantasystar",
+      "names": [
+       "レスタ",
+       "サレスタ",
+       "ギサレスタ",
+       "ナサレスタ"
+      ]
+     }
+    ]
+   }
+  ],
+  "questions": [
+   "In your world, does magic grow? If it does not, \"No tiers\" fits. If it grows while keeping its name, the \"Same-name type\" fits.",
+   "Should strength be clear from the name alone? If so, the \"Shared suffix type\", the \"Prefix type\", and the \"Symbol type\" are suitable.",
+   "Do you want to convey the worldview through the sound or imagery of the names? Then the \"Word-form change type\", the \"Renamed type\", and the \"Compound-word type\" are suitable.",
+   "Is magic born from combining the materials of the world? Then the \"Combination type\" or a grammar of parts like that of Treasure of the Rudras fits.",
+   "Will you also show range (single or all targets) in the name? If so, avoid using the same word as for tiers, and keep them apart by position or by separate words to prevent misreading."
+  ]
+ },
+ "terms": {
+  "呪文": "Magic activated by speaking words. Dragon Quest uses short coined words like Mera and Hoimi, and Wizardry uses coined words that combine letters into an ancient-language sound. The sound of the name itself becomes the face of the game.",
+  "魔法": "The most general term. As with the White Magic and Black Magic of FINAL FANTASY, games often have finer categories of their own within it. Even under the same word \"magic\", the rules for naming and upgrading differ greatly from game to game.",
+  "スキル": "Persona calls the moves a persona learns \"skills\", and attack, healing, and support magic are included among them. A feature is that magic and physical moves are handled in the same category.",
+  "PSI": "The psychic powers of the MOTHER series. Greek letters α, β, γ, and Ω are added to kind names such as \"PK Faiā\" to show the tier, and they are portrayed as psychic powers, not magic.",
+  "術": "The term used in the SaGa series, Japanese-style RPGs, and Tales. In SaGa, you learn arts by family, such as fire arts and water arts. They appear as \"-no jutsu\" arts with kanji names in Tengai Makyō and Momotarō Densetsu, and as sorcery, healing arts, and summoning arts in Tales (Tales uses different terms from game to game, such as shōjutsu and tenjutsu).",
+  "技（魔法）": "In Chrono Trigger, magic is not an independent command but part of the \"techs\" a character learns. Those marked with a star in the tech list count as magic.",
+  "マントラ": "What magic used by the dragon is called in Samsara Naga 2. Many of the names play on the names of medicines and sweets, and a sound reminiscent of Indian mantras coexists with a playful spirit.",
+  "スペシャル": "What moves that use FP (Flower Points) are called in Super Mario RPG. Fire and lightning moves and physical moves like jumps fall in the same category, so there is no distinction between magic and techs.",
+  "なし": "No magic or psychic powers appear in Metal Max. The healing and travel that magic handles in other RPGs are handled by items and tank equipment.",
+  "策略": "The \"-no kei\" stratagems that the strategist uses in Tenchi o Kurau II: Shokatsu Kōmei Den. In the game they are not magic, but they are a system equivalent to magic: they spend points to attack with fire and water and to heal allies.",
+  "忍術": "What corresponds to magic in Ganbare Goemon Gaiden. Comical onomatopoeic names such as Nenkorori and Supīda! line up, and adding \"Do\" to the front makes an upgraded version.",
+  "変身技": "Moves used in Maka Maka by transforming into a past-life form taught by a spirit medium. The past-life form and the usable moves differ for each character, a system with few parallels elsewhere.",
+  "アーツ": "The magic of The Legend of Heroes: Trails series. When you set quartz into an orbment, the arts you can use are decided by the attribute values of the seven Sepith elements: earth, water, fire, wind, time, space, and mirage. It is also called orbal magic.",
+  "紋章": "The magic of Suikoden. When you bear a rune such as the Fire Rune or Lightning Rune, you can use the magic belonging to that rune, and you cast it using a number of uses per level. The worldview and the magic system are directly connected.",
+  "エナジー": "The magic of Golden Sun. Based on the four powers of earth, water, fire, and wind, it is used not only in battle but also in puzzle solving, such as moving objects and reading minds. There are also summons using Djinn.",
+  "言霊": "The magic of Treasure of the Rudras. The player lines up katakana to make a spell themselves; the last word decides the element and effect, and the words added before it decide power and range. A system with no parallel, in which the name itself becomes the magic.",
+  "テクニック": "The magic of Phantasy Star. Adding Gi or Na to the front of names such as Foie and Barta raises the power, and adding Sa makes the all-targets version.",
+  "わざ": "In Pokémon, everything from attacks to support is called a \"move\", and there is no distinction as magic. In the original Red and Green, the type of a move decides whether it is physical or special, and the game includes the special-type moves and the support, healing, and status moves with no power as the equivalent of magic.",
+  "紋章術": "The magic of Star Ocean. Arts that spellcasters cast through the power of symbols; in The Second Story, each individual art is called a \"juumon\" (rune spell). Within the series, the term changes from game to game, as in sejutsu and juinjutsu.",
+  "バトルアビリティ（魔法）": "Octopath Traveler has no independent magic command. Within the \"battle abilities\" learned by jobs such as Scholar, Cleric, and Sorcerer, there are moves that count as magic, such as elemental attacks and healing.",
+  "エーテル": "A general term for the special powers used by the flesh-and-blood characters in Xenogears. Even for the same ether, the name differs by character: Fei's is \"kikō\", Citan's is \"hijutsu\", Chuchu's is \"jujutsu\", and Maria's is \"kisō\"."
+ },
+ "catalog": [
+  {
+   "name": "Classics",
+   "items": [
+    {
+     "name": "Dragon Quest (series)",
+     "sys": "incantations",
+     "game": "dq",
+     "gameEn": "Dragon Quest (series)"
+    },
+    {
+     "name": "Final Fantasy V",
+     "sys": "magic",
+     "game": "ff",
+     "gameEn": "Final Fantasy V"
+    },
+    {
+     "name": "Wizardry",
+     "sys": "incantations",
+     "game": "wiz",
+     "gameEn": "Wizardry"
+    },
+    {
+     "name": "Shin Megami Tensei III: Nocturne",
+     "sys": "magic",
+     "game": "smt",
+     "gameEn": "Shin Megami Tensei III: Nocturne"
+    },
+    {
+     "name": "Persona 5 Royal",
+     "sys": "skills",
+     "game": "persona",
+     "gameEn": "Persona 5 Royal"
+    }
+   ]
+  },
+  {
+   "name": "Square lineage",
+   "items": [
+    {
+     "name": "The Final Fantasy Legend (Makai Toushi SaGa)",
+     "sys": "magic",
+     "game": "saga1",
+     "gameEn": "The Final Fantasy Legend (Makai Toushi SaGa)"
+    },
+    {
+     "name": "Final Fantasy Legend II (SaGa 2)",
+     "sys": "magic",
+     "game": "saga2",
+     "gameEn": "Final Fantasy Legend II (SaGa 2)"
+    },
+    {
+     "name": "Final Fantasy Legend III (SaGa 3)",
+     "sys": "magic",
+     "game": "saga3",
+     "gameEn": "Final Fantasy Legend III (SaGa 3)"
+    },
+    {
+     "name": "Romancing SaGa",
+     "sys": "arts",
+     "game": "rsaga",
+     "gameEn": "Romancing SaGa"
+    },
+    {
+     "name": "SaGa Frontier",
+     "sys": "arts",
+     "game": "sf",
+     "gameEn": "SaGa Frontier"
+    },
+    {
+     "name": "Romancing SaGa 2",
+     "sys": "arts",
+     "game": "rsaga2",
+     "gameEn": "Romancing SaGa 2"
+    },
+    {
+     "name": "Romancing SaGa 3",
+     "sys": "arts",
+     "game": "rsaga3",
+     "gameEn": "Romancing SaGa 3"
+    },
+    {
+     "name": "SaGa Frontier 2",
+     "sys": "arts",
+     "game": "sf2",
+     "gameEn": "SaGa Frontier 2"
+    },
+    {
+     "name": "Secret of Mana",
+     "sys": "magic",
+     "game": "seiken2",
+     "gameEn": "Secret of Mana"
+    },
+    {
+     "name": "Trials of Mana",
+     "sys": "magic",
+     "game": "seiken3",
+     "gameEn": "Trials of Mana"
+    },
+    {
+     "name": "Chrono Trigger",
+     "sys": "techs (magic)",
+     "game": "chrono",
+     "gameEn": "Chrono Trigger"
+    },
+    {
+     "name": "EarthBound (Mother 2)",
+     "sys": "psychic powers (PSI)",
+     "game": "mother",
+     "gameEn": "EarthBound (Mother 2)"
+    },
+    {
+     "name": "NieR Replicant",
+     "sys": "magic",
+     "game": "nier",
+     "gameEn": "NieR Replicant"
+    }
+   ]
+  },
+  {
+   "name": "Japanese-style and classic",
+   "items": [
+    {
+     "name": "Tengai Makyō II: Manjimaru",
+     "sys": "arts",
+     "game": "tengai",
+     "gameEn": "Tengai Makyō II: Manjimaru"
+    },
+    {
+     "name": "Shin Momotarō Densetsu",
+     "sys": "arts",
+     "game": "momo",
+     "gameEn": "Shin Momotarō Densetsu"
+    },
+    {
+     "name": "ONI V: Innin o Tsugu Mono",
+     "sys": "arts",
+     "game": "oni",
+     "gameEn": "ONI V: Innin o Tsugu Mono"
+    },
+    {
+     "name": "Samsara Naga 2",
+     "sys": "mantras",
+     "game": "naga",
+     "gameEn": "Samsara Naga 2"
+    },
+    {
+     "name": "Heracles no Eikō III",
+     "sys": "magic",
+     "game": "heracles",
+     "gameEn": "Heracles no Eikō III"
+    },
+    {
+     "name": "Daikaijū Monogatari",
+     "sys": "magic",
+     "game": "daikaiju",
+     "gameEn": "Daikaijū Monogatari"
+    },
+    {
+     "name": "Ganbare Goemon Gaiden: Kieta Ōgon Kiseru",
+     "sys": "ninja arts",
+     "game": "goemon",
+     "gameEn": "Ganbare Goemon Gaiden: Kieta Ōgon Kiseru"
+    }
+   ]
+  },
+  {
+   "name": "Others",
+   "items": [
+    {
+     "name": "Breath of Fire",
+     "sys": "magic",
+     "game": "bof",
+     "gameEn": "Breath of Fire"
+    },
+    {
+     "name": "Tenchi o Kurau II: Shokatsu Kōmei Den",
+     "sys": "stratagems",
+     "game": "tenchi",
+     "gameEn": "Tenchi o Kurau II: Shokatsu Kōmei Den"
+    },
+    {
+     "name": "Metal Max",
+     "sys": "none",
+     "game": "metalmax",
+     "gameEn": "Metal Max"
+    },
+    {
+     "name": "SD Gundam Gaiden: Knight Gundam Monogatari",
+     "sys": "magic",
+     "game": "knightgundam",
+     "gameEn": "SD Gundam Gaiden: Knight Gundam Monogatari"
+    },
+    {
+     "name": "Super Mario RPG",
+     "sys": "specials",
+     "game": "smrpg",
+     "gameEn": "Super Mario RPG"
+    },
+    {
+     "name": "Tales of Phantasia",
+     "sys": "arts",
+     "game": "tales",
+     "gameEn": "Tales of Phantasia"
+    },
+    {
+     "name": "Pokémon Red & Green",
+     "sys": "moves",
+     "game": "pokemon",
+     "gameEn": "Pokémon Red & Green"
+    },
+    {
+     "name": "The Legend of Zelda: Ocarina of Time",
+     "sys": "magic",
+     "game": "zelda",
+     "gameEn": "The Legend of Zelda: Ocarina of Time"
+    },
+    {
+     "name": "Kingdom Hearts",
+     "sys": "magic",
+     "game": "kh",
+     "gameEn": "Kingdom Hearts"
+    },
+    {
+     "name": "Metaphor: ReFantazio",
+     "sys": "magic",
+     "game": "metaphor",
+     "gameEn": "Metaphor: ReFantazio"
+    },
+    {
+     "name": "The Legend of Heroes: Trails in the Sky",
+     "sys": "arts",
+     "game": "kiseki",
+     "gameEn": "The Legend of Heroes: Trails in the Sky"
+    },
+    {
+     "name": "Suikoden",
+     "sys": "runes",
+     "game": "suikoden",
+     "gameEn": "Suikoden"
+    },
+    {
+     "name": "Golden Sun",
+     "sys": "Psynergy",
+     "game": "goldensun",
+     "gameEn": "Golden Sun"
+    },
+    {
+     "name": "Treasure of the Rudras",
+     "sys": "kotodama (word spirits)",
+     "game": "rudra",
+     "gameEn": "Treasure of the Rudras"
+    },
+    {
+     "name": "Maka Maka",
+     "sys": "transformation moves",
+     "game": "makamaka",
+     "gameEn": "Maka Maka"
+    },
+    {
+     "name": "Phantasy Star II",
+     "sys": "techniques",
+     "game": "phantasystar",
+     "gameEn": "Phantasy Star II"
+    },
+    {
+     "name": "Shining Force",
+     "sys": "magic",
+     "game": "shiningforce",
+     "gameEn": "Shining Force"
+    },
+    {
+     "name": "Bravely Default",
+     "sys": "magic",
+     "game": "bravely",
+     "gameEn": "Bravely Default"
+    },
+    {
+     "name": "Star Ocean: The Second Story",
+     "sys": "symbol arts",
+     "game": "starocean",
+     "gameEn": "Star Ocean: The Second Story"
+    },
+    {
+     "name": "Wild Arms",
+     "sys": "magic",
+     "game": "wildarms",
+     "gameEn": "Wild Arms"
+    },
+    {
+     "name": "Octopath Traveler",
+     "sys": "battle abilities (magic)",
+     "game": "octopath",
+     "gameEn": "Octopath Traveler"
+    },
+    {
+     "name": "Xenogears",
+     "sys": "ether",
+     "game": "xenogears",
+     "gameEn": "Xenogears"
+    },
+    {
+     "name": "Valkyrie Profile",
+     "sys": "magic",
+     "game": "valkyrie",
+     "gameEn": "Valkyrie Profile"
+    },
+    {
+     "name": "Lunar: The Silver Star",
+     "sys": "magic",
+     "game": "lunar",
+     "gameEn": "Lunar: The Silver Star"
+    },
+    {
+     "name": "Lufia II: Rise of the Sinistrals",
+     "sys": "magic",
+     "game": "estpolis",
+     "gameEn": "Lufia II: Rise of the Sinistrals"
+    },
+    {
+     "name": "Grandia",
+     "sys": "magic",
+     "game": "grandia",
+     "gameEn": "Grandia"
+    }
+   ]
+  }
+ ],
+ "kinds": {
+  "atkup": {
+   "magic": "Raises magic power",
+   "atkdef": "Raises attack and defense"
+  },
+  "atkdown": {
+   "atkdef": "Lowers attack and defense"
+  },
+  "defdown": {
+   "magic": "Lowers magic defense"
+  },
+  "ailment": {
+   "sleep": "Puts to sleep",
+   "confuse": "Causes confusion",
+   "paralyze": "Causes paralysis",
+   "poison": "Poisons",
+   "silence": "Seals spells and magic",
+   "blind": "Causes blindness or darkness",
+   "stone": "Turns to stone",
+   "charm": "Charms",
+   "fear": "Freezes with fear",
+   "stop": "Stops time",
+   "curse": "Curses",
+   "mini": "Shrinks",
+   "toad": "Turns into a frog",
+   "old": "Ages",
+   "despair": "Causes despair",
+   "rage": "Causes rage",
+   "jewel": "Turns into a jewel",
+   "dance": "Seals dancing",
+   "slime": "Turns into slime",
+   "pig": "Turns into a pig",
+   "imp": "Turns into a kappa",
+   "zombie": "Turns into a zombie",
+   "immobilize": "Seals movement",
+   "sap": "Drains HP little by little",
+   "physical-seal": "Seals physical attacks",
+   "happy": "Causes a happy state",
+   "sick": "Causes illness or a cold",
+   "bind": "Binds so the target cannot move",
+   "unlucky": "Causes bad luck",
+   "distress": "Causes agitation",
+   "enervate": "Causes weakness"
+  },
+  "cure": {
+   "poison": "Cures poison",
+   "paralyze": "Cures paralysis",
+   "stone": "Cures petrification",
+   "silence": "Cures silence and spell sealing",
+   "all": "Cures multiple status ailments at once",
+   "sleep": "Wakes from sleep",
+   "confuse": "Cures confusion",
+   "curse": "Lifts a curse",
+   "blind": "Cures blindness and darkness",
+   "disease": "Cures illness",
+   "burn": "Cures burns",
+   "freeze": "Cures freezing",
+   "virus": "Cures a virus",
+   "sick": "Cures illness",
+   "charm": "Cures charm",
+   "rage": "Cures rage",
+   "physical-seal": "Cures skill sealing"
+  },
+  "barrier": {
+   "reflect": "Reflects magic",
+   "magic": "Reduces magic and elemental damage",
+   "element": "Grants resistance to a specific element",
+   "physical": "Reduces physical damage",
+   "damage": "Reduces damage taken",
+   "evade": "Makes it easier to dodge attacks",
+   "ailment": "Prevents status ailments",
+   "invincible": "Becomes invincible for a time",
+   "counter": "Reflects attacks back",
+   "curse": "Keeps curses and evil away",
+   "endure": "Hangs on with 1 HP",
+   "debuff": "Prevents stats from being lowered"
+  },
+  "field": {
+   "warp": "Moves to a place you have visited",
+   "escape": "Escapes from a dungeon",
+   "light": "Lights up the surroundings",
+   "repel": "Keeps enemies away",
+   "map": "Shows your current location or the map",
+   "detect": "Reveals traps and treasure",
+   "battle-escape": "Flees from battle",
+   "travel": "Travels between worlds and eras",
+   "lure": "Draws enemies in",
+   "floor": "Protects against damage floors",
+   "preemptive": "Makes a preemptive strike more likely",
+   "mark": "Places a marker",
+   "hazard": "Protects against harm from terrain and weather",
+   "speed": "Speeds up movement",
+   "daynight": "Switches day and night",
+   "unlock": "Unlocks a door",
+   "invisible": "Becomes invisible",
+   "move-object": "Moves or takes objects",
+   "mind-read": "Reads people's minds",
+   "halt": "Stops people or objects from moving",
+   "reset": "Resets a mechanism"
+  },
+  "misc": {
+   "mp-drain": "Drains MP",
+   "hp-drain": "Drains HP",
+   "mp-transfer": "Shares MP",
+   "stat-transfer": "Transfers stats",
+   "hp-mp-swap": "Swaps HP and MP",
+   "dispel": "Cancels effects",
+   "dispel-formation": "Breaks up a formation",
+   "transform": "Transforms",
+   "clone": "Creates a double",
+   "scan": "Checks information about a target",
+   "identify": "Identifies items",
+   "quick": "Acts in succession",
+   "multi-attack": "Lets a character act again",
+   "time-stop": "Stops time to act",
+   "position": "Swaps positions",
+   "stat-up": "Raises stats",
+   "stat-down": "Lowers stats",
+   "int-up": "Raises intelligence",
+   "luck-up": "Raises luck",
+   "sp-down": "Lowers morale",
+   "half": "Halves HP",
+   "level-up": "Raises level",
+   "weapon": "Creates a magic weapon",
+   "random": "Anything could happen",
+   "self-destruct": "Sacrifices itself",
+   "miracle": "Performs a miracle",
+   "summon": "Summons",
+   "weather": "Changes the weather",
+   "magic-accuracy-up": "Raises the accuracy of arts",
+   "accuracy-down": "Lowers accuracy",
+   "duration-up": "Extends how long effects last",
+   "luck-down": "Lowers luck",
+   "int-down": "Lowers intelligence",
+   "hp-equalize": "Evens out HP",
+   "battle-speed": "Speeds up the pace of battle",
+   "rewind": "Redoes the battle",
+   "level-down": "Lowers level",
+   "mp-down": "Reduces MP",
+   "enchant": "Adds an element to a weapon",
+   "terrain": "Changes the terrain or the nature of the battlefield",
+   "debuff-heal": "Cancels weakening effects",
+   "duel": "Forces a one-on-one duel",
+   "battle-reset": "Erases the battle as if it never happened",
+   "item-create": "Creates items",
+   "gag": "Has no particular effect",
+   "ailment-vuln": "Makes the target more prone to status ailments",
+   "resist-down": "Cancels elemental resistance",
+   "fortune": "Foretells the outcome of the battle",
+   "knockback": "Blows enemies away",
+   "move-down": "Lowers movement range",
+   "mp-heal": "Restores MP",
+   "tech-gauge": "Fills the special-move gauge",
+   "near-death": "Reduces HP to near death",
+   "status-swap": "Swaps statuses",
+   "limit-up": "Makes special moves easier to trigger",
+   "multicast": "Casts spells in succession",
+   "decoy": "Draws attacks as a decoy",
+   "reverse": "Reverses healing and damage",
+   "atb-reset": "Resets the ATB gauge",
+   "crit-up": "Raises critical hit rate",
+   "move-up": "Raises movement range",
+   "accuracy-up": "Makes attacks always hit",
+   "banish": "Drives enemies out of battle",
+   "copy": "Mimics the opponent's move",
+   "type-change": "Changes the type",
+   "evade-down": "Lowers evasion",
+   "spread": "Spreads the effect to all targets",
+   "bp": "Adds or gives BP"
+  }
+ },
+ "basis": {
+  "dq": {
+   "basis": "Covers the series by numbered titles (differences between games are given in each spell's note). Names follow the Japanese version.",
+   "releaseNote": "Release date of the series' first game, Dragon Quest."
+  },
+  "dq1": {
+   "basis": "Famicom version (1986). Differences from remakes such as the SFC and GB versions are given in the notes."
+  },
+  "dq2": {
+   "basis": "Famicom version (1987). Differences from remakes such as the SFC, GB, and smartphone versions are given in the notes."
+  },
+  "dq3": {
+   "basis": "Famicom version (1988). Differences from remakes such as the SFC, GBC, and HD-2D versions are given in the notes."
+  },
+  "dq4": {
+   "basis": "Famicom version (1990). Differences from remakes such as the PS, DS, and smartphone versions are given in the notes."
+  },
+  "dq5": {
+   "basis": "Super Famicom version (1992). Differences from remakes such as the PS2, DS, and smartphone versions are given in the notes."
+  },
+  "dq6": {
+   "basis": "Names and data from the Super Famicom version (1995)."
+  },
+  "dq7": {
+   "basis": "Names and data from the PlayStation version (2000)."
+  },
+  "dq8": {
+   "basis": "Names and data from the PlayStation 2 version (2004)."
+  },
+  "dq9": {
+   "basis": "Names and data from the Nintendo DS version (2009)."
+  },
+  "dq10": {
+   "basis": "Names and data from the online version (2012 onward, sources as of Ver. 7). Only representative spells are included."
+  },
+  "ff": {
+   "basis": "Based on the Japanese names in the Super Famicom version (1992). Numbers and specifications may differ in versions such as the Pixel Remaster."
+  },
+  "ff1": {
+   "basis": "Names from the Famicom version (1987)."
+  },
+  "ff2": {
+   "basis": "Names from the Famicom version (1988)."
+  },
+  "ff3": {
+   "basis": "Names from the Famicom version (1990)."
+  },
+  "ff4": {
+   "basis": "Names from the Super Famicom version (1991)."
+  },
+  "ff6": {
+   "basis": "Japanese names from the Super Famicom version (1994)."
+  },
+  "ff7": {
+   "basis": "Japanese names from the PlayStation version (1997)."
+  },
+  "ff8": {
+   "basis": "Japanese names from the PlayStation version (1999)."
+  },
+  "ff9": {
+   "basis": "Japanese names from the PlayStation version (2000)."
+  },
+  "ff10": {
+   "basis": "Japanese names from the PS2 version (2001). Differences from the International version (2002) are given in each spell's note."
+  },
+  "ff11": {
+   "basis": "Japanese names from the online RPG (2002 onward, the current service version). Because this MMO has a very large number of spells, only 38 representative spells from White Magic, Black Magic, and Summoning Magic are included. MP costs may change with updates."
+  },
+  "ff12": {
+   "basis": "Japanese names from the PS2 version (2006). Differences in categories and names in The Zodiac Age (2017) are given in each spell's note."
+  },
+  "ff13": {
+   "basis": "Japanese names from the PS3 version (2009). Includes the magic-type command abilities for each role, the magic-type TP abilities, and the Eidolons."
+  },
+  "ff14": {
+   "basis": "Japanese names from the online RPG (A Realm Reborn, 2013 onward, as of patch 7.x \"Golden Legacy\"). Because this MMO has a very large number of actions, only 38 representative spells of the White Mage, Black Mage, Summoner, and Red Mage are included. MP costs are the values in the official job guide and may change with patches.",
+   "releaseNote": "The version rebuilt as A Realm Reborn officially launched on August 27, 2013 on Windows and PlayStation 3."
+  },
+  "smt": {
+   "basis": "Japanese names from Shin Megami Tensei III: Nocturne (PS2, 2003) and its HD Remaster."
+  },
+  "smt1": {
+   "basis": "Japanese names from the Super Famicom version (1992). Spells whose MP costs appear to differ in versions such as the PS and GBA versions are noted in each spell's note."
+  },
+  "smt2": {
+   "basis": "Japanese names from the Super Famicom version (1994)."
+  },
+  "smt4": {
+   "basis": "Japanese names from the Nintendo 3DS version (2013). Differences in IV Final (2016) are given in the notes and systems."
+  },
+  "smt5": {
+   "basis": "Japanese names from the Nintendo Switch version (2021, the original). Differences in V: Vengeance (2024) are given in the notes and systems."
+  },
+  "persona": {
+   "basis": "Japanese names from Persona 5 Royal (2019). Mainly includes what is shared with Persona 5 (2016).",
+   "releaseNote": "The original Persona 5 was released on September 15, 2016 for PlayStation 3 and PlayStation 4."
+  },
+  "persona1": {
+   "basis": "Names from the PlayStation version of Megami Ibunroku Persona (1996)."
+  },
+  "persona2": {
+   "basis": "Names from the PlayStation version of Persona 2: Innocent Sin (1999). Spells added in Persona 2: Eternal Punishment (2000) are given in the overview."
+  },
+  "persona3": {
+   "basis": "Names from the PlayStation 2 version of Persona 3 (2006). Differences in FES (2007), Portable (2009), and Reload (2024) are given in the notes."
+  },
+  "persona4": {
+   "basis": "Names from the PlayStation 2 version of Persona 4 (2008). Differences in The Golden (2012) are given in the notes."
+  },
+  "mother": {
+   "basis": "Names from the Super Famicom version of MOTHER 2: Giygas Strikes Back (1994). The existing PSI (PK Faiā α to Ω, PK Sandā α and β, and so on) also match MOTHER 2's names, so this was used as the basis."
+  },
+  "metaphor": {
+   "basis": "Japanese names from Metaphor: ReFantazio (2024)."
+  },
+  "saga1": {
+   "basis": "Names from the Game Boy version (1989)."
+  },
+  "saga2": {
+   "basis": "Names from the Game Boy version (1990)."
+  },
+  "saga3": {
+   "basis": "Names from the Game Boy version (1991)."
+  },
+  "rsaga": {
+   "basis": "Names from the Super Famicom version (1992)."
+  },
+  "sf": {
+   "basis": "Art names from the PlayStation version (1997). Some sources are from the remaster (2021)."
+  },
+  "rsaga2": {
+   "basis": "Names from the Super Famicom version (1993)."
+  },
+  "rsaga3": {
+   "basis": "Names from the Super Famicom version (1995)."
+  },
+  "sf2": {
+   "basis": "Arts from the PlayStation version (1999). Arts added in the remaster (2025) are excluded."
+  },
+  "chrono": {
+   "basis": "Based on the Japanese names in the Super Famicom version (1995). Includes only the single techs for magic marked with a star in the tech list."
+  },
+  "wiz": {
+   "basis": "Based on the spell names in the Japanese version (Famicom version) of #1, Proving Grounds of the Mad Overlord.",
+   "releaseNote": "The first release in Japan was the PC-9801 version on November 15, 1985 (the release months of other platforms differ slightly depending on the source). The Famicom version was released on December 22, 1987."
+  },
+  "bof": {
+   "basis": "Names from the Super Famicom version (1993, Capcom)."
+  },
+  "bof2": {
+   "basis": "Names from the Super Famicom version (1994, Capcom)."
+  },
+  "bof3": {
+   "basis": "Names from the PlayStation version (1997, Capcom)."
+  },
+  "bof4": {
+   "basis": "Names from the PlayStation version (2000, Capcom)."
+  },
+  "bof5": {
+   "basis": "Names from the PlayStation 2 version (2002, Capcom)."
+  },
+  "tengai": {
+   "basis": "Names from the PC Engine Super CD-ROM² version (1992, Hudson)."
+  },
+  "momo": {
+   "basis": "Names from the Super Famicom version (1993, Hudson)."
+  },
+  "heracles": {
+   "basis": "Names from the Super Famicom version of Heracles no Eikō III: Kamigami no Chinmoku (1992, Data East)."
+  },
+  "daikaiju": {
+   "basis": "Names from the Super Famicom version (1994, Hudson)."
+  },
+  "naga": {
+   "basis": "Names from the Super Famicom version (1994, Victor Entertainment)."
+  },
+  "oni": {
+   "basis": "Names from the Game Boy version (1995, Banpresto)."
+  },
+  "zelda": {
+   "basis": "Includes only the three spells of the Great Fairies from The Legend of Zelda: Ocarina of Time (N64, 1998)."
+  },
+  "smrpg": {
+   "basis": "The Super Famicom version (1996) and the Nintendo Switch version (2023).",
+   "releaseNote": "The Nintendo Switch version (a remake) was released worldwide simultaneously on November 17, 2023."
+  },
+  "metalmax": {
+   "basis": "The Famicom version of Metal Max (1991) and the series' basic design."
+  },
+  "tenchi": {
+   "basis": "Names from the Famicom version of Tenchi o Kurau II: Shokatsu Kōmei Den (1991, Capcom)."
+  },
+  "knightgundam": {
+   "basis": "Names from the Famicom version (1990, Bandai)."
+  },
+  "knightgundam2": {
+   "basis": "Names from the Famicom version (1991, Bandai)."
+  },
+  "knightgundam3": {
+   "basis": "Names from the Super Famicom version (1991, Angel)."
+  },
+  "knightgundam4": {
+   "basis": "Names from the Famicom version (1992, Bandai)."
+  },
+  "knightgundam5": {
+   "basis": "Names from the Super Famicom version (1992, Yutaka)."
+  },
+  "goemon": {
+   "basis": "Names from the Famicom version (1990, Konami)."
+  },
+  "kh": {
+   "basis": "Based on the Japanese names in the first game on PS2 (2002). Differences in performance in Final Mix are given in the notes."
+  },
+  "nier": {
+   "basis": "The eight spells that Nier uses after making a pact with the White Book in NieR Replicant ver.1.22474487139... (2021), with their names.",
+   "releaseNote": "On the same day, NieR Gestalt, with a different protagonist and other changes, was released on Xbox 360."
+  },
+  "seiken2": {
+   "basis": "Names from the Super Famicom version (1993, Square). MP costs were confirmed with sources that are also consistent with the remake (2018)."
+  },
+  "seiken3": {
+   "basis": "Names from the Super Famicom version (1995, Square). The remake, Trials of Mana (2020), is not included because its learned spells and performance differ."
+  },
+  "makamaka": {
+   "basis": "Names from the Super Famicom version of Maka Maka (1992, Sigma). Move names, TP costs, and learning levels are based mainly on the list of transformation moves at GAME CENTER GX."
+  },
+  "tales": {
+   "basis": "The PlayStation version (1998) of the series' first game, Tales of Phantasia, is included as the representative of the series. Its arts are clearly divided into three families, sorcery (Arche), healing arts (Mint), and summoning arts (Klarth), and it is the starting point of art names such as Fire Ball, Heal, and Nurse that were used in later games. The PS version is a rebuild of the original SFC version (1995) and is the basis for ports such as the GBA and PSP versions. Differences from the SFC version are given in each art's note."
+  },
+  "kiseki": {
+   "basis": "Names from the PSP version of The Legend of Heroes: Trails in the Sky FC (2006, Nihon Falcom; the original was the Windows version in 2004). Art names, EP, and effects were cross-checked against two walkthrough sources for the PSP version and the art list of the original FC (Kiseki Wiki). The remake, Trails in the Sky the 1st (2025), is not included.",
+   "releaseNote": "At release, the title was The Legend of Heroes VI: Sora no Kiseki. After the release of the sequel SC, it was renamed The Legend of Heroes: Sora no Kiseki FC."
+  },
+  "suikoden": {
+   "basis": "The PlayStation version (1995, Konami). Spell names prioritize the PS version's names; for those whose PS-version names could not be confirmed, the names in sources based on the HD Remaster (2025) were used (noted in each spell's note)."
+  },
+  "goldensun": {
+   "basis": "Names from the Game Boy Advance version (2001, Nintendo/Camelot). Energy names and EP costs were cross-checked against a list at RRPG that mirrors the other sources, and the Ninja, Samurai, and puzzle-solving ones were also confirmed in the English-language Golden Sun Universe."
+  },
+  "rudra": {
+   "basis": "Names from the Super Famicom version (1996, Square). Because kotodama can be made freely, only the base word and rank for each element, the representative support kotodama listed in sources, and examples of strengthening are included."
+  },
+  "phantasystar": {
+   "basis": "The Mega Drive version (1989). It was chosen as the representative game because it is the first in the series to have the \"techniques\", names such as Foie, Zan, and Resta, and tiers by the prefixes Gi, Na, and Sa all together, and because it can be cross-checked against both Japanese walkthroughs (technique list, learning levels) and overseas per-character sources. The remake in PS2's Sega Ages 2500 Phantasy Star Generation:2 is excluded."
+  },
+  "shiningforce": {
+   "basis": "Names from the Mega Drive version (1992, Sega/Climax Entertainment/Sonic). Spell names, MP costs, ranges, and learners were cross-checked against the lists at RRPG, Uji's Room, Izuito (Mega Drive walkthrough), and Kōryaku 1. The Game Boy Advance remake (2004) is not included because its spell lineup differs."
+  },
+  "pokemon": {
+   "basis": "Pokémon Red and Green (Game Boy, 1996, the first generation). Move names, PP, and effects are those of the first generation. Points that changed in later games are given in the notes."
+  },
+  "bravely": {
+   "basis": "Japanese names from the Nintendo 3DS version of Bravely Default: Flying Fairy (2012). Spell names, levels, and effects were cross-checked against lists at Altima and Game8. MP costs are values from walkthrough sources for the English version (Bravely Default, North America and Europe), and for Lv1 spells only, they were also confirmed to match a Japanese trial-version article."
+  },
+  "starocean": {
+   "basis": "The PlayStation version (1998). It is the most famous game in the series; the four spellcasters (Rena, Celine, Leon, and Noel) each learn symbol spells in their specialty areas, and with healing, support, and attacks of 10 elements all present, the symbol-art system is easiest to see in it. It was chosen as the representative game because names, MP costs, and learning levels can be cross-checked against a Japanese per-character learning table (ui-nap) and a North American symbol-spell list (RPGClassics). Names, elements, and learning that changed in the PSP version, Second Evolution (2008), are given in each spell's note."
+  },
+  "wildarms": {
+   "basis": "The PlayStation version (1996). Spell names, MP costs, and ranges were cross-checked against the lists at RRPG, Kōryaku-dō, and Kōryaku 1. Guardians were cross-checked against the power plate tables at RRPG and Kōryaku-dō and a terminology wiki."
+  },
+  "octopath": {
+   "basis": "Names from the Nintendo Switch version (2018, Square Enix). Ability names, SP costs, and effects were cross-checked against Kamige Kōryaku and Game Ranbu (Japanese) and Gamer Guides (English version)."
+  },
+  "xenogears": {
+   "basis": "The PlayStation version (1998, Square). Names, EP costs, and ranges of the special abilities (ether) used by the flesh-and-blood characters were cross-checked against the per-character learned-moves pages, a learned-skills page, the Game Nandemo Database, and Stateless Zone, and for Fei, Elly, and Citan also against EXCEED THE LIMIT!!"
+  },
+  "valkyrie": {
+   "basis": "The PlayStation version (1999). The game content is said to be the same in the PSP version, Lenneth, and later, and the spell names match sources for the PSP version as well."
+  },
+  "lunar": {
+   "basis": "The Mega CD version (1992, Game Arts). Spell names, learning, and MP costs follow RRPG (its Mega CD version walkthrough pages), and order, MP costs, targets, and effects were cross-checked against the North American Sega CD English chart (oocities) and Almar's Guides. Differences from the remakes (Silver Star Story on SS and PS) are given in the notes."
+  },
+  "estpolis": {
+   "basis": "The Super Famicom version (1995, Taito)."
+  },
+  "grandia": {
+   "basis": "Based on the PlayStation version (1999). The main Japanese source (chulip.org) is an article on the PS version. Differences in spells from the Sega Saturn version (1997) could not be confirmed in the sources. The kinds of spells and required skills mostly match English-language sources (Almar's Guides, North American PS version) as well."
+  }
+ },
+ "shopLabels": {
+  "ドラゴンクエストシリーズ": "Dragon Quest (series)",
+  "ドラゴンクエストI&II（HD-2D版）": "Dragon Quest I & II HD-2D Remake",
+  "ドラゴンクエストIII そして伝説へ…（HD-2D版）": "Dragon Quest III HD-2D Remake",
+  "ドラゴンクエストIV 導かれし者たち": "Dragon Quest IV: Chapters of the Chosen",
+  "ドラゴンクエストV 天空の花嫁": "Dragon Quest V: Hand of the Heavenly Bride",
+  "ドラゴンクエストVI 幻の大地": "Dragon Quest VI: Realms of Revelation",
+  "ドラゴンクエストVII Reimagined": "Dragon Quest VII Reimagined",
+  "ドラゴンクエストVIII 空と海と大地と呪われし姫君": "Dragon Quest VIII: Journey of the Cursed King",
+  "ドラゴンクエストIX 星空の守り人": "Dragon Quest IX: Sentinels of the Starry Skies",
+  "ドラゴンクエストX オンライン": "Dragon Quest X Online",
+  "ファイナルファンタジー I-VI ピクセルリマスター": "Final Fantasy I-VI Pixel Remaster",
+  "ファイナルファンタジーVII": "Final Fantasy VII",
+  "ファイナルファンタジーVIII リマスタード": "Final Fantasy VIII Remastered",
+  "ファイナルファンタジーIX": "Final Fantasy IX",
+  "ファイナルファンタジーX/X-2 HD リマスター": "Final Fantasy X/X-2 HD Remaster",
+  "ファイナルファンタジーXI": "Final Fantasy XI",
+  "ファイナルファンタジーXII ザ ゾディアック エイジ": "Final Fantasy XII: The Zodiac Age",
+  "ファイナルファンタジーXIII": "Final Fantasy XIII",
+  "ファイナルファンタジーXIV": "Final Fantasy XIV",
+  "真・女神転生III NOCTURNE HD REMASTER": "Shin Megami Tensei III: Nocturne HD Remaster",
+  "真・女神転生": "Shin Megami Tensei",
+  "真・女神転生II": "Shin Megami Tensei II",
+  "真・女神転生IV": "Shin Megami Tensei IV",
+  "真・女神転生V Vengeance": "Shin Megami Tensei V: Vengeance",
+  "ペルソナ5 ザ・ロイヤル": "Persona 5 Royal",
+  "女神異聞録ペルソナ": "Revelations: Persona",
+  "ペルソナ2 罪": "Persona 2: Innocent Sin",
+  "ペルソナ3 リロード（2024年・PS4版）": "Persona 3 Reload (2024, PS4 version)",
+  "ペルソナ4 ザ・ゴールデン": "Persona 4 Golden",
+  "MOTHER2 ギーグの逆襲": "MOTHER 2: Giygas Strikes Back",
+  "メタファー：リファンタジオ": "Metaphor: ReFantazio",
+  "COLLECTION of SaGa FINAL FANTASY LEGEND": "Collection of SaGa: Final Fantasy Legend",
+  "ロマンシング サガ -ミンストレルソング- リマスター": "Romancing SaGa: Minstrel Song Remastered",
+  "サガ フロンティア リマスター": "SaGa Frontier Remastered",
+  "ロマンシング サガ2 リベンジオブザセブン": "Romancing SaGa 2: Revenge of the Seven",
+  "ロマンシング サガ3": "Romancing SaGa 3",
+  "サガ フロンティア2 リマスター": "SaGa Frontier 2 Remastered",
+  "クロノ・トリガー": "Chrono Trigger",
+  "ウィザードリィ": "Wizardry",
+  "ブレス オブ ファイア 竜の戦士": "Breath of Fire",
+  "ブレス オブ ファイアII 使命の子": "Breath of Fire II",
+  "ブレス オブ ファイアIII": "Breath of Fire III",
+  "ブレス オブ ファイアIV うつろわざるもの": "Breath of Fire IV",
+  "ブレス オブ ファイアV ドラゴンクォーター": "Breath of Fire: Dragon Quarter",
+  "天外魔境II 卍MARU": "Tengai Makyō II: Manjimaru",
+  "新桃太郎伝説": "Shin Momotarō Densetsu",
+  "ヘラクレスの栄光III 神々の沈黙": "Heracles no Eikō III: Kamigami no Chinmoku",
+  "大貝獣物語": "Daikaijū Monogatari",
+  "サンサーラ・ナーガ2": "Samsara Naga 2",
+  "ONI V 隠忍を継ぐ者": "ONI V: Innin o Tsugu Mono",
+  "ゼルダの伝説 時のオカリナ": "The Legend of Zelda: Ocarina of Time",
+  "スーパーマリオRPG": "Super Mario RPG",
+  "メタルマックス": "Metal Max",
+  "天地を喰らうII 諸葛孔明伝": "Tenchi o Kurau II: Shokatsu Kōmei Den",
+  "SDガンダム外伝 ナイトガンダム物語": "SD Gundam Gaiden: Knight Gundam Monogatari",
+  "SDガンダム外伝 ナイトガンダム物語2 光の騎士": "SD Gundam Gaiden: Knight Gundam Monogatari 2: Hikari no Kishi",
+  "SDガンダム外伝 ナイトガンダム物語 大いなる遺産": "SD Gundam Gaiden: Knight Gundam Monogatari: Ōinaru Isan",
+  "SDガンダム外伝 ナイトガンダム物語3 伝説の騎士団": "SD Gundam Gaiden: Knight Gundam Monogatari 3: Densetsu no Kishidan",
+  "SDガンダム外伝2 円卓の騎士": "SD Gundam Gaiden 2: Entaku no Kishi",
+  "がんばれゴエモン外伝 きえた黄金キセル": "Ganbare Goemon Gaiden: Kieta Ōgon Kiseru",
+  "キングダム ハーツ HD 1.5+2.5 リミックス": "Kingdom Hearts HD 1.5+2.5 ReMIX",
+  "ニーア レプリカント ver.1.22474487139...": "NieR Replicant ver.1.22474487139...",
+  "聖剣伝説2 シークレット オブ マナ": "Secret of Mana",
+  "聖剣伝説3 トライアルズ オブ マナ": "Trials of Mana",
+  "摩訶摩訶": "Maka Maka",
+  "テイルズ オブ ファンタジア": "Tales of Phantasia",
+  "英雄伝説 空の軌跡 the 1st": "The Legend of Heroes: Trails in the Sky the 1st",
+  "幻想水滸伝 I&II HDリマスター": "Suikoden I & II HD Remaster",
+  "黄金の太陽 開かれし封印": "Golden Sun",
+  "ルドラの秘宝": "Treasure of the Rudras",
+  "ファンタシースターII 還らざる時の終わりに": "Phantasy Star II",
+  "シャイニング・フォース 神々の遺産": "Shining Force",
+  "ポケットモンスター 赤・緑": "Pokémon Red & Green",
+  "ブレイブリーデフォルト フライングフェアリー HD リマスター": "Bravely Default: Flying Fairy HD Remaster",
+  "スターオーシャン セカンドストーリー R": "Star Ocean: The Second Story R",
+  "ワイルドアームズ": "Wild Arms",
+  "オクトパストラベラー": "Octopath Traveler",
+  "ゼノギアス": "Xenogears",
+  "ヴァルキリープロファイル": "Valkyrie Profile",
+  "LUNAR リマスターコレクション": "Lunar Remastered Collection",
+  "エストポリス伝記II": "Lufia II: Rise of the Sinistrals",
+  "グランディア": "Grandia"
+ }
+}

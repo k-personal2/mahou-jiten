@@ -3,16 +3,23 @@ import '../styles/global.css';
 import Search from '../components/Search.astro';
 import { statsText } from '../lib/dict';
 import { statsTextEn } from '../lib/en';
+import { enPath, jaPath } from '../lib/i18n';
 /**
  * crumbs: 画面のパンくずと同じ並び（BreadcrumbList の構造化データに使う）/ jsonld: ページ固有の構造化データ
- * lang: 'en' は英語版トップ（/en）だけ。alternates: 日本語版と英語版の対（hreflang とヘッダーの言語切替に使う）
+ * lang: 'en' は英語版（/en/ 以下）。path から日本語版と英語版の対を作り、hreflang とヘッダーの言語切替に使う
  */
 interface Props {
   title: string; description?: string; active?: 'home' | 'compare' | 'games' | 'names' | 'blueprint' | 'about'; path?: string; hideSearch?: boolean;
   crumbs?: { name: string; path: string }[]; jsonld?: Record<string, unknown>[]; noindex?: boolean;
-  lang?: 'ja' | 'en'; alternates?: { ja: string; en: string };
+  /** false：相手の言語のページが noindex なので hreflang を出さない（言語切替のリンクは出す） */
+  hreflang?: boolean;
+  lang?: 'ja' | 'en';
 }
-const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false, lang = 'ja', alternates } = Astro.props;
+const { title, description = 'あのゲームの「あの魔法」、別のRPGでは何て呼ぶ？ 同じ役割の魔法を作品横断で比較する辞典。', active, path, hideSearch = false, crumbs, jsonld = [], noindex = false, lang = 'ja', hreflang = true } = Astro.props;
+// 日本語版と英語版の対（hreflang とヘッダーの言語切替）。すべてのページに英語版がある
+const alternates = path ? { ja: jaPath(path), en: enPath(jaPath(path)) } : undefined;
+// hreflang は、両方の言語のページが検索に出るときだけ（noindex のページを指さない）
+const pairIndexed = alternates && !noindex && hreflang;
 const en = lang === 'en';
 const siteName = en ? 'RPG Spell Name Thesaurus' : 'RPG魔法辞典';
 const canonical = path && Astro.site ? new URL(path, Astro.site).href : undefined;
@@ -29,9 +36,10 @@ const ld = [
 const FONT_CSS = 'https://fonts.googleapis.com/css2?family=DotGothic16&family=IBM+Plex+Mono&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Shippori+Mincho+B1:wght@700;800&display=swap';
 const nav = en ? [
   { key: 'home', label: 'Home', href: '/en' },
-  { key: 'compare', label: 'Compare', href: '/element/fire' },
-  { key: 'games', label: 'Games', href: '/game' },
-  { key: 'names', label: 'What they call magic', href: '/names' },
+  { key: 'compare', label: 'Compare', href: '/en/element/fire' },
+  { key: 'games', label: 'Games', href: '/en/game' },
+  { key: 'names', label: 'What they call magic', href: '/en/names' },
+  { key: 'blueprint', label: 'Spell tiers', href: '/en/blueprint/tier' },
 ] : [
   { key: 'home', label: 'トップ', href: '/' },
   { key: 'compare', label: '横断比較', href: '/element/fire' },
@@ -42,8 +50,8 @@ const nav = en ? [
 // スマホの下部タブ（グローバルナビの代わり）。1字の印は明朝
 const tabs = en ? [
   { key: 'home', label: 'Home', glyph: '辞', href: '/en' },
-  { key: 'compare', label: 'Compare', glyph: '較', href: '/element/fire' },
-  { key: 'games', label: 'Games', glyph: '作', href: '/game' },
+  { key: 'compare', label: 'Compare', glyph: '較', href: '/en/element/fire' },
+  { key: 'games', label: 'Games', glyph: '作', href: '/en/game' },
 ] : [
   { key: 'home', label: 'トップ', glyph: '辞', href: '/' },
   { key: 'compare', label: '比較', glyph: '較', href: '/element/fire' },
@@ -64,7 +72,7 @@ const tabs = en ? [
     <meta name="theme-color" content="#f7f6f2" />
     <meta name="google-site-verification" content="xtgTp9GaqCZJbzQf_eNLFUsGESCEf6iWNv42d084ivY" />
     {canonical && <link rel="canonical" href={canonical} />}
-    {alternates && <>
+    {pairIndexed && <>
       <link rel="alternate" hreflang="ja" href={abs(alternates.ja)} />
       <link rel="alternate" hreflang="en" href={abs(alternates.en)} />
       <link rel="alternate" hreflang="x-default" href={abs(alternates.ja)} />
@@ -99,9 +107,9 @@ const tabs = en ? [
       <div class="wrap hdr-in">
         <a class="logo" href={en ? '/en' : '/'}><span class="seal" aria-hidden="true">魔</span><span>{siteName}</span></a>
         <div class="hdr-sp"></div>
-        {!hideSearch && <Search />}
+        {!hideSearch && <Search en={en} />}
         <nav class="gnav" aria-label={en ? 'Main' : 'メイン'}>
-          {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} hreflang={en && n.key !== 'home' ? 'ja' : undefined}>{n.label}</a>)}
+          {nav.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} >{n.label}</a>)}
           <a href="#" data-random>{en ? 'Random' : 'ランダム'}</a>
         </nav>
         {alternates && (en
@@ -121,10 +129,10 @@ const tabs = en ? [
         <span>An unofficial fan site run by one person</span>
         <span>As an Amazon Associate, this site earns from qualifying purchases.</span>
         <nav class="ftr-nav" aria-label="Site">
-          <a href="/about" hreflang="ja">About this site and its data (Japanese)</a>
-          <a href="/names" hreflang="ja">What they call magic</a>
-          <a href="/blueprint/tier" hreflang="ja">How spells are tiered</a>
-          <a href="/" hreflang="ja" lang="ja">日本語</a>
+          <a href="/en/about" aria-current={active === 'about' ? 'page' : undefined}>About this site and its data</a>
+          <a href="/en/names">What they call magic</a>
+          <a href="/en/blueprint/tier">How spells are tiered</a>
+          {alternates && <a href={alternates.ja} hreflang="ja" lang="ja">日本語</a>}
         </nav>
       </div>
       ) : (
@@ -138,13 +146,13 @@ const tabs = en ? [
           <a href="/about" aria-current={active === 'about' ? 'page' : undefined}>このサイトについて・データの集め方</a>
           <a href="/names">魔法の呼び方</a>
           <a href="/blueprint/tier">段階の付け方</a>
-          <a href="/en" hreflang="en" lang="en">English</a>
+          {alternates && <a href={alternates.en} hreflang="en" lang="en">English</a>}
         </nav>
       </div>
       )}
     </footer>
     <nav class="tabbar" aria-label={en ? 'Main (bottom bar)' : 'メイン（画面下）'}>
-      {tabs.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} hreflang={en && n.key !== 'home' ? 'ja' : undefined}><b aria-hidden="true">{n.glyph}</b>{n.label}</a>)}
+      {tabs.map((n) => <a href={n.href} aria-current={active === n.key ? 'page' : undefined} ><b aria-hidden="true">{n.glyph}</b>{n.label}</a>)}
       <a href="#" data-random><b aria-hidden="true">運</b>{en ? 'Random' : 'ランダム'}</a>
     </nav>
 

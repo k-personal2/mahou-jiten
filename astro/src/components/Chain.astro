@@ -1,17 +1,17 @@
 ---
 /** 系譜を箱の列で。変わる部分（共通の接頭・接尾を除いた部分）を青で。sep は段階順でない並び（／）に使う */
 import type { ChainLine } from '../lib/dict';
-interface Props { lines: ChainLine[]; sep?: string; class?: string; lang?: string }
-const { lines, sep = '→', class: cls, lang } = Astro.props;
+interface Props { lines: ChainLine[]; sep?: string; class?: string }
+const { lines, sep = '→', class: cls } = Astro.props;
 ---
-<div class:list={['chain-lines', cls]} lang={lang}>
+<div class:list={['chain-lines', cls]}>
   {lines.map((ln) => (
     <div class="chain-line">
       {ln.showLabel && <span class="lbl chain-lbl">{ln.label}</span>}
       {ln.items.map((it, i) => (
         <>
           {i > 0 && <span class="chain-arrow" aria-hidden="true">{sep}</span>}
-          <a class:list={['chain-item min', { 'is-cur': it.cur }]} href={it.href} aria-current={it.cur ? 'page' : undefined} hreflang={lang ? 'ja' : undefined}>
+          <a class:list={['chain-item min', { 'is-cur': it.cur }]} href={it.href} aria-current={it.cur ? 'page' : undefined}>
             {it.a}<span class:list={{ hl: it.hl }}>{it.b}</span>{it.c}
           </a>
         </>
