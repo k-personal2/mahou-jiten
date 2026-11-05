@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Chapter from './Chapter.astro';
 import FilterBar from './FilterBar.astro';
-import { EL, FX, SYSTEMS, elById, fxById, compareRows, firstNames, rowsTotal, tone, markStyle } from '../lib/dict';
+import { EL, FX, SYSTEMS, elById, fxById, compareRows, firstNames, rowsTotal, tone, markStyle, searchTitleOf } from '../lib/dict';
 import { L, type Lang } from '../lib/i18n';
 interface Props { el: string | null; fx: string; lang?: Lang }
 const { el, fx, lang = 'ja' } = Astro.props;
@@ -43,17 +43,17 @@ const sample = (e: string | null, f: string) => firstNames(compareRows(e, f)).sl
 const related = (el
   ? [...EL.filter((e) => e.id !== 'none'), ...EL.filter((e) => e.id !== 'none')].slice(EL.findIndex((e) => e.id === el) + 1).slice(0, 2).map((e) => ({ e: e.id as string | null, f: 'atk' })).concat(fx === 'heal' ? [] : [{ e: null, f: 'heal' }])
   : [...FX, ...FX].slice(FX.findIndex((f) => f.id === fx) + 1).filter((f) => f.id !== 'atk').slice(0, 3).map((f) => ({ e: null as string | null, f: f.id }))
-).map(({ e, f }) => ({ title: en ? `${t.title(e, f)} compared` : `${t.title(e, f)}の言い換え一覧`, href: t.compare(e, f), ex: sample(e, f) })).filter((x) => x.ex);
+).map(({ e, f }) => ({ title: en ? `${t.title(e, f)} compared` : `${searchTitleOf(e, f)}の名前一覧`, href: t.compare(e, f), ex: sample(e, f) })).filter((x) => x.ex);
 
 const what = en
   ? (E ? `${E.id === 'none' ? 'Non-elemental' : t.el(E)} ${fx === 'atk' ? 'attack' : t.fx(F).toLowerCase()} spells` : `${t.fx(F)} spells`)
   : E ? `${E.id === 'none' ? '無属性' : E.name}の${F.name}魔法` : `${F.name}魔法`;
 const pageTitle = en
   ? `${title} in ${nGames} RPGs: ${names.length} different names compared | RPG Spell Name Thesaurus`
-  : `${title}の言い換え一覧（${nGames}作品・${names.length}通り）｜RPG魔法辞典`;
+  : `${searchTitleOf(el, fx)}の名前一覧｜RPG${nGames}作品・${names.length}通りを比較｜RPG魔法辞典`;
 const desc = en
   ? (rows.length ? `What are ${title.toLowerCase()} called in each RPG? ${names.slice(0, 3).map((x) => `${t.name(x.magic)} (${t.game(x.games[0]).short})`).join(', ')} and more: ${names.length} names across ${nGames} games, with how each game tiers them.` : `${title} compared across games.`)
-  : (rows.length ? `${title}を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。` : `${title}を作品ごとに比較します。`);
+  : (rows.length ? `${title}の名前を${nGames}作品で比較。${names.slice(0, 3).map((x) => `${x.name}（${x.games[0].short}）`).join('、')}など${names.length}通りの呼び名と、作品ごとの段階（系統）の違いが分かります。` : `${title}を作品ごとに比較します。`);
 const tier = (i: number) => (en ? `Tier ${i}` : `${i}段目`);
 ---
 <Base title={pageTitle} description={desc} active="compare" path={t.compare(el, fx)} lang={lang}
@@ -65,7 +65,7 @@ const tier = (i: number) => (en ? `Tier ${i}` : `${i}段目`);
       <span class="mark" style={markStyle(E, 72)} aria-hidden="true">{E ? E.name : F.kanji}</span>
       <div>
         <h1>
-          <span class="lbl cmp-kicker">{en ? `${title} compared across games` : `${title}の言い換え一覧`}</span>
+          <span class="lbl cmp-kicker">{en ? `${title} compared across games` : `${searchTitleOf(el, fx)}の名前一覧`}</span>
           <span class="cmp-h1">{en ? <>{what}:<br />every RPG calls them something else.</> : <>{what}、<br />ゲームによってこんなに違う。</>}</span>
         </h1>
         <p class="lbl">{en ? `${nGames} games · ${total} spells` : `${nGames}作品 · ${total}件`}</p>

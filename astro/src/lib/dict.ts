@@ -133,6 +133,16 @@ export const titleOf = (el: string | null, fx: string) => {
   return E ? `${E.name}属性の${fxById[fx].name}魔法` : `${fxById[fx].name}魔法`;
 };
 
+/**
+ * 比較ページのタイトル・h1・リンク文字に使う「〇〇魔法の名前一覧」の〇〇魔法。検索される言い方に合わせる
+ * （属性の攻撃魔法は「炎魔法」、地は検索の多い「土魔法」を前に出す）
+ */
+export const searchTitleOf = (el: string | null, fx: string) => {
+  if (!el) return fx === 'misc' ? 'その他の魔法' : `${fxById[fx].name}魔法`;
+  if (fx !== 'atk') return titleOf(el, fx);
+  return el === 'none' ? '無属性魔法' : el === 'earth' ? '土魔法（地属性）' : `${elById[el].name}魔法`;
+};
+
 /** 作品内での分類名（黒魔法・僧侶呪文など） */
 export const subOf = (m: Magic) => {
   const c = SYSTEMS[m.game]?.classes;
